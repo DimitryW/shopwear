@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>SHOPWEAR</title>
+    <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
+
+</head>
+
+<body id="body">
+    <div class="page_container">
+        <div class="page-wrapper">
+            <div class="topnav-container ">
+                <div class="topnav">
+                    <a id="nav-title" href="/">SHOPWEAR</a>
+                    <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;">購物車</a></button>
+                    <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;">會員登入</a></button>
+                </div>
+            </div>
+
+            <div class="main-container" id="main-container">
+
+                <div class="login-container">
+                    <div id="login">
+                        <div id="login-form">
+                            <input id="email" type="text" placeholder="信箱">
+                            <input id="email" type="password" placeholder="密碼">
+                            <div id="reset-pw">忘記密碼</div>
+                            <button id="login-btn">登入</button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="footer-container">
+            <div id="footer">SHOPWEAR</div>
+        </div>
+        <div id="end"></div>
+    </div>
+
+    <script type="text/javascript" src="../static/script/script.js"></script>
+    <script>
+        window.onload = () => {
+            showProducts();
+        }
+    </script>
+
+</body>
+
+</html>
