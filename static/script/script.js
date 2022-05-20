@@ -12,7 +12,7 @@ const showProducts = async(page = 0) => {
         box.id = "box" + i["id"];
         box.href = "/product/" + i["id"];
         spinner.id = "spinner";
-        img.src = i["photo"][0];
+        img.src = "https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/" + i["photo"];
         name.textContent = i["product_name"];
         name.id = "product-name";
         price.textContent = "NT$ " + i["price"];
@@ -25,8 +25,25 @@ const showProducts = async(page = 0) => {
         box.appendChild(img);
         box.appendChild(name);
         box.appendChild(price);
-        document.getElementById("catalogue").appendChild(box)
+        document.getElementById("catalogue").appendChild(box);
     }
+    let pageList = document.createElement("ul");
+    pageList.id = "catalogue-page";
+    let pageLi = document.createElement("li");
+    pageLi.textContent = "Page: ";
+    pageList.appendChild(pageLi);
+    for (let i in [...Array(data["total_page"]).keys()]) {
+        let li = document.createElement("li");
+        li.textContent = i;
+        li.onclick = () => {
+            let oldPage = document.getElementById("catalogue-page");
+            oldPage.remove();
+            document.getElementById("catalogue").innerHTML = "";
+            showProducts(i);
+        }
+        pageList.appendChild(li);
+    }
+    document.getElementById("main-container").appendChild(pageList);
 }
 
 
@@ -61,7 +78,7 @@ const showProductDetail = async() => {
         // let spinner = document.createElement("div");
         addAttributes(input, inputAttributes);
         li.setAttribute("class", "slide");
-        img.src = imgList[i];
+        img.src = "https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/" + imgList[i];
         // spinner.id = "spinner";
         // img.onload = () => {
         //     img.style.display = "block";

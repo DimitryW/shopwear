@@ -35,3 +35,5 @@ path = "D:\Coding\WeHelp\dimalife\shopwear photos\product photos"
 for i in os.listdir(path):
   for j in os.listdir(path + "\\" + i):
     src = f"https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/{i}/{j}"
+    new_src = f"shopwear/{i}/{j}"
+    print(src)

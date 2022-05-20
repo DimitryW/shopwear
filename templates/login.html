@@ -24,12 +24,41 @@
             <div class="main-container" id="main-container">
 
                 <div class="login-container">
-                    <div id="login">
-                        <div id="login-form">
-                            <input id="email" type="text" placeholder="信箱">
-                            <input id="email" type="password" placeholder="密碼">
-                            <div id="reset-pw">忘記密碼</div>
-                            <button id="login-btn">登入</button>
+
+                    <div id="login-wrapper">
+
+                        <div id="login-method">
+                            <input type="radio" id="signin-input" name="login-method" checked onchange="showLogin('none', 'block');">
+                            <label for="signin">登入</label>
+                            <input type="radio" id="signup-input" name="login-method" onchange="showLogin('block', 'none');">
+                            <label for="signup">註冊</label>
+                        </div>
+
+                        <!-- 登入 -->
+                        <div class="login" id="signin-block">
+                            <div id="login-form">
+                                <input id="signin-email" type="text" placeholder="信箱">
+                                <input id="signin-password" type="password" placeholder="密碼">
+                                <div id="reset-pw">忘記密碼</div>
+                                <button id="login-btn">登入</button>
+                                <div class="google-signin" style="margin: 0 10px 0;">
+                                    <div id="buttonDiv"></div>
+                                    <!-- <div>GOOGLE 登入</div> -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 註冊 -->
+                        <div class="login" id="signup-block" style="display: none;">
+                            <div id="login-form">
+                                <input id="signup-email" type="text" placeholder="信箱">
+                                <input id="signup-password" type="password" placeholder="密碼">
+                                <input id="confirm-password" type="password" placeholder="確認密碼">
+                                <input id="signup-number" type="number" placeholder="手機">
+                                <input id="signup-address" type="text" placeholder="地址">
+                                <button id="login-btn">加入</button>
+
+                            </div>
                         </div>
 
                     </div>
@@ -43,11 +72,58 @@
         </div>
         <div id="end"></div>
     </div>
-
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://unpkg.com/jwt-decode/build/jwt-decode.js"></script>
     <script type="text/javascript" src="../static/script/script.js"></script>
     <script>
-        window.onload = () => {
-            showProducts();
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            let responsePayload = jwt_decode(response.credential);
+            let body = {
+                "token": response.credential
+                    // "id": responsePayload.sub,
+                    // "name": responsePayload.name,
+                    // "email": responsePayload.email
+            }
+            fetch("/api/googleuser", {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                })
+                .then(response => {
+                    return response.json()
+                })
+                .then(result => {
+                    console.log(result)
+                        // if (result["ok"]) {
+                        //     window.location = "/hello";
+                        // }
+                })
+        }
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com",
+                callback: handleCredentialResponse,
+                // ux_mode: "redirect",
+                // login_uri: "http://localhost:5000/hello"
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("buttonDiv"), {
+                    // type: "icon",
+                    theme: "outline",
+                    size: "large",
+                    width: 400,
+                } // customization attributes
+            );
+            // google.accounts.id.prompt(); // also display the One Tap dialog
+        }
+    </script>
+    <script>
+        const showLogin = (a, b) => {
+            document.getElementById("signup-block").style.display = a;
+            document.getElementById("signin-block").style.display = b;
         }
     </script>
 

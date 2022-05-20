@@ -186,6 +186,21 @@ body {
     text-align: left;
 }
 
+#catalogue-page {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+}
+
+#catalogue-page>li {
+    float: left;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin: 0 10px;
+    padding: 0 10px;
+    cursor: pointer;
+}
+
 
 /*product.html*/
 
@@ -215,9 +230,6 @@ body {
     /* margin-top: 15px; */
     /* height: 392px; */
 }
-
-
-/* product.html */
 
 .carousel {
     width: 100%;
@@ -323,14 +335,19 @@ body {
 
 /* login */
 
-#login {
-    margin: 60px 0 20px;
+#login-method {
+    text-align: center;
+    margin: 60px 0 0;
+}
+
+.login {
+    margin: 0px 0 20px;
     height: 600px;
 }
 
 #login-form>input {
     display: block;
-    width: 400px;
+    width: 388px;
     height: 30px;
     line-height: 30px;
     padding: 0 0 0 10px;
@@ -348,20 +365,37 @@ body {
     line-height: 30px;
     font-size: 16px;
     margin: 0 10px 30px;
+    color: #2e2e2e;
 }
 
 #login-btn {
     display: block;
-    width: 414px;
-    height: 35px;
+    width: 400px;
+    height: 40px;
     line-height: 35px;
-    font-size: 16px;
-    margin: 10px;
-    border-radius: 3px;
+    font-size: 20px;
+    margin: 30px 10px;
+    border-radius: 5px;
     border: none;
-    background: #959595;
+    color: white;
+    background: #0700d1;
     cursor: pointer;
 }
+
+
+/* .google-signin {
+    margin: 0 10px 0;
+    display: flex;
+    border: 1px solid #bcbcbc;
+    border-radius: 5px;
+    align-items: center;
+    padding: 5px;
+}
+
+.google-signin>div {
+    margin: 0 5px 0;
+    color: #2e2e2e;
+} */
 
 
 /*member.heml*/
