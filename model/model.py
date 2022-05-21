@@ -33,6 +33,22 @@ class Products:
         cursor.close()
         cnx.close()
         return data
+    
+    @staticmethod
+    def check_stock(product_id):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "select color from stock where product_id=%s group by color"
+        cursor.execute(sql, (product_id,) )
+        colors = cursor.fetchall()
+        stock_list = {}
+        for i in range(len(colors)):
+            sql = "select size from stock where product_id=%s and color=%s"
+            cursor.execute(sql, (product_id, colors[i][0]) )
+            stock_list[colors[i][0]] = [size[0] for size in cursor.fetchall()]
+        cursor.close()
+        cnx.close()
+        return stock_list
 
 class Products_Photos:
     @staticmethod
@@ -49,18 +65,96 @@ class Products_Photos:
         cnx.close()
         return list_of_data
 
-# class Members:
-#     @staticmethod
-#     def sign_up(name, email):
-#         cnx = cnxpool.get_connection()
-#         cursor = cnx.cursor()
-#         sql = "INSERT INTO members('name', 'email') VALUES(%s, %s)"
-#         val = (name, email)
-#         cursor.execute(sql, val)
-#         cnx.commit()
-#         cursor.close()
-#         cnx.close()
-#         return
+class Members:
+    @staticmethod
+    def check_third_party_member(name, email):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "SELECT COUNT(*) from third_party_members WHERE name=%s AND email=%s"
+        val = (name, email)
+        cursor.execute(sql, val)
+        count = cursor.fetchone()[0]
+        cursor.close()
+        cnx.close()
+        return count
+
+    @staticmethod
+    def member_info(email, third_party):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        if third_party:
+            sql = "SELECT * FROM third_party_members WHERE email=%s"
+        else:
+            sql = "SELECT * FROM members WHERE email=%s"
+        val = (email,)
+        cursor.execute(sql, val)
+        data = cursor.fetchone()
+        cursor.close()
+        cnx.close()
+        return data
+
+    @staticmethod
+    def verify_member(email, password):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "SELECT COUNT(*) from members WHERE email=%s AND password=%s"
+        val = (email, password)
+        cursor.execute(sql, val)
+        count = cursor.fetchone()
+        cursor.close()
+        cnx.close()
+        return count
+
+    @staticmethod
+    def count_member(email):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "SELECT COUNT(*) from members WHERE email=%s"
+        val = (email,)
+        cursor.execute(sql, val)
+        count = cursor.fetchone()[0]
+        cursor.close()
+        cnx.close()
+        return count
+
+    @staticmethod
+    def sign_up(name, email, password, number, address):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO members(name, email, password, number, address) VALUES(%s, %s, %s, %s, %s)"
+        val = (name, email, password, number, address)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+
+    @staticmethod
+    def third_party_sign_up(name, email, third_party):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO third_party_members(name, email, third_party) VALUES(%s, %s, %s)"
+        val = (name, email, third_party)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+
+    @staticmethod
+    def update_pw(email, old_pw, new_pw):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "UPDATE members SET password=%s WHERE email=%s AND password=%s"
+        val = (new_pw, email, old_pw)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+
+
+
 
 # import os
 # path = "D:\Coding\WeHelp\dimalife\shopwear photos\product photos"

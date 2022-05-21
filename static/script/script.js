@@ -1,3 +1,7 @@
+let headers = {
+    "Content-type": "application/json"
+};
+
 // 首頁
 const showProducts = async(page = 0) => {
     let apiAddress = "api/products?page=" + String(page);
@@ -65,10 +69,34 @@ const showProductDetail = async() => {
     let apiAddress = "/api/product/" + window.location.pathname.split("/")[2];
     let res = await fetch(apiAddress);
     let data = await res.json();
+    document.getElementById("product_id").textContent = data["id"];
     document.getElementById("product_name").textContent = data["product_name"];
-    document.getElementById("price").textContent = "NT$ " + data["price"];
+    document.getElementById("product_price").textContent = "NT$ " + data["price"];
     document.getElementById("description").textContent = data["description"];
     document.getElementById("content").textContent = data["content"];
+    for (i in data["stock"]) {
+        let colorStock = document.createElement("div");
+        let color = document.createElement("div");
+        color.className = "color";
+        color.textContent = i;
+        let sizeBox = document.createElement("div");
+        sizeBox.className = "size-box";
+        let list = document.createElement("ul");
+        list.className = "size-list"
+        for (j of Object.values(data["stock"][i])) {
+            let size = document.createElement("li");
+            size.textContent = j;
+            list.appendChild(size);
+        }
+        sizeBox.appendChild(list);
+        colorStock.appendChild(color);
+        colorStock.appendChild(sizeBox);
+        document.getElementById("product-desc").append(colorStock);
+    }
+    let btn = document.createElement("button");
+    btn.id = "cart-btn";
+    btn.textContent = "加入購物車";
+    document.getElementById("product-desc").append(btn);
     window.document.title = data["product_name"];
     let imgList = data["photo"];
     for (let i = 0; i < imgList.length; i++) {
@@ -127,4 +155,159 @@ window.onclick = e => {
     let slides = document.querySelector("[data-slides]")
     delete activeSlide.dataset.active
     slides.children[index].dataset.active = true
+}
+
+
+// member
+// 檢查會員登入狀況
+const loggedIn = () => {
+    fetch("/api/user", {
+            method: "GET",
+            headers: headers
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((result) => {
+            if (result["data"]) {
+                console.log("LOGIN OK");
+                // membername = result["data"]["name"];
+                // console.log(membername);
+                // loginButton.innerHTML = "登出系統";
+                document.getElementById("nav-item2-a").style.display = "none";
+                document.getElementById("mem-dropdown").style.display = "block";
+                // loginButton.removeEventListener("click", signinWindow);
+                // loginButton.addEventListener("click", logout);
+                // document.getElementById("nav-item2-a").setAttribute("href", memberSrc + "/member");
+                // document.getElementById("nav-item2-a").style.color = "#666666";
+                // console.log("already logged in.")
+                // document.getElementById("nav-item1").removeEventListener("click", signinWindow);
+                // document.getElementById("nav-item1-a").setAttribute("href", memberSrc + "/booking");
+                // document.getElementById("nav-item1-a").style.color = "#666666";
+                if (window.location.pathname === "/login") {
+                    location.href = "/member";
+                }
+            } else {
+                console.log("LOGOUT");
+                // document.getElementById("nav-item1-a").addEventListener("click", signinWindow);
+                if (window.location.pathname === "/member") {
+                    location.href = "/";
+                }
+            }
+        })
+}
+
+// 會員登入功能
+const signin = () => {
+    let email = document.getElementById("signin-email").value;
+    let password = document.getElementById("signin-password").value;
+    // 串接API
+    let body = {
+        "email": email,
+        "password": password
+    };
+    fetch("/api/user", {
+            method: "PATCH",
+            headers: headers,
+            body: JSON.stringify(body)
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((result) => {
+            if (result["ok"]) {
+                window.location.reload();
+            } else {
+                console.log(result["message"])
+                document.getElementById("signin-message").innerHTML = "登入失敗，帳號或密碼錯誤或其他原因";
+            }
+        })
+}
+
+// 註冊功能
+const signup = () => {
+    let name = document.getElementById("signup-name").value;
+    let email = document.getElementById("signup-email").value;
+    let password = document.getElementById("signup-password").value;
+    let number = document.getElementById("signup-number").value;
+    let address = document.getElementById("signup-address").value;
+    // 表單驗證
+    let nameRegex = /^([\u4e00-\u9fa5]{2,20}|[a-zA-Z.\s]{2,20})$/;
+    let emailRegex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$/;
+    // let pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_ `\-={}:";'<>?,.\/]).{3,18}$/;
+    if (name === "" | email === "" | password === "") {
+        document.getElementById("signup-message").innerHTML = "欄位不可為空，請輸入資料!";
+        return;
+    }
+    if (!nameRegex.test(name)) {
+        document.getElementById("signup-message").innerHTML = "請輸入正確姓名格式";
+        return;
+    }
+    if (!emailRegex.test(email)) {
+        document.getElementById("signup-message").innerHTML = "請輸入正確信箱格式";
+        return;
+    }
+    // if (!pwRegex.test(password)) {
+    //     document.getElementById("signup-message").innerHTML = "密碼必須為3-18位字母、數字、特殊符號";
+    //     return;
+    // }
+    // 串接API，回復註冊狀況
+    let body = {
+        "name": name,
+        "email": email,
+        "password": password,
+        "number": number,
+        "address": address
+    };
+    fetch("/api/user", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(body)
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((result) => {
+            if (result["ok"]) {
+                document.getElementById("signup-message").innerHTML = "註冊成功";
+                location.href = "/login";
+            } else {
+                console.log(result["message"])
+                document.getElementById("signup-message").innerHTML = "註冊失敗，重複的 Email 或其他原因";
+            }
+        })
+}
+
+// 會員登出功能
+const logout = () => {
+    fetch("/api/user", {
+            method: "DELETE",
+            headers: headers
+        })
+        .then((response) => {
+            return response.json();
+        })
+        .then((result) => {
+            if (result["ok"]) {
+                // loginButton.removeEventListener("click", logout);
+                // loginButton.addEventListener("click", signinWindow);
+                // document.getElementById("nav-item1-a").removeAttribute("href"); // 移除預定行程按鈕連結
+                // document.getElementById("nav-item2").removeAttribute("href");
+                // document.getElementById("nav-item1-a").addEventListener("click", signinWindow);
+                window.location.reload();
+            }
+            console.log("logged out!")
+        })
+}
+
+const showMemberInfo = async() => {
+    let res = await fetch("/api/user", { method: "GET", headers: headers });
+    let data = await res.json();
+    if (data["data"]) {
+        document.getElementById("mem-name").textContent = "姓名 : " + data['data']["name"];
+        document.getElementById("mem-email").textContent = "Email : " + data['data']["email"];
+        document.getElementById("mem-number").textContent = data['data']["number"] !== null ? "聯絡電話 : " + data['data']["number"] : "聯絡電話 : ";
+        document.getElementById("mem-add").textContent = data['data']["address"] !== null ? "地址 : " + data['data']["address"] : "地址 : ";
+        return
+    }
 }
