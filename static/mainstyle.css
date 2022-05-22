@@ -185,10 +185,16 @@
     }
     
     #spinner {
+        background-image: url("../static/photo/spinner1.gif");
         grid-area: img;
         width: 270px;
         height: 320px;
-        background: #868686;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 80px 80px;
+        width: 100%;
+        height: 100%;
+        /* background: #f1f2f3; */
     }
     
     #product-name {
