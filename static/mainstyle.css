@@ -84,7 +84,6 @@
     #nav-item1-a:visited,
     #nav-item2-a:visited {
         color: #2e2e2e;
-        ;
     }
     
     #nav-item2,
@@ -495,6 +494,14 @@
         /* align-self: center; */
         /* display: block; */
         cursor: pointer;
+    }
+    
+    #check-btn>a {
+        text-decoration: none;
+    }
+    
+    #check-btn>a:visited {
+        color: white;
     }
     /* checkout */
     
