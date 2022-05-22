@@ -74,25 +74,53 @@ const showProductDetail = async() => {
     document.getElementById("product_price").textContent = "NT$ " + data["price"];
     document.getElementById("description").textContent = data["description"];
     document.getElementById("content").textContent = data["content"];
+    let colorStock = document.createElement("div");
+    colorStock.className = "color-stock"
+    let colBox = document.createElement("div");
+    colBox.className = "col-box";
     for (i in data["stock"]) {
-        let colorStock = document.createElement("div");
-        let color = document.createElement("div");
-        color.className = "color";
-        color.textContent = i;
-        let sizeBox = document.createElement("div");
-        sizeBox.className = "size-box";
-        let list = document.createElement("ul");
-        list.className = "size-list"
-        for (j of Object.values(data["stock"][i])) {
-            let size = document.createElement("li");
-            size.textContent = j;
-            list.appendChild(size);
-        }
-        sizeBox.appendChild(list);
-        colorStock.appendChild(color);
-        colorStock.appendChild(sizeBox);
-        document.getElementById("product-desc").append(colorStock);
+        let colLabl = document.createElement("label");
+        colLabl.className = "labl";
+        let colInput = document.createElement("input");
+        colInput.setAttribute("type", "radio");
+        colInput.setAttribute("name", "color");
+        let col = document.createElement("div");
+        col.textContent = i;
+        colLabl.appendChild(colInput);
+        colLabl.appendChild(col);
+        colBox.appendChild(colLabl);
     }
+
+    let sizeBox = document.createElement("div");
+    sizeBox.className = "size-box";
+    for (j of Object.values(data["stock"])[0]) {
+        let labl = document.createElement("label");
+        labl.className = "labl";
+        let input = document.createElement("input");
+        input.setAttribute("type", "radio");
+        input.setAttribute("name", "size");
+        let size = document.createElement("div");
+        size.textContent = j;
+        labl.appendChild(input);
+        labl.appendChild(size);
+        sizeBox.appendChild(labl);
+    }
+    colorStock.appendChild(colBox);
+    colorStock.appendChild(sizeBox);
+    document.getElementById("product-desc").append(colorStock);
+    let qtyLabl = document.createElement("label");
+    qtyLabl.for = "prod-qty";
+    qtyLabl.textContent = "數量 ";
+    let qty = document.createElement("select");
+    qty.id = "prod-qty";
+    for (let i = 1; i < 11; i++) {
+        let opt = document.createElement("option");
+        opt.textContent = i;
+        qty.appendChild(opt);
+    }
+    document.getElementById("product-desc").append(qtyLabl);
+    document.getElementById("product-desc").append(qty);
+
     let btn = document.createElement("button");
     btn.id = "cart-btn";
     btn.textContent = "加入購物車";

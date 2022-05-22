@@ -254,10 +254,13 @@ input {
     font-size: 30px;
 }
 
-.color,
+
+/* .col-box,
 .size-box {
-    display: inline-block;
-}
+    display: inline-flex;
+    width: 40px;
+    padding: 5px;
+} */
 
 .size-list {
     list-style: none;
@@ -274,7 +277,44 @@ input {
     cursor: pointer;
 }
 
+.labl {
+    display: inline-block;
+}
+
+.labl>input {
+    /* HIDE RADIO */
+    visibility: hidden;
+    /* Makes input not-clickable */
+    position: absolute;
+    /* Remove input from document flow */
+}
+
+.labl>input+div {
+    /* DIV STYLES */
+    cursor: pointer;
+    border: 2px solid transparent;
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+}
+
+.labl>input:checked+div {
+    /* (RADIO CHECKED) DIV STYLES */
+    border-radius: 5px;
+    background-color: #e7e7e7;
+    border: 1px solid #5868ff;
+    height: 40px;
+    width: 40px;
+}
+
+#prod-qty {
+    height: 25px;
+    width: 40px;
+}
+
 #cart-btn {
+    display: block;
     background: #0b0bb7;
     border-radius: 3px;
     color: white;
