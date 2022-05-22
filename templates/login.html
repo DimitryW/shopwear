@@ -17,9 +17,10 @@
                 <div class="topnav">
                     <a id="nav-title" href="/">SHOPWEAR</a>
                     <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;">購物車</a></button>
-                    <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://www.dimalife.com//login">會員登入</a></button>
+                    <div id="cart-item" style="display: none;"></div>
+                    <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://www.dimalife.com/login">會員登入</a></button>
                     <select class="mem-dropdown" id="mem-dropdown" onchange="if (this.selectedIndex==2) logout();">
-                        <option value="" disabled selected><a id="drowpdown-mem-info-a" href="https://www.dimalife.com//member">會員資料</a></option>
+                        <option value="" disabled selected><a id="drowpdown-mem-info-a" href="https://www.dimalife.com/member">會員資料</a></option>
                         <option id="drowpdown-mem-info">會員資料</option>
                         <option id="dropdown-logout">登出</option>
                     </select>
@@ -111,6 +112,8 @@
         }
         window.onload = function() {
             loggedIn();
+            showCart();
+
             google.accounts.id.initialize({
                 client_id: "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com",
                 callback: handleCredentialResponse,

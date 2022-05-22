@@ -65,6 +65,7 @@ function addAttributes(element, attributes) {
     });
 }
 
+//產品資料
 const showProductDetail = async() => {
     let apiAddress = "/api/product/" + window.location.pathname.split("/")[2];
     let res = await fetch(apiAddress);
@@ -84,6 +85,7 @@ const showProductDetail = async() => {
         let colInput = document.createElement("input");
         colInput.setAttribute("type", "radio");
         colInput.setAttribute("name", "color");
+        colInput.value = i;
         let col = document.createElement("div");
         col.textContent = i;
         colLabl.appendChild(colInput);
@@ -99,6 +101,7 @@ const showProductDetail = async() => {
         let input = document.createElement("input");
         input.setAttribute("type", "radio");
         input.setAttribute("name", "size");
+        input.value = j;
         let size = document.createElement("div");
         size.textContent = j;
         labl.appendChild(input);
@@ -116,6 +119,7 @@ const showProductDetail = async() => {
     for (let i = 1; i < 11; i++) {
         let opt = document.createElement("option");
         opt.textContent = i;
+        opt.value = i;
         qty.appendChild(opt);
     }
     document.getElementById("product-desc").append(qtyLabl);
@@ -124,6 +128,10 @@ const showProductDetail = async() => {
     let btn = document.createElement("button");
     btn.id = "cart-btn";
     btn.textContent = "加入購物車";
+    btn.onclick = () => {
+        addCart();
+        showCart();
+    };
     document.getElementById("product-desc").append(btn);
     window.document.title = data["product_name"];
     let imgList = data["photo"];
@@ -151,6 +159,109 @@ const showProductDetail = async() => {
         // console.log(inputBtn = document.querySelectorAll(".data-switch-input-btn"))
 
 }
+
+//A Function to Get a Cookie
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return undefined;
+}
+
+//加入購物車cookie
+const addCart = () => {
+    let color = document.querySelector('input[name="color"]:checked').value;
+    let size = document.querySelector('input[name="size"]:checked').value;
+    let id = document.getElementById('product_id').textContent;
+    let name = document.getElementById('product_name').textContent;
+    let price = document.getElementById('product_price').textContent.split(" ")[1]
+    let qty = document.getElementById("prod-qty").value;
+    let pic = document.querySelector(".slide>img").src;
+    let arr = JSON.stringify([id, name, color, size, price, qty, pic]);
+    // console.log("shopwearCart:" + arr + "=" + arr + "; path=/")
+    if (getCookie("shopwearCart") === undefined) {
+        document.cookie = "shopwearCart=" + arr + "; path=/";
+    } else {
+        currentItem = getCookie("shopwearCart");
+        currentItem = currentItem + "&" + arr;
+        document.cookie = "shopwearCart=" + currentItem + "; path=/";
+    }
+
+}
+
+//Parse購物車cookie
+const showCart = () => {
+    if (getCookie("shopwearCart") !== undefined) {
+        let item = getCookie("shopwearCart").split("&");
+        let c = 0;
+        let table = document.getElementById("cart-table");
+        for (i of item) {
+            combo = i.replace(/[[\]]/g, '').replace(/['"]+/g, "").split(",")
+            let id = combo[0];
+            let name = combo[1];
+            let color = combo[2];
+            let size = combo[3];
+            let price = combo[4];
+            let qty = combo[5];
+            let pic = combo[6];
+            console.log(combo);
+            c++;
+
+            if (window.location.pathname === "/cart") {
+                // console.log("CART")
+                let tableRow = table.insertRow(c);
+                let cell0 = tableRow.insertCell(0); //pic
+                let photo = document.createElement("img");
+                photo.src = pic
+                let cell1 = tableRow.insertCell(1); //product
+                let cell2 = tableRow.insertCell(2); //price
+                let cell3 = tableRow.insertCell(3); //qty
+                let cell4 = tableRow.insertCell(4); //amount
+                cell4.id = "piece-amount";
+                let cell5 = tableRow.insertCell(5); //cancel
+                let cancelBtn = document.createElement("btn");
+                cell0.appendChild(photo);
+                cell1.innerHTML = name + " / " + color + " / " + size;
+                cell2.innerHTML = "NT$ " + price;
+                cell3.innerHTML = qty;
+                cell4.innerHTML = "NT$ " + (price * qty);
+                cell5.appendChild(cancelBtn);
+            }
+
+
+        }
+        let sum = 0;
+        if (window.location.pathname === "/cart") {
+            for (i of document.querySelectorAll('#piece-amount')) {
+                let priceString = i.textContent.split(" ")[1];
+                sum += parseInt(priceString);
+            }
+            let fee = 0;
+            document.getElementById("cart-fee").textContent = "NT$ " + fee
+            document.getElementById("cart-sum").textContent = "NT$ " + sum;
+            document.getElementById("cart-total").textContent = "NT$ " + (sum + fee);
+            document.getElementById("confirm-cart").style.display = "block";
+        }
+        document.getElementById("cart-item").style.display = "block"
+        document.getElementById("cart-item").textContent = c;
+
+    }
+
+
+
+
+
+}
+
 
 // 左右按鈕輪播功能
 const buttons = document.querySelectorAll("[data-carousel-button]")

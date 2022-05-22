@@ -3,15 +3,22 @@ from flask import *
 from flask_cors import CORS
 import jwt
 import time
-# import requests
+import requests
+from dotenv import load_dotenv
 # import json
 # import datetime
-# import os
+import os
 import re
 from model.model import Products, Products_Photos, Members
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
+load_dotenv()
+jwt_key = os.getenv("jwt_key")
+partner_key = os.getenv("partner_key")
+merchant_id = os.getenv("merchant_id")
+tappay_details = os.getenv("tappay_details")
+x_api_key = os.getenv("x_api_key")
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
@@ -32,12 +39,14 @@ def product(product_id):
     return render_template("product.html")
 
 #購物車頁面
-@app.route("/order")
+@app.route("/cart")
 def booking():
-    return render_template("order.html")
+    return render_template("cart.html")
 
 #結帳頁面    
-
+@app.route("/checkout")
+def checkout():
+    return render_template("checkout.html")
 # @app.route("/thankyou")
 # def thankyou():
 #     return render_template("thankyou.html")
@@ -118,7 +127,7 @@ def api_login():
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-        id_info = id_token.verify_oauth2_token(token, requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=33)
+        id_info = id_token.verify_oauth2_token(token, requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=34)
 
         if id_info:
             # ID token is valid. 
@@ -314,6 +323,88 @@ def user():
             status = 500
         return jsonify(res), status
 
+# @app.route("/api/orders", methods=["POST"])
+# def receive_order():
+#     user_token = request.cookies.get("shopwear_user")
+#     try:
+#         if user_token:
+#             decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
+#             member_email = decoded_jwt["email"]
+#             order_data = request.get_json()
+#             prime = order_data["prime"]
+#             amount = order_data["order"]["price"]
+#             name = order_data["order"]["contact"]["name"]
+#             email = order_data["order"]["contact"]["email"]
+#             phone = order_data["order"]["contact"]["phone"]
+#             member_id = MemberDB.search_member(member_email)[0]
+#             attract_id = order_data["order"]["trip"]["attraction"]["id"]
+#             attract_name = order_data["order"]["trip"]["attraction"]["name"]
+#             date = order_data["order"]["trip"]["date"]
+#             order_no = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+#             re_name = "^([\u4e00-\u9fa5]{2,20}|[a-zA-Z.\s]{2,20})$"
+#             re_email = "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$"
+#             re_phone = "^09[0-9]{8}$"
+#             if (re.search(re_name, name)!=None) & (re.search(re_email, email)!=None) & (re.search(re_phone, phone)!=None):
+#                 OrdersDB.create_order(member_id, attract_id, attract_name, date, amount, name, email, phone, order_no)
+#             else:
+#                 order_response = {
+#                     "error": True,
+#                     "message": "訂單建立失敗，輸入格式錯誤。"
+#                     }
+#                 return jsonify(order_response), 400
+
+#             url = 'https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime'
+#             myobj = {
+#                 "prime": prime,
+#                 "partner_key": partner_key,
+#                 "merchant_id": merchant_id,
+#                 "details": tappay_details,
+#                 "amount": amount,
+#                 "cardholder": {
+#                     "phone_number": phone,
+#                     "name": name,
+#                     "email": email,
+#                 },
+#                 "remember": True
+#             }
+#             header = {
+#                 "Content-Type": "application/json",
+#                 "x-api-key": x_api_key}
+#             response = requests.post(url, json=myobj, headers=header)
+#             tappay_response = json.loads(response.text)
+
+#             if tappay_response["status"]==0:
+#                 OrdersDB.pay_order(order_no, tappay_response["status"])
+#                 order_response = {
+#                     "data": {
+#                         "number": order_no,
+#                         "payment": {
+#                         "status": 0,
+#                         "message": "付款成功"
+#                         }
+#                     }
+#                     }
+#                 return jsonify(order_response), 200
+#             else:
+#                 order_response = {
+#                     "error": True,
+#                     "message": "訂單建立失敗，輸入不正確或其他原因"
+#                     }
+#                 return jsonify(order_response), 400
+#         else:
+#             order_response = {
+#                 "error": True,
+#                 "message": "未登入系統，拒絕存取"
+#                 }
+#             return jsonify(order_response), 403
+#     except:
+#         order_response = {
+#             "error": True,
+#             "message": "伺服器內部錯誤"
+#             }
+#         return jsonify(order_response), 500
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
-    # app.run(debug=True, port=5000)
+    # app.run(host='0.0.0.0', port=3000)
+    app.run(debug=True, port=5000)
