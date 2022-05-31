@@ -67,11 +67,11 @@ class Products_Photos:
 
 class Members:
     @staticmethod
-    def check_third_party_member(name, email):
+    def check_member(name, email, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "SELECT COUNT(*) from third_party_members WHERE name=%s AND email=%s"
-        val = (name, email)
+        sql = "SELECT COUNT(*) from members WHERE name=%s AND email=%s AND third_party=%s"
+        val = (name, email, third_party)
         cursor.execute(sql, val)
         count = cursor.fetchone()[0]
         cursor.close()
@@ -82,11 +82,8 @@ class Members:
     def member_info(email, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        if third_party:
-            sql = "SELECT * FROM third_party_members WHERE email=%s"
-        else:
-            sql = "SELECT * FROM members WHERE email=%s"
-        val = (email,)
+        sql = "SELECT * FROM members WHERE email=%s AND third_party=%s"
+        val = (email, third_party)
         cursor.execute(sql, val)
         data = cursor.fetchone()
         cursor.close()
@@ -94,23 +91,11 @@ class Members:
         return data
 
     @staticmethod
-    def verify_member(email, password):
+    def verify_member(email, password, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "SELECT COUNT(*) from members WHERE email=%s AND password=%s"
-        val = (email, password)
-        cursor.execute(sql, val)
-        count = cursor.fetchone()
-        cursor.close()
-        cnx.close()
-        return count
-
-    @staticmethod
-    def count_member(email):
-        cnx = cnxpool.get_connection()
-        cursor = cnx.cursor()
-        sql = "SELECT COUNT(*) from members WHERE email=%s"
-        val = (email,)
+        sql = "SELECT COUNT(*) from members WHERE email=%s AND password=%s AND third_party=%s"
+        val = (email, password, third_party)
         cursor.execute(sql, val)
         count = cursor.fetchone()[0]
         cursor.close()
@@ -118,11 +103,23 @@ class Members:
         return count
 
     @staticmethod
-    def sign_up(name, email, password, number, address):
+    def count_member(email, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "INSERT INTO members(name, email, password, number, address) VALUES(%s, %s, %s, %s, %s)"
-        val = (name, email, password, number, address)
+        sql = "SELECT COUNT(*) from members WHERE email=%s AND third_party=%s"
+        val = (email, third_party)
+        cursor.execute(sql, val)
+        count = cursor.fetchone()[0]
+        cursor.close()
+        cnx.close()
+        return count
+
+    @staticmethod
+    def sign_up(name, email, password, number, address, third_party):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO members(name, email, password, number, address, third_party) VALUES(%s, %s, %s, %s, %s, %s)"
+        val = (name, email, password, number, address, third_party)
         cursor.execute(sql, val)
         cnx.commit()
         cursor.close()
@@ -130,11 +127,11 @@ class Members:
         return
 
     @staticmethod
-    def third_party_sign_up(name, email, third_party):
+    def update_member(name, gender, number, address, email, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "INSERT INTO third_party_members(name, email, third_party) VALUES(%s, %s, %s)"
-        val = (name, email, third_party)
+        sql = "UPDATE members SET name=%s, gender=%s, number=%s, address=%s WHERE email=%s AND third_party=%s"
+        val = (name, gender, number, address, email, third_party)
         cursor.execute(sql, val)
         cnx.commit()
         cursor.close()
@@ -142,11 +139,11 @@ class Members:
         return
 
     @staticmethod
-    def update_pw(email, old_pw, new_pw):
+    def update_pw(new_pw, email, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "UPDATE members SET password=%s WHERE email=%s AND password=%s"
-        val = (new_pw, email, old_pw)
+        sql = "UPDATE members SET password=%s WHERE email=%s AND third_party=%s"
+        val = (new_pw, email, third_party)
         cursor.execute(sql, val)
         cnx.commit()
         cursor.close()
@@ -154,7 +151,70 @@ class Members:
         return
 
 
+class Orders:
+    @staticmethod
+    def create_order(order_no, member_id, amount, address):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO orders(order_no, member_id, amount, address) VALUES(%s, %s, %s, %s)"
+        val = (order_no, member_id, amount, address)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+    
+    def create_order_details(order_no, product_id, color, size, price, qty):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO order_details(order_no, product_id, color, size, price, qty) VALUES(%s, %s, %s, %s, %s, %s)"
+        val = (order_no, product_id, color, size, price, qty)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+    
+    @staticmethod
+    def pay_order(order_no, status):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        cursor.execute("UPDATE orders SET payment='paid' Where order_no = %s", (order_no,))
+        if status==0:
+            cnx.commit()
+        else:
+            cnx.rollback()
+        cursor.close()
+        cnx.close()
+        return
 
+class Wears:
+    @staticmethod
+    def show_photos(index=0, limit=12):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        cursor.execute("SELECT COUNT(*) from products")
+        count = cursor.fetchone()[0]
+        sql = "SELECT id, photo, member_id, caption from wears LIMIT %s, %s"
+        cursor.execute(sql, (index, limit))
+        data = cursor.fetchall()
+        cursor.close()
+        cnx.close()
+        return (data, count)
+
+    @staticmethod
+    def upload_wears(photo, member_id, caption):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO wears(photo, member_id, caption) VALUES(%s, %s, %s)"
+        val = (photo, member_id, caption)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+
+    
 
 # import os
 # path = "D:\Coding\WeHelp\dimalife\shopwear photos\product photos"

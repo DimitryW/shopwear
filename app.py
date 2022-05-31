@@ -5,13 +5,18 @@ import jwt
 import time
 import requests
 from dotenv import load_dotenv
-# import json
-# import datetime
+import json
+import datetime
 import os
 import re
-from model.model import Products, Products_Photos, Members
+import boto3
+import config
+
+
+from model.model import Products, Products_Photos, Members, Orders, Wears
 from google.oauth2 import id_token
-from google.auth.transport import requests
+import google.auth.transport.requests
+import requests
 
 load_dotenv()
 jwt_key = os.getenv("jwt_key")
@@ -26,7 +31,12 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['JSON_SORT_KEYS'] = False  
 CORS(app)
 
-jwt_key = "a3a4q0xFI8t-NaiiNsyD63EPNp22lx6P9u6GmDYIEOo"
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=config.aws_access_key_id,
+    aws_secret_access_key=config.aws_secret_access_key
+)
+
 
 #商品展示首頁
 @app.route("/")
@@ -47,29 +57,39 @@ def booking():
 @app.route("/checkout")
 def checkout():
     return render_template("checkout.html")
-# @app.route("/thankyou")
-# def thankyou():
-#     return render_template("thankyou.html")
+
+#結帳完成頁面
+@app.route("/thankyou")
+def thankyou():
+    order_no = request.args.get("order")
+    return render_template("thankyou.html", order_no=order_no)
 
 # 登入頁面
 @app.route("/login", methods=["GET", "POST"])
 def login():
     return render_template("login.html")
- 
-
-
 
 #會員頁面
 @app.route("/member")
 def member():
     return render_template("member.html")
 
-#分享平台頁面
+#更改密碼
+@app.route("/password")
+def password():
+    return render_template("password.html")
+
+#個人頁面
+@app.route("/mywear/<member_id>")
+def mywear(member_id):
+    return render_template("mywear.html")
+
+#個人頁面
 @app.route("/wear")
 def wear():
     return render_template("wear.html")
 
-
+#全部產品資料
 @app.route("/api/products", methods=["GET"])
 def api_product_index():
     page = request.args.get("page", default=0, type=int)
@@ -95,6 +115,7 @@ def api_product_index():
 
     return jsonify(res), status
 
+# 單一產品資料
 @app.route("/api/product/<product_id>", methods=["GET"])
 def api_product(product_id):
     try:
@@ -118,7 +139,7 @@ def api_product(product_id):
     return jsonify(res), status
 
 
-
+# Google登入
 @app.route('/api/googleuser', methods=["POST"])
 def api_login():
     data = request.get_json()
@@ -127,17 +148,18 @@ def api_login():
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-        id_info = id_token.verify_oauth2_token(token, requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=34)
+        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=37)
 
         if id_info:
             # ID token is valid. 
             # user_id = id_info['sub']
             user_name = id_info['name']
             user_email = id_info['email']
-            count = Members.check_third_party_member(user_name, user_email)
+            
+            count = Members.check_member(user_name, user_email, "google")
 
             if count==0:
-                Members.third_party_sign_up(user_name, user_email, "google")
+                Members.sign_up(user_name, user_email, "google", "", "", "google")
             
             encoded_jwt = jwt.encode({"third_party": "google", "email": user_email}, jwt_key, algorithm="HS256")
             api = {
@@ -163,7 +185,8 @@ def api_login():
 
     return res
 
-@app.route("/api/user", methods=["GET", "POST", "PATCH", "DELETE", "PUT"])
+# 會員註冊、登入與登出
+@app.route("/api/user", methods=["GET", "POST", "PATCH", "DELETE"])
 def user():
     if request.method == "GET":
         try:
@@ -176,6 +199,7 @@ def user():
                 loggedin_api = {
                     "data": {
                         "name": data[1],
+                        "gender":data[7],
                         "email": data[2],
                         "number": data[4],
                         "address": data[5]
@@ -189,7 +213,7 @@ def user():
                 }
                 status = 400
         except:
-            res = {
+            loggedin_api = {
                 "error": True,
                 "message": "伺服器內部錯誤"
                 }
@@ -208,7 +232,7 @@ def user():
         re_email = "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$"
 
         if (re.search(re_name, name)!=None) & (re.search(re_email, email)!=None):
-            member_count = Members.count_member(email)
+            member_count = Members.count_member(email, False)
         else:
             signup_api = {
                 "error": True,
@@ -217,7 +241,7 @@ def user():
             status = 400
 
         if member_count == 0:
-            Members.sign_up(name, email, password, number, address)
+            Members.sign_up(name, email, password, number, address, False)
             signup_api = {
                 "ok": True
             }
@@ -244,8 +268,7 @@ def user():
         request_data = request.get_json()
         email = request_data["email"]
         password = request_data["password"]
-        data = Members.verify_member(email, password)
-
+        data = Members.verify_member(email, password, False)
         if data == 1:
             encoded_jwt = jwt.encode({"third_party": False, "email": email}, jwt_key, algorithm="HS256")
             signin_api = {
@@ -279,132 +302,242 @@ def user():
         res.set_cookie("shopwear_user", "", expires=0)
         return res
 
-# change password
-    elif request.method == "PUT":
-        pws = request.get_json() #email, old_pw, new_pw, confirm_pw
-        try:
-            old_member_data = Members.verify_member(pws["email"], pws["old_pw"])
-            if old_member_data == 1:
-                if pws["old_pw"]==pws["new_pw"]:
-                    res = {
-                    "error": True,
-                    "message": "新舊密碼不可相同"
-                    }
-                    status = 400
-                elif (pws["old_pw"]!=pws["new_pw"]) & (pws["new_pw"]==pws["confirm_pw"]) & (pws["new_pw"]!=""):
-                    Members.update_pw(pws["email"], pws["old_pw"], pws["new_pw"])
-                    res = {
+
+#更新會員資料API
+@app.route("/api/member", methods=["PATCH"])
+def api_member():
+    try:
+        if "shopwear_user" in request.cookies:
+                user_token = request.cookies.get("shopwear_user")
+                decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
+                email = decoded_jwt["email"]
+                third_party = decoded_jwt["third_party"]
+                data = request.get_json()
+                Members.update_member(data["name"], data["gender"], data["number"], data["address"], email, third_party)
+                res = {
                     "ok": True
                     }
-                    status = 200
-                elif pws["new_pw"]!=pws["confirm_pw"]:
-                    res = {
-                    "error": True,
-                    "message": "新密碼不相同"
-                    }
-                    status = 400
-                elif pws["new_pw"]=="":
-                    res = {
-                    "error": True,
-                    "message": "請輸入新密碼"
-                    }
-                    status = 400
-            else:
-                res = {
-                    "error": True,
-                    "message": "密碼輸入錯誤"
-                    }
-                status = 400
-        except:
+                status = 200
+        else:
             res = {
+                "error": True,
+                "message": "請先登入會員"
+            }
+            status = 400
+
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status = 500
+
+    return jsonify(res), status
+
+#更新會員密碼API
+@app.route("/api/password", methods=["PATCH"])
+def api_password():
+    try:
+        if "shopwear_user" in request.cookies:
+                user_token = request.cookies.get("shopwear_user")
+                decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
+                email = decoded_jwt["email"]
+                third_party = decoded_jwt["third_party"]
+                data = request.get_json()
+                old_data = Members.verify_member(email, data["old_pw"], third_party)
+                if old_data == 1:
+                    if data["old_pw"]==data["new_pw"]:
+                        res = {
+                        "error": True,
+                        "message": "新舊密碼不可相同"
+                        }
+                        status = 400
+                    elif (data["old_pw"]!=data["new_pw"]) & (data["new_pw"]==data["confirm_pw"]) & (data["new_pw"]!=""):
+                        Members.update_pw(data["new_pw"], email, third_party)
+                        res = {
+                        "ok": True
+                        }
+                        status = 200
+                    elif data["new_pw"]!=data["confirm_pw"]:
+                        res = {
+                        "error": True,
+                        "message": "新密碼與確認密碼不相同"
+                        }
+                        status = 400
+                    elif data["new_pw"]=="":
+                        res = {
+                        "error": True,
+                        "message": "請輸入新密碼"
+                        }
+                        status = 400
+                else:
+                    res = {
+                        "error": True,
+                        "message": "密碼輸入錯誤"
+                        }
+                    status = 400      
+        else:
+            res = {
+                "error": True,
+                "message": "請先登入會員"
+            }
+            status = 400
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status = 500
+
+    return jsonify(res), status
+
+#建立訂單與付款
+@app.route("/api/orders", methods=["POST"])
+def receive_order():
+    user_token = request.cookies.get("shopwear_user")
+    try:
+        if user_token:
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            #取得訂單資料
+            order_data = request.get_json()  
+            prime = order_data["prime"] #tappay prime
+            amount = order_data["order"]["amount"]
+            items = order_data["order"]["items"]
+            address = order_data["order"]["address"]
+            member_data = Members.member_info(email, third_party)
+            member_id = member_data[0]
+            name = member_data[1]
+            phone = member_data[4]
+            order_no = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+            # 資料庫建立訂單
+            Orders.create_order(order_no, member_id, amount, address)
+            for i in range(len(items)):
+                # print(items[i]["prod_id"])
+                Orders.create_order_details(order_no, items[i]["prod_id"], items[i]["prod_color"], items[i]["prod_size"], items[i]["prod_price"], items[i]["prod_qty"])
+            
+            # Tappay請求
+            url = 'https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime'
+            myobj = {
+                "prime": prime,
+                "partner_key": partner_key,
+                "merchant_id": merchant_id,
+                "details": tappay_details,
+                "amount": amount,
+                "cardholder": {
+                    "phone_number": phone,
+                    "name": name,
+                    "email": email,
+                },
+                "remember": True
+            }
+            header = {
+                "Content-Type": "application/json",
+                "x-api-key": x_api_key}
+            response = requests.post(url, json=myobj, headers=header)
+            tappay_response = json.loads(response.text)
+            # print(tappay_response)
+            if tappay_response["status"]==0:
+                print("taypay payment ok")
+                Orders.pay_order(order_no, tappay_response["status"])
+                order_response = {
+                    "data": {
+                        "number": order_no,
+                        "payment": {
+                        "status": 0,
+                        "message": "付款成功"
+                        }
+                    }
+                    }
+                return jsonify(order_response), 200
+            else:
+                order_response = {
+                    "error": True,
+                    "message": "訂單建立失敗，輸入不正確或其他原因"
+                    }
+                return jsonify(order_response), 400
+        else:
+            order_response = {
+                "error": True,
+                "message": "未登入系統，拒絕存取"
+                }
+            return jsonify(order_response), 403
+    except:
+            order_response = {
                 "error": True,
                 "message": "伺服器內部錯誤"
                 }
-            status = 500
-        return jsonify(res), status
+            return jsonify(order_response), 500
 
-# @app.route("/api/orders", methods=["POST"])
-# def receive_order():
-#     user_token = request.cookies.get("shopwear_user")
-#     try:
-#         if user_token:
-#             decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
-#             member_email = decoded_jwt["email"]
-#             order_data = request.get_json()
-#             prime = order_data["prime"]
-#             amount = order_data["order"]["price"]
-#             name = order_data["order"]["contact"]["name"]
-#             email = order_data["order"]["contact"]["email"]
-#             phone = order_data["order"]["contact"]["phone"]
-#             member_id = MemberDB.search_member(member_email)[0]
-#             attract_id = order_data["order"]["trip"]["attraction"]["id"]
-#             attract_name = order_data["order"]["trip"]["attraction"]["name"]
-#             date = order_data["order"]["trip"]["date"]
-#             order_no = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
-#             re_name = "^([\u4e00-\u9fa5]{2,20}|[a-zA-Z.\s]{2,20})$"
-#             re_email = "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$"
-#             re_phone = "^09[0-9]{8}$"
-#             if (re.search(re_name, name)!=None) & (re.search(re_email, email)!=None) & (re.search(re_phone, phone)!=None):
-#                 OrdersDB.create_order(member_id, attract_id, attract_name, date, amount, name, email, phone, order_no)
-#             else:
-#                 order_response = {
-#                     "error": True,
-#                     "message": "訂單建立失敗，輸入格式錯誤。"
-#                     }
-#                 return jsonify(order_response), 400
+# Wear資料API
+@app.route("/api/wear")
+def api_wear():
+    page = request.args.get("page", default=0, type=int)
+    (data, total) = Wears.show_photos(index=page*12)
+    
+    res = {
+        "total_page": (total//12) if total%12==0 else (total//12)+1,
+        "next_page": page+1 if page < (total//12) else None,
+        "data":[]
+    }
+    
+    for i in range(len(data)):
+        photos={
+            "id": data[i][0],
+            "photo":data[i][1],
+            "member_id": data[i][2], 
+            "caption": data[i][3]
+        }
+        res["data"].append(photos)
+    status=200
 
-#             url = 'https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime'
-#             myobj = {
-#                 "prime": prime,
-#                 "partner_key": partner_key,
-#                 "merchant_id": merchant_id,
-#                 "details": tappay_details,
-#                 "amount": amount,
-#                 "cardholder": {
-#                     "phone_number": phone,
-#                     "name": name,
-#                     "email": email,
-#                 },
-#                 "remember": True
-#             }
-#             header = {
-#                 "Content-Type": "application/json",
-#                 "x-api-key": x_api_key}
-#             response = requests.post(url, json=myobj, headers=header)
-#             tappay_response = json.loads(response.text)
+    return jsonify(res), status
 
-#             if tappay_response["status"]==0:
-#                 OrdersDB.pay_order(order_no, tappay_response["status"])
-#                 order_response = {
-#                     "data": {
-#                         "number": order_no,
-#                         "payment": {
-#                         "status": 0,
-#                         "message": "付款成功"
-#                         }
-#                     }
-#                     }
-#                 return jsonify(order_response), 200
-#             else:
-#                 order_response = {
-#                     "error": True,
-#                     "message": "訂單建立失敗，輸入不正確或其他原因"
-#                     }
-#                 return jsonify(order_response), 400
-#         else:
-#             order_response = {
-#                 "error": True,
-#                 "message": "未登入系統，拒絕存取"
-#                 }
-#             return jsonify(order_response), 403
-#     except:
-#         order_response = {
-#             "error": True,
-#             "message": "伺服器內部錯誤"
-#             }
-#         return jsonify(order_response), 500
+# mywear上傳貼文
+@app.route("/api/mywear/upload", methods=['POST'])
+def upload_mywear():
+    if "shopwear_user" in request.cookies:
+        # message = request.form["text"]
+        if "pic" not in request.files:
+            # BoardMsg.SaveMsg(message)
+            # print("save msg")
+            res = {
+                "error":True,
+                "message": "沒有檔案"
+                }
+            status=400
+            print("err")
+            return jsonify(res), status
+        else:
+            user_token = request.cookies.get("shopwear_user")
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            member_data = Members.member_info(email, third_party)
+            member_id = member_data[0]
+            file = request.files["pic"]
+            file_name = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
+            Wears.upload_wears(file_name, member_id, "")
+            print("uploaded")
+            res = {
+                "ok": True,
+                "file_name": file_name
+                }
+            status = 200
+            
+    else:
+            res = {
+                "error": True,
+                "message": "請先登入會員"
+            }
+            status = 400
+
+    return jsonify(res), status
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
-    # app.run(debug=True, port=5000)
+    # app.run(host='0.0.0.0', port=3000)
+    app.run(debug=True, port=5000)

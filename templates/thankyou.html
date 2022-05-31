@@ -30,48 +30,24 @@
 
             <div class="main-container" id="main-container">
 
-                <div class="cart" id="cart">
-                    <div>
-                        <table id="cart-table">
-                            <thead id="tb-header">
-                                <th style="width: 15%;">PHOTO</th>
-                                <th style="width: 30%;">商品</th>
-                                <th style="width: 15%;">價格</th>
-                                <th style="width: 15%;">數量</th>
-                                <th style="width: 15%;">小計</th>
-                                <th style="width: 60px;"></th>
-                            </thead>
-                        </table>
-                    </div>
+
+                <div id="thankyou" style="text-align: center; margin: 100px 0;font-size: 20px; color: #2e2e2e;">
+                    <!-- <div><img src="../static/photo/cart.png" style="width: 200px;"> </div> -->
+                    謝謝您，訂單已成立，您可至會員專區查詢訂單資料。
+                    <div style="margin: 30px;">訂單編號 : <span>{{order_no}}</span></div>
                 </div>
 
-                <div id="no-item" style="display: none;text-align: center; margin: 100px 0;font-size: 20px; color: #2e2e2e;">
-                    <div><img src="../static/photo/cart.png" style="width: 200px;"> </div>
-                    您還沒有選購任何商品
-                    <button id="keep-buy" style="width: 100%;"><a href="/">&lt;&lt;繼續購物</a></button>
-                </div>
+                <button id="keep-buy" style="width: 100%;"><a href="/" style="border-bottom: 2px solid #4a61e8;">查詢訂單資料</a></button>
 
-
-
-                <div class="confirm-cart" id="confirm-cart">
-
-                    <div id="sum-block">
-                        <div><span style="float: left;">商品總計</span><span id="cart-sum"></span></div>
-                        <div><span style="float: left;">運費</span><span id="cart-fee"></span></div>
-                        <div><span style="float: left;">總金額</span><span id="cart-total"></span></div>
-                        <button id="keep-buy"><a href="/">&lt;&lt;繼續購物</a></button>
-                        <button id="check-btn" onclick="goToCheckout();"><a>前往結帳</a></button>
-                    </div>
-
-
-                </div>
 
             </div>
 
         </div>
 
+        <!-- <div class="footer-container">
+            <div id="footer">SHOPWEAR</div>
+        </div>
 
-        <!-- 
         <div id="end"></div> -->
     </div>
     <div id="footer">SHOPWEAR</div>
@@ -80,8 +56,6 @@
     <script>
         window.onload = () => {
             loggedIn();
-            showCart();
-            keepBuy();
         }
     </script>
 </body>

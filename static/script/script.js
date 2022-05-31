@@ -1,4 +1,5 @@
 let headers = {
+    "Access-Control-Allow-Origin": "*",
     "Content-type": "application/json"
 };
 
@@ -16,7 +17,7 @@ const showProducts = async(page = 0) => {
         box.id = "box" + i["id"];
         box.href = "/product/" + i["id"];
         spinner.id = "spinner";
-        img.src = "https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/" + i["photo"];
+        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
         name.textContent = i["product_name"];
         name.id = "product-name";
         price.textContent = "NT$ " + i["price"];
@@ -116,7 +117,7 @@ const showProductDetail = async() => {
     qtyLabl.textContent = "數量 ";
     let qty = document.createElement("select");
     qty.id = "prod-qty";
-    for (let i = 1; i < 11; i++) {
+    for (let i = 1; i < 6; i++) {
         let opt = document.createElement("option");
         opt.textContent = i;
         opt.value = i;
@@ -189,22 +190,28 @@ const addCart = () => {
     let arr = JSON.stringify([id, name, color, size, price, qty, pic]);
     // console.log("shopwearCart:" + arr + "=" + arr + "; path=/")
     if (getCookie("shopwearCart") === undefined) {
-        document.cookie = "shopwearCart=" + arr + "; path=/";
+        document.cookie = "shopwearCart=" + arr + "&" + "; max-age=604800; path=/";
     } else {
         currentItem = getCookie("shopwearCart");
-        currentItem = currentItem + "&" + arr;
-        document.cookie = "shopwearCart=" + currentItem + "; path=/";
+        currentItem = currentItem + arr + "&";
+        document.cookie = "shopwearCart=" + currentItem + "; max-age=604800; path=/";
     }
 
 }
 
 //Parse購物車cookie
 const showCart = () => {
-    if (getCookie("shopwearCart") !== undefined) {
-        let item = getCookie("shopwearCart").split("&");
+    let cookie = getCookie("shopwearCart");
+    let carItem = document.getElementById("cart-item");
+    // console.log(cookie)
+    if (cookie === undefined || cookie === "") {
+        return
+    } else {
+        let item = cookie.split("&").filter(Boolean); //去掉split("&")後留下的空string ""
         let c = 0;
         let table = document.getElementById("cart-table");
         for (i of item) {
+            // console.log(i)
             combo = i.replace(/[[\]]/g, '').replace(/['"]+/g, "").split(",")
             let id = combo[0];
             let name = combo[1];
@@ -213,12 +220,14 @@ const showCart = () => {
             let price = combo[4];
             let qty = combo[5];
             let pic = combo[6];
-            console.log(combo);
+            // console.log(combo);
             c++;
 
-            if (window.location.pathname === "/cart") {
+            //顯示購物清單
+            if (window.location.pathname === "/cart" || window.location.pathname === "/checkout") {
                 // console.log("CART")
                 let tableRow = table.insertRow(c);
+                tableRow.id = "tr" + c;
                 let cell0 = tableRow.insertCell(0); //pic
                 let photo = document.createElement("img");
                 photo.src = pic
@@ -228,7 +237,45 @@ const showCart = () => {
                 let cell4 = tableRow.insertCell(4); //amount
                 cell4.id = "piece-amount";
                 let cell5 = tableRow.insertCell(5); //cancel
-                let cancelBtn = document.createElement("btn");
+                let cancelBtn = document.createElement("button"); //取消購物車 Btn
+                let btnImg = document.createElement("img");
+                cancelBtn.id = "cancel-cart";
+                // cancelBtn.innerText = "取消"
+                btnImg.src = "../static/photo/cross2.png";
+                cancelBtn.appendChild(btnImg);
+                let trId = "tr" + c;
+                let itemCookie = i + "&";
+                // let newCcookie = cookie.replace(itemCookie, "");
+                //取消購物車 功能
+                cancelBtn.addEventListener("click", () => {
+                    document.getElementById(trId).remove();
+                    // console.log(itemCookie)
+                    // console.log("shopwearCart=" + getCookie("shopwearCart").replace(itemCookie, "") + "; path=/")
+                    //重設Cookie
+                    document.cookie = "shopwearCart=" + getCookie("shopwearCart").replace(itemCookie, "") + "; max-age=604800; path=/";
+                    //重設購物車圖示
+                    carItem.innerText -= 1;
+                    if (parseInt(carItem.innerText) === 0) {
+                        carItem.style.display = "none";
+                    }
+                    //重新計算商品總計
+                    let sum = 0;
+                    for (i of document.querySelectorAll('#piece-amount')) {
+                        let priceString = i.textContent.split(" ")[1];
+                        sum += parseInt(priceString);
+                    }
+                    let fee = 0;
+                    document.getElementById("cart-fee").textContent = "NT$ " + fee
+                    document.getElementById("cart-sum").textContent = "NT$ " + sum;
+                    document.getElementById("cart-total").textContent = "NT$ " + (sum + fee);
+                    // 購物車歸 0 時
+                    if ((sum + fee) === 0) {
+                        document.getElementById("confirm-cart").style.display = "none";
+                        document.getElementById("cart").style.display = "none";
+                        document.getElementById("no-item").style.display = "block";
+                    }
+
+                })
                 cell0.appendChild(photo);
                 cell1.innerHTML = name + " / " + color + " / " + size;
                 cell2.innerHTML = "NT$ " + price;
@@ -236,11 +283,9 @@ const showCart = () => {
                 cell4.innerHTML = "NT$ " + (price * qty);
                 cell5.appendChild(cancelBtn);
             }
-
-
         }
         let sum = 0;
-        if (window.location.pathname === "/cart") {
+        if (window.location.pathname === "/cart" || window.location.pathname === "/checkout") {
             for (i of document.querySelectorAll('#piece-amount')) {
                 let priceString = i.textContent.split(" ")[1];
                 sum += parseInt(priceString);
@@ -251,15 +296,32 @@ const showCart = () => {
             document.getElementById("cart-total").textContent = "NT$ " + (sum + fee);
             document.getElementById("confirm-cart").style.display = "block";
         }
-        document.getElementById("cart-item").style.display = "block"
-        document.getElementById("cart-item").textContent = c;
-
+        if (c === 0) {
+            carItem.style.display = "none";
+        } else {
+            carItem.style.display = "block"
+            carItem.textContent = c;
+        }
     }
 
+}
 
 
+//購物車歸 0 時
+const keepBuy = () => {
+    if (document.getElementById("confirm-cart").style.display !== "block") {
+        document.getElementById("cart").style.display = "none";
+        document.getElementById("no-item").style.display = "block";
+    }
+}
 
-
+//前往結帳
+const goToCheckout = () => {
+    if (getCookie("shopwear_user") === undefined) {
+        window.location = "/login";
+    } else {
+        window.location = "/checkout";
+    }
 }
 
 
@@ -324,19 +386,19 @@ const loggedIn = () => {
                 // document.getElementById("nav-item1-a").setAttribute("href", memberSrc + "/booking");
                 // document.getElementById("nav-item1-a").style.color = "#666666";
                 if (window.location.pathname === "/login") {
-                    location.href = "/member";
+                    window.history.back();
                 }
             } else {
                 console.log("LOGOUT");
                 // document.getElementById("nav-item1-a").addEventListener("click", signinWindow);
-                if (window.location.pathname === "/member") {
+                if (window.location.pathname === "/member" || window.location.pathname === "/checkout" || window.location.pathname === "/password") {
                     location.href = "/";
                 }
             }
         })
 }
 
-// 會員登入功能
+// 會員登入功能 PATCH
 const signin = () => {
     let email = document.getElementById("signin-email").value;
     let password = document.getElementById("signin-password").value;
@@ -355,7 +417,7 @@ const signin = () => {
         })
         .then((result) => {
             if (result["ok"]) {
-                window.location.reload();
+                window.history.back();
             } else {
                 console.log(result["message"])
                 document.getElementById("signin-message").innerHTML = "登入失敗，帳號或密碼錯誤或其他原因";
@@ -363,7 +425,7 @@ const signin = () => {
         })
 }
 
-// 註冊功能
+// 註冊功能 POST
 const signup = () => {
     let name = document.getElementById("signup-name").value;
     let email = document.getElementById("signup-email").value;
@@ -417,7 +479,7 @@ const signup = () => {
         })
 }
 
-// 會員登出功能
+// 會員登出功能 DELETE
 const logout = () => {
     fetch("/api/user", {
             method: "DELETE",
@@ -439,14 +501,298 @@ const logout = () => {
         })
 }
 
+//顯示會員資料 GET
 const showMemberInfo = async() => {
     let res = await fetch("/api/user", { method: "GET", headers: headers });
     let data = await res.json();
     if (data["data"]) {
-        document.getElementById("mem-name").textContent = "姓名 : " + data['data']["name"];
-        document.getElementById("mem-email").textContent = "Email : " + data['data']["email"];
-        document.getElementById("mem-number").textContent = data['data']["number"] !== null ? "聯絡電話 : " + data['data']["number"] : "聯絡電話 : ";
-        document.getElementById("mem-add").textContent = data['data']["address"] !== null ? "地址 : " + data['data']["address"] : "地址 : ";
+        document.getElementById("mem-name").value = data['data']["name"];
+        document.getElementById("mem-email").value = data['data']["email"];
+        if (data['data']['gender'] !== "") { document.getElementById("gender").value = data['data']['gender'] }
+        if (data['data']["number"] !== "") { document.getElementById("mem-number").value = data['data']["number"] }
+        if (data['data']["address"] !== "") { document.getElementById("mem-add").value = data['data']["address"] }
         return
     }
+}
+
+//更新會員資料 PATCH
+const updateMember = async() => {
+    let name = document.getElementById("mem-name").value;
+    let gender = document.getElementById("gender").value
+    let number = document.getElementById("mem-number").value;
+    let address = document.getElementById("mem-add").value;
+    let body = {
+        "name": name,
+        "gender": gender,
+        "number": number,
+        "address": address
+    }
+    let res = await fetch("/api/member", { method: "PATCH", headers: headers, body: JSON.stringify(body) });
+    let data = await res.json();
+    if (data["ok"]) {
+        document.getElementById('update-member-msg').style.display = "flex";
+        setTimeout(function() {
+            document.getElementById('update-member-msg').style.display = "none";
+        }, 1500)
+    }
+}
+
+
+//更改會員密碼 PATCH
+const changePw = async() => {
+    let oldPw = document.getElementById("cur-pw").value;
+    let newPw = document.getElementById("new-pw").value;
+    let confirmPw = document.getElementById("confirm-pw").value;
+    if (oldPw === "" || newPw === "" || confirmPw === "") {
+        document.getElementById("noUpdate-pw-msg").style.display = "flex";
+        document.getElementById("error-pw-msg").style.color = "red";
+        document.getElementById("error-pw-msg").innerHTML = "欄位不可為空，請輸入資料!";
+        setTimeout(function() {
+            document.getElementById('noUpdate-pw-msg').style.display = "none";
+        }, 2000)
+        return;
+    }
+    let body = {
+        "old_pw": oldPw,
+        "new_pw": newPw,
+        "confirm_pw": confirmPw
+    }
+    let res = await fetch("/api/password", {
+        method: "PATCH",
+        headers: headers,
+        body: JSON.stringify(body)
+    });
+    let data = await res.json();
+    if (res.status === 400) {
+        document.getElementById("noUpdate-pw-msg").style.display = "flex";
+        document.getElementById("error-pw-msg").style.color = "red";
+        document.getElementById("error-pw-msg").innerHTML = data["message"];
+        setTimeout(function() {
+            document.getElementById('noUpdate-pw-msg').style.display = "none";
+        }, 2000)
+    }
+    if (data["ok"]) {
+        document.getElementById("okUpdate-pw-msg").style.display = "flex";
+        document.getElementById("ok-pw-msg").innerHTML = "更新密碼成功";
+        setTimeout(function() {
+            document.getElementById('okUpdate-pw-msg').style.display = "none";
+        }, 2000)
+    }
+
+}
+
+
+
+// tappay
+async function send_order(prime) {
+    let tappayRequestBody = {
+        "prime": prime,
+        "order": {
+            "amount": parseInt(document.getElementById("cart-total").textContent.split(" ")[1]),
+            "items": [],
+            "address": document.getElementById("receiver-address").value
+        }
+    }
+    let cookie = getCookie("shopwearCart");
+    let item = cookie.split("&").filter(Boolean); //去掉split("&")後留下的空string ""
+    for (i of item) {
+        // console.log(i)
+        combo = i.replace(/[[\]]/g, '').replace(/['"]+/g, "").split(",")
+        let id = combo[0];
+        let name = combo[1];
+        let color = combo[2];
+        let size = combo[3];
+        let price = combo[4];
+        let qty = combo[5];
+        let pic = combo[6];
+        let items = {
+            "prod_id": id,
+            "prod_name": name,
+            "prod_color": color,
+            "prod_size": size,
+            "prod_price": price,
+            "prod_qty": qty,
+            "prod_pic": pic
+        };
+        tappayRequestBody.order.items.push(items);
+
+    }
+    try {
+        let response = await fetch("/api/orders", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(tappayRequestBody)
+        });
+        let data = await response.json();
+        // order_no = data["data"]["number"];
+        // console.log(order_no);
+        if (data['error']) {
+            console.log("tappay not OK");
+            document.getElementById("backdrop-wrapper").style.display = "block";
+        } else {
+            console.log("tappay OK");
+            orderNo = data["data"]["number"]
+            console.log("/thankyou?order=" + orderNo)
+            location.href = "/thankyou?order=" + orderNo;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+// wear.html自動載入後續頁面的功能
+
+// page
+let page = 0;
+// 觸發條件後的回呼函式
+let showWear = (entry) => {
+    if (entry[0].isIntersecting) {
+        // keyword = document.getElementById("keyword").value;
+        console.log("SCROLL showWear OK")
+
+        if (page != null) {
+            // src = indexSrc + "/api/attractions?page=" + page + "&keyword=" + keyword;
+            src = "/api/wear?page=" + page;
+            // let listName = [];
+            // let listMrt = [];
+            // let listCat = [];
+            // let listImg = [];
+            // let listId = [];
+            // 新增id作為連結網址id
+
+            fetch(src)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((result) => {
+                    page = result.nextPage;
+                    if (result.error) { // 先確認有無此資料
+                        console.log("WEAR NO OK")
+                        observer.unobserve(target); // 沒有資料的話記得要關閉observer，不然之後很難再打開
+                        // div = document.createElement('div');
+                        // div.id = "errMsg";
+                        // txt = document.createTextNode("查無此景點");
+                        // div.appendChild(txt);
+                        // document.getElementById("content").appendChild(div);
+                    } else {
+                        let photoWrapper = document.createElement("div");
+                        photoWrapper.className = "pics-set";
+                        let photoCount = 1;
+                        for (let i in result.data) {
+                            data = result["data"][i]
+                            let id = data["id"];
+                            let photo = data["photo"];
+                            let member = data["member_id"];
+                            let caption = data["caption"];
+
+                            let photoBox = document.createElement("div");
+                            let aTag = document.createElement("a");
+                            let img = document.createElement("img");
+
+                            photoBox.id = "pic" + photoCount;
+                            // a.href = 
+                            img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/1/" + photo;
+                            aTag.appendChild(img);
+                            photoBox.appendChild(aTag);
+                            photoWrapper.appendChild(photoBox);
+                            photoCount++;
+                            // listName.push(name);
+                            // listMrt.push(mrt);
+                            // listCat.push(cat);
+                            // listImg.push(img);
+                            // listId.push(id);
+                        }
+
+                        document.getElementById("wear-pics").appendChild(photoWrapper)
+                            // showData(listName, listMrt, listCat, listImg, listId);
+                            // console.log("nextPage: " + page);
+                            // console.log("keyword: " + keyword);
+                    }
+                })
+                // 沒有下一頁時停止observe
+        } else {
+            observer.unobserve(target);
+            console.log("unobserved");
+        };
+    }
+}
+
+// 觸發條件
+let options = { rootMargin: '20px', threshold: 0, };
+// 建立 IntersectionObserver物件
+let observer = new IntersectionObserver(showWear, options);
+const target = document.getElementById("end"); // observer的target
+if (window.location.pathname === "/wear") {
+    observer.observe(target); // 開啟觀察目標
+}
+
+
+// mywear.html自動載入後續頁面的功能
+
+// mywear.html PO文視窗
+const showSubmitWindow = () => {
+    document.getElementById('submit-window-block').style.display = 'flex';
+}
+const closeSubmitWindow = () => {
+    document.getElementById('submit-window-block').style.display = 'none';
+    document.getElementById("preview-container").style.zIndex = 0;
+    document.getElementById("file-ip-1-preview").removeAttribute('src');
+    document.getElementById("file-ip-1-preview").style.display = 'none';
+    document.getElementById("preview-cncl-btn").style.display = 'none';
+}
+const submitWindow = () => {
+
+    }
+    // 拖曳上傳圖片功能
+function uploadFiles() {
+    var files = document.getElementById('file-upload').files;
+    if (files.length == 0) {
+        alert("Please first choose or drop any file(s)...");
+        return;
+    }
+    var filenames = "";
+    for (var i = 0; i < files.length; i++) {
+        filenames += files[i].name + "\n";
+    }
+    alert("Selected file(s) :\n____________________\n" + filenames);
+}
+
+const showPreview = (event) => {
+    if (event.target.files.length > 0) {
+        let src = URL.createObjectURL(event.target.files[0]);
+        document.getElementById("preview-cncl-btn").style.display = 'block';
+        document.getElementById("preview-container").style.zIndex = 4;
+        document.getElementById("file-ip-1-preview").src = src;
+        document.getElementById("file-ip-1-preview").style.display = "block";
+    }
+}
+const closePreviewImg = () => {
+    document.getElementById("preview-container").style.zIndex = 0;
+    document.getElementById("file-ip-1-preview").removeAttribute('src');
+    document.getElementById("file-ip-1-preview").style.display = 'none';
+    document.getElementById("preview-cncl-btn").style.display = 'none';
+    document.getElementById("wear-upload-spinner").style.display = 'none';
+}
+
+
+// mywear.html 上傳檔案
+const submitMywear = async() => {
+    document.getElementById("wear-upload-spinner").style.display = 'block';
+    const formData = new FormData();
+    const file = document.getElementById("file-upload");
+    formData.append("pic", file.files[0]);
+    // formData.append("text", document.getElementById("text-message").value);
+    let res = await fetch("/api/mywear/upload", {
+        method: "POST",
+        body: formData
+    });
+    let data = await res.json();
+    if (data["ok"]) {
+        closeSubmitWindow();
+    }
+    console.log(data["file_name"]);
 }
