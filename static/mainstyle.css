@@ -49,7 +49,7 @@ input {
 
 .topnav-container {
     z-index: 5;
-    display: flex;
+    /* display: flex; */
     position: sticky;
     grid-row: 1/2;
     width: 100%;
@@ -64,6 +64,7 @@ input {
     display: grid;
     height: 54px;
     grid-template-columns: 1fr 76px 88px;
+    /* grid-template-rows: 1fr 1fr; */
 }
 
 
@@ -149,7 +150,8 @@ input {
 .wear-pics-container,
 .mywear-container,
 .mywear-pics-container,
-.mywear-option-container {
+.mywear-option-container,
+.category-wrapper {
     display: flex;
     width: 100%;
     justify-content: center;
@@ -160,16 +162,45 @@ input {
 
 /*index.html*/
 
+.category {
+    margin: 0 0 0 50px;
+    height: 40px;
+    line-height: 40px;
+}
+
+.category-wrapper {
+    box-shadow: 0 4px 5px -5px grey;
+}
+
+.category>div {
+    display: inline-block;
+    margin: 0px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    height: 40px;
+    color: #2e2e2e;
+    cursor: pointer;
+}
+
+.category>div:hover {
+    border-bottom: 2px solid #424242;
+}
+
 #index-carousel {
     margin: 20px 0 20px;
-    height: 400px;
-    background: #555555;
+    height: 500px;
+    /* background: #555555; */
 }
 
 #index-carousel>img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* padding: 0 20px; */
+}
+
+.main-container {
+    margin: 21px 0 0;
 }
 
 .catalogue-container {
@@ -194,7 +225,7 @@ input {
     float: left;
     display: grid;
     grid-template-rows: 320px 30px 30px;
-    /* width: 330px; */
+    width: 330px;
     /* height: 320px; */
     margin: 12px;
     text-align: center;
@@ -243,15 +274,18 @@ input {
     list-style: none;
     display: flex;
     justify-content: center;
+    padding: 0;
 }
 
 #catalogue-page>li {
-    float: left;
     border: 1px solid gray;
     border-radius: 5px;
     margin: 0 10px;
-    padding: 0 10px;
     cursor: pointer;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
 }
 
 
@@ -454,21 +488,21 @@ input {
 }
 
 .data-switch-input-btn:after {
-    width: 10px;
-    height: 10px;
-    margin: 3px;
+    width: 11px;
+    height: 11px;
+    margin: 2px;
 }
 
 .data-switch-input-btn:checked:after {
     position: relative;
     border-radius: 10px;
-    top: -4px;
-    left: -4px;
+    top: -1px;
+    left: -1px;
     background-color: #2e2e2e;
     content: '';
     display: inline-block;
     visibility: visible;
-    border: 2px solid #FFFFFF;
+    border: 1px solid #FFFFFF;
 }
 
 
@@ -988,7 +1022,7 @@ input {
     position: fixed;
     z-index: 1;
     top: 100px;
-    width: 750px;
+    width: 700px;
     height: 600px;
     background: #ffffff;
     border-radius: 8px;
@@ -1009,6 +1043,16 @@ input {
     right: 12px;
 }
 
+#preview-container {
+    z-index: 0;
+    width: 500px;
+    height: 405px;
+    position: absolute;
+    top: 210px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 #preview-cncl-btn {
     display: none;
     z-index: 6;
@@ -1022,22 +1066,37 @@ input {
 
 .upload-container {
     position: relative;
-    display: flex;
+    display: none;
     justify-content: center;
     margin: 20px 0 0;
+    height: 450px;
+}
+
+#upload-container-1,
+#upload-container-2,
+#upload-container-3 {
+    height: 550px;
+    width: 100%;
+    background: #ffffff;
+    position: absolute;
+    top: 20px;
+    z-index: 8;
+    border-top: 1px solid #e7e7e7;
 }
 
 .upload-container label,
 .upload-container input {
     border: 1px solid #92b0b3;
     background: #ffffff;
-    outline: 2px dashed #949bed;
+    outline: 2px dashed #414de5;
     outline-offset: -10px;
     padding: 200px 50px;
     text-align: center !important;
     width: 500px;
     border-radius: 10px;
     color: gray;
+    height: 400px;
+    margin: 10px 0 0;
 }
 
 .upload-container input[type='file'] {
@@ -1046,6 +1105,107 @@ input {
     opacity: 0;
     z-index: 2;
     position: absolute;
+    cursor: pointer;
+}
+
+#select-cate>div {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    /* padding: 0 0 0 30px; */
+    font-size: 16px;
+    /* background: #f3f3f3; */
+    text-align: center;
+    font-weight: bold;
+    color: #363b3f;
+    /* border: 1px solid #d9d9d9;*/
+}
+
+#select-cate td {
+    width: 50%;
+    height: 30px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#select-cate table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f3f3f3;
+    text-align: center;
+}
+
+#select-cate table tr td {
+    border: 1px solid #ffffff;
+}
+
+#cate-catalogue {
+    width: 95%;
+    overflow-y: scroll;
+    display: flex;
+    flex-wrap: wrap;
+    height: 400px;
+    border-bottom: 1px solid #e7e7e7;
+    border-top: 1px solid #e7e7e7;
+}
+
+[id^="sub-item"] {
+    height: 80px;
+    width: 45%;
+    display: flex;
+    margin: 10px;
+    cursor: pointer;
+}
+
+[id^="sub-item"] img {
+    width: 80px;
+    height: 80px;
+    /* display: inline-block; */
+    object-fit: cover;
+}
+
+#sub-item-name {
+    height: 80px;
+    line-height: 80px;
+    text-align: left;
+    font-size: 14px;
+    width: 100%;
+    margin: 0 0 0 10px;
+    /* display: inline-block; */
+}
+
+[id^="selected-item"] {
+    position: absolute;
+    top: 400px;
+    margin-top: 20px;
+    height: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+}
+
+[id^="selected-item"]>div>div {
+    padding: 0 5px 0 0;
+}
+
+#selected-id {
+    background-image: url("../static/photo/close.png");
+}
+
+[id^="selected-item"]>div {
+    border: 1px solid #d7d7d7;
+    border-radius: 5px;
+    height: 25px;
+    padding: 2px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    margin: 0 5px;
+}
+
+[id^="selected-item"] img {
+    height: 70%;
+    margin: 0 5px;
     cursor: pointer;
 }
 
@@ -1065,7 +1225,7 @@ input {
 }
 
 .upload-btn {
-    margin-left: 330px;
+    /* margin-left: 330px; */
     padding: 7px 20px;
     background: #2d28d9;
     border: 0;
@@ -1170,8 +1330,9 @@ input {
 }
 
 @media screen and (min-width:1200px) {
-    #index-carousel {
-        width: 1200px;
+    #index-carousel,
+    .category {
+        width: 950px;
     }
     .product {
         width: 1000px;
@@ -1195,8 +1356,9 @@ input {
 }
 
 @media screen and (max-width:1200px) {
-    #index-carousel {
-        width: 100%;
+    #index-carousel,
+    .category {
+        width: 950px;
     }
     .product {
         width: 1000px;
@@ -1215,8 +1377,14 @@ input {
     }
 }
 
-@media screen and (max-width:1000px) {
+@media screen and (max-width:960px) {
     #index-carousel,
+    .category {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width:1000px) {
     .product {
         width: 100%;
     }

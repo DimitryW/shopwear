@@ -4,10 +4,12 @@ let headers = {
 };
 
 // 首頁
-const showProducts = async(page = 0) => {
-    let apiAddress = "api/products?page=" + String(page);
+const showProducts = async(page = 0, category = "", subcategory = "") => {
+    let apiAddress = "/api/products?page=" + String(page) + "&category=" + category + "&subcategory=" + subcategory;
     let res = await fetch(apiAddress);
     let data = await res.json();
+    document.getElementById("catalogue").innerHTML = "";
+
     for (i of data["data"]) {
         let box = document.createElement("a");
         let spinner = document.createElement("div");
@@ -32,23 +34,30 @@ const showProducts = async(page = 0) => {
         box.appendChild(price);
         document.getElementById("catalogue").appendChild(box);
     }
+
     let pageList = document.createElement("ul");
     pageList.id = "catalogue-page";
     let pageLi = document.createElement("li");
     pageLi.textContent = "Page: ";
+    pageLi.style.display = "none";
     pageList.appendChild(pageLi);
+    document.getElementById("page-container").innerHTML = "";
+    //頁數 p
+    let p = 1
     for (let i in [...Array(data["total_page"]).keys()]) {
         let li = document.createElement("li");
-        li.textContent = i;
+        li.textContent = p;
+        li.id = "p" + p;
         li.onclick = () => {
-            let oldPage = document.getElementById("catalogue-page");
-            oldPage.remove();
-            document.getElementById("catalogue").innerHTML = "";
-            showProducts(i);
+            showProducts(i, category, subcategory);
+            li.style.border = "1px solid #d8d8d8";
         }
         pageList.appendChild(li);
+        p++;
     }
-    document.getElementById("main-container").appendChild(pageList);
+    document.getElementById("page-container").appendChild(pageList);
+    let liId = "p" + (parseInt(page) + 1);
+    document.getElementById(liId).style.border = "1px solid #d8d8d8";
 }
 
 
@@ -372,24 +381,23 @@ const loggedIn = () => {
         .then((result) => {
             if (result["data"]) {
                 console.log("LOGIN OK");
-                // membername = result["data"]["name"];
-                // console.log(membername);
-                // loginButton.innerHTML = "登出系統";
+                console.log(result["data"]["id"]);
+                document.getElementById("dorpdown-mywear").value = "mywear/" + result["data"]["id"];
                 document.getElementById("nav-item2-a").style.display = "none";
                 document.getElementById("mem-dropdown").style.display = "block";
-                // loginButton.removeEventListener("click", signinWindow);
-                // loginButton.addEventListener("click", logout);
-                // document.getElementById("nav-item2-a").setAttribute("href", memberSrc + "/member");
-                // document.getElementById("nav-item2-a").style.color = "#666666";
-                // console.log("already logged in.")
-                // document.getElementById("nav-item1").removeEventListener("click", signinWindow);
-                // document.getElementById("nav-item1-a").setAttribute("href", memberSrc + "/booking");
-                // document.getElementById("nav-item1-a").style.color = "#666666";
+
+                if (window.location.pathname.startsWith("/mywear")) {
+                    if (window.location.pathname.split("/")[2] === String(result["data"]["id"])) {
+                        document.getElementById("show-submit-window").style.display = "block";
+                    }
+                }
+
+
                 if (window.location.pathname === "/login") {
                     window.history.back();
                 }
             } else {
-                console.log("LOGOUT");
+                console.log("not login");
                 // document.getElementById("nav-item1-a").addEventListener("click", signinWindow);
                 if (window.location.pathname === "/member" || window.location.pathname === "/checkout" || window.location.pathname === "/password") {
                     location.href = "/";
@@ -736,34 +744,79 @@ if (window.location.pathname === "/wear") {
 // mywear.html PO文視窗
 const showSubmitWindow = () => {
     document.getElementById('submit-window-block').style.display = 'flex';
+    document.getElementById('upload-container-1').style.display = 'flex';
+    document.getElementById("wear-upload-msg").innerHTML = "";
+    document.getElementById("selected-item-1").innerHTML = "";
+    document.getElementById("selected-item-2").innerHTML = "";
 }
+const nextStep = (prev, next) => {
+    if (document.getElementById('file-upload').value === "") {
+        document.getElementById("wear-upload-msg").style.display = 'block';
+        document.getElementById("wear-upload-msg").innerHTML = "請選擇照片";
+        return
+    }
+    document.getElementById("wear-upload-msg").style.display = 'none';
+    document.getElementById(prev).style.display = 'none';
+    document.getElementById(next).style.display = 'flex';
+}
+const switchBtnPrev = () => {
+    let btn = document.getElementById('c1-prev');
+    if (btn.style.display === 'block') {
+        btn.style.display = 'none';
+    } else {
+        btn.style.display = 'block';
+    }
+
+}
+const switchBtnNext = (status) => {
+    let btn1 = document.getElementById('c1-next');
+    let btn2 = document.getElementById('upload-btn');
+    if (status === "none") {
+        btn1.style.display = 'none';
+        btn2.style.display = 'block';
+    } else {
+        btn1.style.display = 'block';
+        btn2.style.display = 'none';
+    }
+
+}
+
 const closeSubmitWindow = () => {
+    document.getElementById('file-upload').value = "";
+    document.getElementById('wear-upload-spinner').style.display = "none";
     document.getElementById('submit-window-block').style.display = 'none';
     document.getElementById("preview-container").style.zIndex = 0;
     document.getElementById("file-ip-1-preview").removeAttribute('src');
     document.getElementById("file-ip-1-preview").style.display = 'none';
     document.getElementById("preview-cncl-btn").style.display = 'none';
+    document.getElementById("upload-container-1").style.display = 'flex';
+    document.getElementById("upload-container-2").style.display = 'none';
+    document.getElementById("upload-container-3").style.display = 'none';
+    switchBtnNext("");
+    switchBtnPrev();
+    nextStep('upload-container-2', 'upload-container-1');
 }
 const submitWindow = () => {
 
     }
     // 拖曳上傳圖片功能
-function uploadFiles() {
-    var files = document.getElementById('file-upload').files;
-    if (files.length == 0) {
-        alert("Please first choose or drop any file(s)...");
-        return;
-    }
-    var filenames = "";
-    for (var i = 0; i < files.length; i++) {
-        filenames += files[i].name + "\n";
-    }
-    alert("Selected file(s) :\n____________________\n" + filenames);
-}
+    // function uploadFiles() {
+    //     var files = document.getElementById('file-upload').files;
+    //     if (files.length == 0) {
+    //         alert("Please first choose or drop any file(s)...");
+    //         return;
+    //     }
+    //     var filenames = "";
+    //     for (var i = 0; i < files.length; i++) {
+    //         filenames += files[i].name + "\n";
+    //     }
+    //     alert("Selected file(s) :\n____________________\n" + filenames);
+    // }
 
 const showPreview = (event) => {
     if (event.target.files.length > 0) {
         let src = URL.createObjectURL(event.target.files[0]);
+        document.getElementById("wear-upload-msg").style.display = 'none';
         document.getElementById("preview-cncl-btn").style.display = 'block';
         document.getElementById("preview-container").style.zIndex = 4;
         document.getElementById("file-ip-1-preview").src = src;
@@ -771,6 +824,7 @@ const showPreview = (event) => {
     }
 }
 const closePreviewImg = () => {
+    document.getElementById('file-upload').value = "";
     document.getElementById("preview-container").style.zIndex = 0;
     document.getElementById("file-ip-1-preview").removeAttribute('src');
     document.getElementById("file-ip-1-preview").style.display = 'none';
@@ -778,14 +832,80 @@ const closePreviewImg = () => {
     document.getElementById("wear-upload-spinner").style.display = 'none';
 }
 
+// selected item
+const selectedItem = (id, name) => {
+    let wrapper = document.createElement("div");
+    let close = document.createElement("img");
+    let item = document.createElement("div");
+    close.src = "../static/photo/close.png";
+    close.onclick = () => {
+        wrapper.remove();
+    }
+    item.id = id;
+    item.textContent = name;
+    wrapper.appendChild(close);
+    wrapper.appendChild(item);
+    document.getElementById("selected-item-1").appendChild(wrapper);
+    document.getElementById("selected-item-2").appendChild(wrapper.cloneNode(true));
+    document.getElementById("cate-catalogue").innerHTML = "";
+    nextStep('upload-container-3', 'upload-container-2');
+}
+
+const closeCate = () => {
+        document.getElementById("cate-catalogue").innerHTML = "";
+    }
+    //select category
+const selectProduct = async(subcategory) => {
+    let apiAddress = "/api/selectproducts?subcategory=" + subcategory;
+    let res = await fetch(apiAddress);
+    let data = await res.json();
+    document.getElementById("cate-catalogue").innerHTML = "";
+
+    for (i of data["data"]) {
+        let box = document.createElement("div");
+        let spinner = document.createElement("div");
+        let img = document.createElement("img");
+        let name = document.createElement("div");
+        // let price = document.createElement("div");
+        let id = i["id"];
+        let itemName = i["product_name"];
+        box.id = "sub-item" + id;
+        box.onclick = () => {
+                console.log(id);
+                selectedItem(id, itemName);
+
+            }
+            // box.href = "/product/" + i["id"];
+        spinner.id = "spinner";
+        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
+        name.textContent = i["product_name"];
+        name.id = "sub-item-name";
+        // price.textContent = "NT$ " + i["price"];
+        // price.id = "price";
+        img.onload = () => {
+            img.style.display = "block";
+            spinner.style.display = "none";
+        }
+        box.appendChild(spinner);
+        box.appendChild(img);
+        box.appendChild(name);
+        // box.appendChild(price);
+        document.getElementById("cate-catalogue").appendChild(box);
+    }
+}
 
 // mywear.html 上傳檔案
 const submitMywear = async() => {
     document.getElementById("wear-upload-spinner").style.display = 'block';
-    const formData = new FormData();
-    const file = document.getElementById("file-upload");
+    let formData = new FormData();
+    let file = document.getElementById("file-upload");
+    let itemIds = [];
+    for (i of document.getElementById('selected-item-1').children) {
+        itemIds.push(i.children[1].id)
+    }
     formData.append("pic", file.files[0]);
-    // formData.append("text", document.getElementById("text-message").value);
+    formData.append("text", itemIds);
+    formData.append("caption", "");
     let res = await fetch("/api/mywear/upload", {
         method: "POST",
         body: formData

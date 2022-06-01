@@ -4,24 +4,50 @@ import mysql.connector.pooling
 
 
 
+
 cnxpool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool", pool_size = 10, pool_reset_session=True, **dbconfig)
 
 
 
 class Products:
     @staticmethod
-    def show_products(index=0, limit=12):
+    def show_products(category, subcategory, index=0, limit=12):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        cursor.execute("SELECT COUNT(*) from products")
-        count = cursor.fetchone()[0]
-        sql = "SELECT id, product_name, price, description, content from products LIMIT %s, %s"
-        cursor.execute(sql, (index, limit))
+        if category=="" and subcategory=="":
+            cursor.execute("SELECT COUNT(*) from products")
+            count = cursor.fetchone()[0]
+            sql = "SELECT id, product_name, price, description, content from products ORDER BY id DESC LIMIT %s, %s"
+            val = (index, limit)
+            # print(1)
+        elif category!="" and subcategory=="":
+            cursor.execute("SELECT COUNT(*) from products WHERE category=%s", (category,))
+            count = cursor.fetchone()[0]
+            sql = "SELECT id, product_name, price, description, content from products WHERE category=%s  ORDER BY id DESC LIMIT %s, %s"
+            val = (category, index, limit)
+            # print(2)
+        elif category=="" and subcategory!="":
+            cursor.execute("SELECT COUNT(*) from products WHERE subcategory=%s", (subcategory,))
+            count = cursor.fetchone()[0]
+            sql = "SELECT id, product_name, price, description, content from products WHERE subcategory=%s  ORDER BY id DESC LIMIT %s, %s"
+            val = (subcategory, index, limit)
+            # print(3)
+        cursor.execute(sql, val)
         data = cursor.fetchall()
         cursor.close()
         cnx.close()
         return (data, count)
 
+    @staticmethod
+    def show_subcategory(subcategory):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "SELECT id, product_name FROM products WHERE subcategory=%s"
+        cursor.execute(sql, (subcategory,) )
+        data = cursor.fetchall()
+        cursor.close()
+        cnx.close()
+        return data
 
     @staticmethod
     def check_product_details(product_id):
@@ -203,41 +229,67 @@ class Wears:
         return (data, count)
 
     @staticmethod
-    def upload_wears(photo, member_id, caption):
+    def upload_wears(photo, member_id, product_id, caption):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "INSERT INTO wears(photo, member_id, caption) VALUES(%s, %s, %s)"
+        sql = "INSERT INTO wears(photo, member_id,caption) VALUES(%s, %s, %s)"
         val = (photo, member_id, caption)
         cursor.execute(sql, val)
         cnx.commit()
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        wears_id = cursor.fetchone()[0]
+        
+        for i in range(len(product_id)):
+            sql = "INSERT INTO wears_products(wears_id, product_id) VALUES(%s, %s)"
+            val = (wears_id, product_id[i])
+            cursor.execute(sql, val)
+            cnx.commit()
+            # print(product_id[i])
+        
         cursor.close()
         cnx.close()
         return
 
     
 
+
+#建立圖片路徑資料
 # import os
-# path = "D:\Coding\WeHelp\dimalife\shopwear photos\product photos"
+# path = "D:/Coding/WeHelp/dimalife/shopwear photos/吳先生"
 # cnx = cnxpool.get_connection()
 # cursor = cnx.cursor()
 # for i in os.listdir(path):
-#   for j in os.listdir(path + "\\" + i):
-#     src = f"https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/{i}/{j}"
-#     new_src = f"{i}/{j}"
-#     sql = "UPDATE products_photos SET src = %s WHERE src = %s"
-#     cursor.execute(sql, (new_src, src))
-#     cnx.commit()
-
+#     cursor.execute("SELECT id FROM products where product_name=%s", (i,))
+#     pid = cursor.fetchone()[0]
+#     for j in os.listdir(path + "\\" + i):
+#         # print(i)
+#         # print(j)
+#         src = i+"/"+j
+#         cursor.execute("INSERT INTO products_photos(product_id, src) VALUES(%s, %s)", (pid, src))
+#         cnx.commit()
 # cursor.close()
 # cnx.close()
 
+
+#更新RDS資料
+
+# file_name = "D:/Coding/WeHelp/dimalife/stock - 複製.xlsx"
+# sheet =  "Product"
+
+# df = pd.read_excel(io=file_name, sheet_name=sheet)
+#   # print first 5 rows of the dataframe
+# # print(df)
+
 # cnx = cnxpool.get_connection()
 # cursor = cnx.cursor()
-# sql = "SELECT id, product_id, src FROM products_photos"
-# cursor.execute(sql)
-# data = cursor.fetchall()
-# for i in data:
-#     cursor.execute("INSERT INTO p_photos(id, product_id, src) VALUES(%s, %s, %s)", (i[0], i[1], i[2]))
+
+# for index, row in df.iterrows():
+#     # print(row["product_name"])
+#     # print(row["qty"])
+#     cursor.execute("SELECT id FROM products where product_name=%s", (row["name"],))
+#     pid = cursor.fetchone()[0]
+#     cursor.execute("INSERT INTO stock(product_id, quantity, size,color) VALUES(%s,%s,%s,%s)", (pid, row["stock"],row["size"],row["color"]))
 #     cnx.commit()
+
 # cursor.close()
 # cnx.close()

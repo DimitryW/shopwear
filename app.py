@@ -1,4 +1,3 @@
-from distutils.ccompiler import new_compiler
 from flask import *
 from flask_cors import CORS
 import jwt
@@ -93,7 +92,12 @@ def wear():
 @app.route("/api/products", methods=["GET"])
 def api_product_index():
     page = request.args.get("page", default=0, type=int)
-    (data, total) = Products.show_products(index=page*12)
+    # print(page)
+    category = request.args.get("category", default="", type=str)
+    # print(category)
+    subcategory = request.args.get("subcategory", default="", type=str)
+    # print(subcategory)
+    (data, total) = Products.show_products(category, subcategory, index=page*12)
     
     res = {
         "total_page": (total//12) if total%12==0 else (total//12)+1,
@@ -115,6 +119,30 @@ def api_product_index():
 
     return jsonify(res), status
 
+@app.route("/api/selectproducts", methods=["GET"])
+def api_select_product():
+    subcategory = request.args.get("subcategory", default="", type=str)
+    # print(subcategory)
+    data = Products.show_subcategory(subcategory)
+    
+    res = {
+        "data":[]
+    }
+    
+    for i in range(len(data)):
+        product={
+            "id": data[i][0],
+            "product_name":data[i][1],
+            # "price": data[i][2], 
+            # "description": data[i][3], 
+            # "content": data[i][4],
+            "photo" : data[i][1] + "/" + data[i][1] + "-1.jpg"
+        }
+        res["data"].append(product)
+    status=200
+
+    return jsonify(res), status
+
 # 單一產品資料
 @app.route("/api/product/<product_id>", methods=["GET"])
 def api_product(product_id):
@@ -127,7 +155,7 @@ def api_product(product_id):
         "price": data[0][2], 
         "description": data[0][3], 
         "content": data[0][4],
-        "photo" : [x[7] for x in data],
+        "photo" : [x[9] for x in data],
         "stock": stock
         }
         status=200
@@ -144,12 +172,13 @@ def api_product(product_id):
 def api_login():
     data = request.get_json()
     token = data["token"]
+    print(1)
     
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=37)
-
+        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=40)
+        print(2)
         if id_info:
             # ID token is valid. 
             # user_id = id_info['sub']
@@ -166,7 +195,7 @@ def api_login():
             "ok":True
             }
             res = make_response((api), 200)
-            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+3600)
+            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
         else:
             # Invalid token
             api = {
@@ -198,6 +227,7 @@ def user():
                 data = Members.member_info(email, third_party)
                 loggedin_api = {
                     "data": {
+                        "id": data[0],
                         "name": data[1],
                         "gender":data[7],
                         "email": data[2],
@@ -275,7 +305,7 @@ def user():
                 "ok": True
             }
             res = make_response((signin_api),200)
-            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+3600)
+            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
             
         elif data == 0:
             signin_api = {
@@ -496,6 +526,9 @@ def api_wear():
 
     return jsonify(res), status
 
+# MyWear資料API
+# @app.route("/api/mywear/<member_id>")
+
 # mywear上傳貼文
 @app.route("/api/mywear/upload", methods=['POST'])
 def upload_mywear():
@@ -519,14 +552,19 @@ def upload_mywear():
             member_data = Members.member_info(email, third_party)
             member_id = member_data[0]
             file = request.files["pic"]
+            id_list = [int(x) for x in request.form["text"].split(",")]
+            caption = request.form["caption"]
             file_name = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
-            Wears.upload_wears(file_name, member_id, "")
-            print("uploaded")
+            # s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
+            Wears.upload_wears(file_name, member_id, id_list, caption)
+            # print("uploaded")
             res = {
                 "ok": True,
-                "file_name": file_name
+                "file_name": file_name,
+                "id":id_list,
+                "caption":caption
                 }
+            # print(res)
             status = 200
             
     else:
