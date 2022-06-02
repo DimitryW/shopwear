@@ -83,10 +83,15 @@ def password():
 def mywear(member_id):
     return render_template("mywear.html")
 
-#個人頁面
+#WEAR頁面
 @app.route("/wear")
 def wear():
     return render_template("wear.html")
+
+#WEAR單頁
+@app.route("/wear/<wear_id>")
+def wear_single_page(wear_id):
+    return render_template("wear_single.html")
 
 #全部產品資料
 @app.route("/api/products", methods=["GET"])
@@ -503,14 +508,39 @@ def receive_order():
 
 
 # Wear資料API
-@app.route("/api/wear")
-def api_wear():
+@app.route("/api/wears", methods=['GET'])
+def api_wears():
     page = request.args.get("page", default=0, type=int)
     (data, total) = Wears.show_photos(index=page*12)
     
     res = {
         "total_page": (total//12) if total%12==0 else (total//12)+1,
         "next_page": page+1 if page < (total//12) else None,
+        "data":[]
+    }
+    
+    for i in range(len(data)):
+        photos={
+            "id": data[i][0],
+            "photo":str(data[i][2]) + "/" + data[i][1],
+            "member_id": data[i][2], 
+            "caption": data[i][3]
+        }
+        res["data"].append(photos)
+    status=200
+
+    return jsonify(res), status
+
+# MyWear資料API
+@app.route("/api/mywear", methods=['GET'])
+def api_mywear():
+    page = request.args.get("page", default=0, type=int)
+    member_id = request.args.get("member", type=int)
+    (data, total) = Wears.show_mywear(member_id, index=page*3)
+    
+    res = {
+        "total_page": (total//3) if total%3==0 else (total//3)+1,
+        "next_page": page+1 if page < (total//3) else None,
         "data":[]
     }
     
@@ -526,8 +556,21 @@ def api_wear():
 
     return jsonify(res), status
 
-# MyWear資料API
-# @app.route("/api/mywear/<member_id>")
+#WEAR單頁API
+@app.route("/api/wear/<wear_id>", methods=['GET'])
+def api_wear_detail(wear_id):
+    (data, member_name, product_photos) = Wears.show_wear_detail(wear_id)
+    res = {
+    "id": data[0][0],
+    "photo":[str(data[0][2]) +"/"+ data[0][1]],
+    "member_id":data[0][2],
+    "member_name":member_name,
+    "caption": data[0][3], 
+    "product_id" : [x[6] for x in data],
+    "product_photos":product_photos
+    }
+    status=200
+    return jsonify(res), status
 
 # mywear上傳貼文
 @app.route("/api/mywear/upload", methods=['POST'])
@@ -555,7 +598,7 @@ def upload_mywear():
             id_list = [int(x) for x in request.form["text"].split(",")]
             caption = request.form["caption"]
             file_name = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            # s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
+            s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
             Wears.upload_wears(file_name, member_id, id_list, caption)
             # print("uploaded")
             res = {
@@ -577,5 +620,5 @@ def upload_mywear():
     return jsonify(res), status
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port=3000)
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=3000)
+    # app.run(debug=True, port=5000)

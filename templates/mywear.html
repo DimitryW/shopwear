@@ -202,8 +202,8 @@
             </div>
 
             <div class="mywear-pics-container" id="mywear-pics-container">
-                <div class="mywear-pics">
-                    <div class="three-pics">
+                <div class="mywear-pics" id="mywear-pics">
+                    <!-- <div class="three-pics">
                         <div>
                             <a>
                                 <img src="../static/photo/sample2.jpg">
@@ -253,7 +253,7 @@
                                 <img src="../static/photo/sample2.jpg">
                             </a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -261,7 +261,7 @@
     </div>
 
     <div id="footer">SHOPWEAR</div>
-
+    <div id="end"></div>
 
 
     <script>
@@ -270,28 +270,28 @@
         }
     </script>
 
-    <!-- <script>
-        let page = 0;
+    <script>
+        let p = 0;
         // 觸發條件後的回呼函式
-        let showWear = (entry) => {
+        let showMyWear = (entry) => {
             if (entry[0].isIntersecting) {
                 console.log("SCROLL showWear OK")
                 memberId = window.location.pathname.split("/")[2];
-                if (page != null) {
-                    src = "/api/mywear/" + memberId + "?page=" + page;
+                if (p != null) {
+                    src = "/api/mywear" + "?member=" + memberId + "&page=" + p;
 
                     fetch(src)
                         .then((response) => {
                             return response.json();
                         })
                         .then((result) => {
-                            page = result.nextPage;
+                            p = result.nextPage;
                             if (result.error) {
                                 console.log("WEAR NO OK")
                                 observer.unobserve(target);
                             } else {
                                 let photoWrapper = document.createElement("div");
-                                photoWrapper.className = "pics-set";
+                                photoWrapper.className = "three-pics";
                                 let photoCount = 1;
                                 for (let i in result.data) {
                                     data = result["data"][i]
@@ -304,16 +304,16 @@
                                     let aTag = document.createElement("a");
                                     let img = document.createElement("img");
 
-                                    photoBox.id = "pic" + photoCount;
+                                    // photoBox.id = "pic" + photoCount;
                                     // a.href = 
-                                    img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/1/" + photo;
+                                    img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
                                     aTag.appendChild(img);
                                     photoBox.appendChild(aTag);
                                     photoWrapper.appendChild(photoBox);
                                     photoCount++;
                                 }
 
-                                document.getElementById("wear-pics").appendChild(photoWrapper)
+                                document.getElementById("mywear-pics").appendChild(photoWrapper)
                             }
                         })
                 } else {
@@ -324,15 +324,15 @@
         }
 
         // 觸發條件
-        let options = {
+        let myWearOptions = {
             rootMargin: '20px',
             threshold: 0,
         };
         // 建立 IntersectionObserver物件
-        let observer = new IntersectionObserver(showWear, options);
-        const target = document.getElementById("end");
-        observer.observe(target);
-    </script> -->
+        let myWearobserver = new IntersectionObserver(showMyWear, myWearOptions);
+        const myWeartarget = document.getElementById("end");
+        myWearobserver.observe(myWeartarget);
+    </script>
 
 </body>
 

@@ -221,12 +221,41 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT COUNT(*) from products")
         count = cursor.fetchone()[0]
-        sql = "SELECT id, photo, member_id, caption from wears LIMIT %s, %s"
+        sql = "SELECT id, photo, member_id, caption from wears ORDER BY id DESC LIMIT %s, %s"
         cursor.execute(sql, (index, limit))
         data = cursor.fetchall()
         cursor.close()
         cnx.close()
         return (data, count)
+    
+    @staticmethod
+    def show_mywear(member_id, index=0,  limit=3):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        cursor.execute("SELECT COUNT(*) FROM wears WHERE member_id=%s ORDER BY id DESC" , (member_id,))
+        count = cursor.fetchone()[0]
+        sql = "SELECT * from wears WHERE member_id=%s LIMIT %s, %s"
+        cursor.execute(sql, (member_id, index, limit))
+        data = cursor.fetchall()
+        cursor.close()
+        cnx.close()
+        return (data, count)
+
+    @staticmethod
+    def show_wear_detail(wear_id):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor(buffered=True)
+        cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
+        data = cursor.fetchall()
+        cursor.execute("SELECT name FROM members WHERE id=%s" , (data[0][2],))
+        member_name = cursor.fetchone()[0]
+        product_photos=[]
+        for i in range(len(data)):
+            cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
+            product_photos.append(cursor.fetchone()[0]) 
+        cursor.close()
+        cnx.close()
+        return (data, member_name, product_photos)
 
     @staticmethod
     def upload_wears(photo, member_id, product_id, caption):

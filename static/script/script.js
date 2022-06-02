@@ -163,6 +163,11 @@ const showProductDetail = async() => {
         // li.appendChild(spinner);
         document.getElementById("slide-list").appendChild(li);
     }
+    if (imgList.length === 1) {
+        document.getElementsByClassName("data-switch-input")[0].style.display = "none";
+        document.getElementsByClassName("carousel-button prev")[0].style.display = "none";
+        document.getElementsByClassName("carousel-button next")[0].style.display = "none";
+    }
     document.getElementsByClassName("data-switch-input-btn")[0].checked = true;
     document.getElementsByClassName("slide")[0].dataset.active = true;
     inputBtn = document.querySelectorAll(".data-switch-input-btn")
@@ -659,18 +664,10 @@ let page = 0;
 // 觸發條件後的回呼函式
 let showWear = (entry) => {
     if (entry[0].isIntersecting) {
-        // keyword = document.getElementById("keyword").value;
         console.log("SCROLL showWear OK")
 
         if (page != null) {
-            // src = indexSrc + "/api/attractions?page=" + page + "&keyword=" + keyword;
-            src = "/api/wear?page=" + page;
-            // let listName = [];
-            // let listMrt = [];
-            // let listCat = [];
-            // let listImg = [];
-            // let listId = [];
-            // 新增id作為連結網址id
+            src = "/api/wears?page=" + page;
 
             fetch(src)
                 .then((response) => {
@@ -681,11 +678,6 @@ let showWear = (entry) => {
                     if (result.error) { // 先確認有無此資料
                         console.log("WEAR NO OK")
                         observer.unobserve(target); // 沒有資料的話記得要關閉observer，不然之後很難再打開
-                        // div = document.createElement('div');
-                        // div.id = "errMsg";
-                        // txt = document.createTextNode("查無此景點");
-                        // div.appendChild(txt);
-                        // document.getElementById("content").appendChild(div);
                     } else {
                         let photoWrapper = document.createElement("div");
                         photoWrapper.className = "pics-set";
@@ -702,23 +694,15 @@ let showWear = (entry) => {
                             let img = document.createElement("img");
 
                             photoBox.id = "pic" + photoCount;
-                            // a.href = 
-                            img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/1/" + photo;
+                            aTag.href = "/wear/" + id;
+                            img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
                             aTag.appendChild(img);
                             photoBox.appendChild(aTag);
                             photoWrapper.appendChild(photoBox);
                             photoCount++;
-                            // listName.push(name);
-                            // listMrt.push(mrt);
-                            // listCat.push(cat);
-                            // listImg.push(img);
-                            // listId.push(id);
                         }
 
                         document.getElementById("wear-pics").appendChild(photoWrapper)
-                            // showData(listName, listMrt, listCat, listImg, listId);
-                            // console.log("nextPage: " + page);
-                            // console.log("keyword: " + keyword);
                     }
                 })
                 // 沒有下一頁時停止observe
@@ -830,6 +814,8 @@ const closePreviewImg = () => {
     document.getElementById("file-ip-1-preview").style.display = 'none';
     document.getElementById("preview-cncl-btn").style.display = 'none';
     document.getElementById("wear-upload-spinner").style.display = 'none';
+    document.getElementById("selected-item-1").innerHTML = "";
+    document.getElementById("selected-item-2").innerHTML = "";
 }
 
 // selected item
@@ -915,4 +901,61 @@ const submitMywear = async() => {
         closeSubmitWindow();
     }
     console.log(data["file_name"]);
+}
+
+//WEAR單頁資料
+
+const showWearDetail = async() => {
+    let apiAddress = "/api/wear/" + window.location.pathname.split("/")[2];
+    let res = await fetch(apiAddress);
+    let data = await res.json();
+    document.getElementById("wear_id").textContent = data["id"];
+    document.getElementById("member_id").textContent = data["member_id"];
+    document.getElementById("member_name").textContent = data["member_name"];
+    // document.getElementById("product_id").textContent = data["product_id"];
+    document.getElementById("caption").textContent = data["caption"];
+
+    // window.document.title = data["product_name"];
+    let imgList = data["photo"];
+    // console.log(imgList)
+    for (let i = 0; i < imgList.length; i++) {
+        let input = document.createElement("input");
+        let li = document.createElement("li");
+        let img = document.createElement("img");
+        // let spinner = document.createElement("div");
+        addAttributes(input, inputAttributes);
+        li.setAttribute("class", "slide");
+        img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + imgList[i];
+        // spinner.id = "spinner";
+        // img.onload = () => {
+        //     img.style.display = "block";
+        //     spinner.style.display = "none";
+        // }
+        document.getElementsByClassName("data-switch-input")[0].appendChild(input);
+        li.appendChild(img);
+        // li.appendChild(spinner);
+        document.getElementById("slide-list").appendChild(li);
+    }
+    if (imgList.length === 1) {
+        document.getElementsByClassName("data-switch-input")[0].style.display = "none";
+        document.getElementsByClassName("carousel-button prev")[0].style.display = "none";
+        document.getElementsByClassName("carousel-button next")[0].style.display = "none";
+    }
+    for (j in data["product_photos"]) {
+        let box = document.createElement("a");
+        let img = document.createElement("img");
+        let span = document.createElement("span");
+        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + data["product_photos"][j];
+        span.textContent = data["product_photos"][j].split("/")[0];
+        box.href = "/product/" + data["product_id"][j];
+        box.appendChild(img);
+        box.appendChild(span)
+        document.getElementById("wear-products").appendChild(box)
+    }
+
+    document.getElementsByClassName("data-switch-input-btn")[0].checked = true;
+    document.getElementsByClassName("slide")[0].dataset.active = true;
+    inputBtn = document.querySelectorAll(".data-switch-input-btn")
+        // console.log(inputBtn = document.querySelectorAll(".data-switch-input-btn"))
+
 }
