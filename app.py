@@ -184,43 +184,43 @@ def api_login():
     token = data["token"]
     print(1)
     
-    # try:
+    try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-    id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=40)
-    print(2)
-    if id_info:
-        # ID token is valid. 
-        # user_id = id_info['sub']
-        user_name = id_info['name']
-        user_email = id_info['email']
-        
-        count = Members.check_member(user_name, user_email, "google")
+        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=40)
+        print(2)
+        if id_info:
+            # ID token is valid. 
+            # user_id = id_info['sub']
+            user_name = id_info['name']
+            user_email = id_info['email']
+            
+            count = Members.check_member(user_name, user_email, "google")
 
-        if count==0:
-            Members.sign_up(user_name, user_email, "google", "", "", "google")
-        
-        encoded_jwt = jwt.encode({"third_party": "google", "email": user_email}, jwt_key, algorithm="HS256")
-        api = {
-        "ok":True
-        }
-        res = make_response((api), 200)
-        res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
-    else:
+            if count==0:
+                Members.sign_up(user_name, user_email, "google", "", "", "google")
+            
+            encoded_jwt = jwt.encode({"third_party": "google", "email": user_email}, jwt_key, algorithm="HS256")
+            api = {
+            "ok":True
+            }
+            res = make_response((api), 200)
+            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
+        else:
+            # Invalid token
+            api = {
+            "error": True,
+            "message": "登入失敗，帳號錯誤或其他原因"
+            }
+            res = make_response((api), 400)
+
+    except:
         # Invalid token
         api = {
         "error": True,
-        "message": "登入失敗，帳號錯誤或其他原因"
+        "message": "伺服器內部錯誤"
         }
-        res = make_response((api), 400)
-
-    # except:
-    #     # Invalid token
-    #     api = {
-    #     "error": True,
-    #     "message": "伺服器內部錯誤"
-    #     }
-    #     res = make_response((api), 500)
+        res = make_response((api), 500)
 
     return res
 
