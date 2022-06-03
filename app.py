@@ -63,6 +63,11 @@ def thankyou():
     order_no = request.args.get("order")
     return render_template("thankyou.html", order_no=order_no)
 
+#結帳頁面    
+@app.route("/order")
+def orders():
+    return render_template("order.html")
+
 # 登入頁面
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -179,43 +184,43 @@ def api_login():
     token = data["token"]
     print(1)
     
-    try:
+    # try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=40)
-        print(2)
-        if id_info:
-            # ID token is valid. 
-            # user_id = id_info['sub']
-            user_name = id_info['name']
-            user_email = id_info['email']
-            
-            count = Members.check_member(user_name, user_email, "google")
+    id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=40)
+    print(2)
+    if id_info:
+        # ID token is valid. 
+        # user_id = id_info['sub']
+        user_name = id_info['name']
+        user_email = id_info['email']
+        
+        count = Members.check_member(user_name, user_email, "google")
 
-            if count==0:
-                Members.sign_up(user_name, user_email, "google", "", "", "google")
-            
-            encoded_jwt = jwt.encode({"third_party": "google", "email": user_email}, jwt_key, algorithm="HS256")
-            api = {
-            "ok":True
-            }
-            res = make_response((api), 200)
-            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
-        else:
-            # Invalid token
-            api = {
-            "error": True,
-            "message": "登入失敗，帳號錯誤或其他原因"
-            }
-            res = make_response((api), 400)
-
-    except:
+        if count==0:
+            Members.sign_up(user_name, user_email, "google", "", "", "google")
+        
+        encoded_jwt = jwt.encode({"third_party": "google", "email": user_email}, jwt_key, algorithm="HS256")
+        api = {
+        "ok":True
+        }
+        res = make_response((api), 200)
+        res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
+    else:
         # Invalid token
         api = {
         "error": True,
-        "message": "伺服器內部錯誤"
+        "message": "登入失敗，帳號錯誤或其他原因"
         }
-        res = make_response((api), 500)
+        res = make_response((api), 400)
+
+    # except:
+    #     # Invalid token
+    #     api = {
+    #     "error": True,
+    #     "message": "伺服器內部錯誤"
+    #     }
+    #     res = make_response((api), 500)
 
     return res
 
@@ -441,6 +446,7 @@ def receive_order():
             amount = order_data["order"]["amount"]
             items = order_data["order"]["items"]
             address = order_data["order"]["address"]
+            date = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
             member_data = Members.member_info(email, third_party)
             member_id = member_data[0]
             name = member_data[1]
@@ -448,7 +454,7 @@ def receive_order():
             order_no = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
             # 資料庫建立訂單
-            Orders.create_order(order_no, member_id, amount, address)
+            Orders.create_order(order_no, member_id, date, amount, address)
             for i in range(len(items)):
                 # print(items[i]["prod_id"])
                 Orders.create_order_details(order_no, items[i]["prod_id"], items[i]["prod_color"], items[i]["prod_size"], items[i]["prod_price"], items[i]["prod_qty"])
@@ -505,6 +511,34 @@ def receive_order():
                 "message": "伺服器內部錯誤"
                 }
             return jsonify(order_response), 500
+
+@app.route("/api/check_orders", methods=["GET"])
+def check_orders():
+    if "shopwear_user" in request.cookies:
+            user_token = request.cookies.get("shopwear_user")
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            member_data = Members.member_info(email, third_party)
+            data = Orders.check_orders(member_data[0])
+            res = {
+                "data":[]
+            }
+            for i in range(len(data)):
+                order={
+                    "id": data[i][0],
+                    "order_no":data[i][1],
+                    "date" : data[i][3],
+                    "amount": data[i][4],
+                    "payment": data[i][5],
+                    "address": data[i][6]
+                }
+                res["data"].append(order)
+            status=200
+
+            return jsonify(res), status
+
+    
 
 
 # Wear資料API

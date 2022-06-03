@@ -52,7 +52,7 @@
                         <div id="wear-desc">
                             <div id="wear_id" style="display: none;">21</div>
                             <div id="member_id" style="display: none;"></div>
-                            <div id="member_name" style="font-weight: bold;height: 60px;line-height: 60px;border-bottom: 1px solid #d6d6d6;"></div>
+                            <a id="member_name" style="display: block;padding: 0 20px;text-decoration: none;color: #2e2e2e;font-weight: bold;height: 60px;line-height: 60px;border-bottom: 1px solid #d6d6d6;"></a>
                             <div style="height: 40px;line-height: 40px;margin: 20px 0 0;font-weight: bold;">搭配單品</div>
                             <div id="wear-products"></div>
                             <div id="caption"></div>
@@ -63,9 +63,12 @@
                     </div>
                 </div>
 
+                <div id="more-post" style=" display: flex;width: 100%;justify-content: center;background-color: #f8f8f8;">
+                    <div style="padding: 40px 0 0;margin: 50px 0 0;font-weight: bold;color: #7b7b7b;width: 900px;border-top: 1px solid #d3d3d3;">更多貼文</div>
+                </div>
 
-                <div class="product-detail-container">
-                    <div class="product-detail" id="product-detail">
+                <div class="other-wears-wrapper" style="margin: 10px 0 0;">
+                    <div id="other-wears">
 
                     </div>
                 </div>
@@ -85,6 +88,7 @@
             showWearDetail();
             loggedIn();
             showCart();
+            showOtherWears();
         }
     </script>
 </body>

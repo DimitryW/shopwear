@@ -192,6 +192,7 @@ function getCookie(cname) {
     return undefined;
 }
 
+
 //加入購物車cookie
 const addCart = () => {
     let color = document.querySelector('input[name="color"]:checked').value;
@@ -338,6 +339,100 @@ const goToCheckout = () => {
     }
 }
 
+// 查歷史訂單
+const showOrders = async() => {
+    let res = await fetch("/api/check_orders");
+    let data = await res.json();
+    if (data["data"].length !== 0) {
+        for (let i = data["data"].length - 1; i >= 0; i--) {
+            let orderInfo = document.createElement("div");
+            let orderTable = document.createElement("table");
+            let btn = document.createElement("button");
+            let img = document.createElement("img");
+            btn.setAttribute("data-id", data["data"][i]["id"]);
+            btn.id = "order-detail-btn";
+            btn.textContent = "詳細訂單資料";
+            img.id = "plus-btn-img"
+            img.src = "../static/photo/plus.jpg";
+
+            let tableHeader = orderTable.insertRow(0);
+            tableHeader.id = "table-header";
+            let th0 = tableHeader.insertCell(0);
+            let th1 = tableHeader.insertCell(1);
+            let th2 = tableHeader.insertCell(2);
+            let th3 = tableHeader.insertCell(3);
+            th0.style.width = "38%";
+            th1.style.width = "23%";
+            th2.style.width = "20%";
+            th3.style.width = "19%";
+            th0.innerHTML = "訂單編號";
+            th1.innerHTML = "下訂日期";
+            th2.innerHTML = "金額";
+            th3.innerHTML = "付款狀態"
+            let tableRow = orderTable.insertRow(1);
+            let cell0 = tableRow.insertCell(0);
+            let cell1 = tableRow.insertCell(1);
+            let cell2 = tableRow.insertCell(2);
+            let cell3 = tableRow.insertCell(3);
+            cell0.innerHTML = data["data"][i]["order_no"];
+            cell1.innerHTML = data["data"][i]["date"];
+            cell2.innerHTML = "NT$ " + String(data["data"][i]["amount"]) + " 元";
+            cell3.innerHTML = data["data"][i]["payment"] === "paid" ? "已付款" : "未付款";
+
+            orderInfo.id = "order-info";
+            let elem = [orderTable, img, btn]
+            elem.forEach(div => { orderInfo.appendChild(div); });
+            document.getElementById("orders").appendChild(orderInfo);
+
+            let hiddenDiv = document.createElement("div");
+            hiddenDiv.id = "hidden-detail";
+            hiddenDiv.style.height = "0";
+            hiddenDiv.classList.add("close");
+            // let attraction = document.createElement("div");
+            // let date = document.createElement("div");
+            // let time = document.createElement("div");
+            // let contactName = document.createElement("div");
+            // let contactNumber = document.createElement("div");
+            // date.id = "order-info-date";
+            // attraction.textContent = "景點 : " + data["data"][i]["attraction"];
+            // date.textContent = "出發日期 : " + data["data"][i]["date"];
+            // time.textContent = "時段 : " + data["data"][i]["time"];
+            // contactName.textContent = "聯絡人 : " + data["data"][i]["contact_name"];
+            // contactNumber.textContent = "連絡電話 : " + data["data"][i]["contact_phone"];
+            // let divs = [attraction, date, time, contactName, contactNumber];
+            // divs.forEach(div => { hiddenDiv.appendChild(div); });
+            document.getElementById("orders").appendChild(hiddenDiv);
+
+            btn.onclick = () => {
+                if (hiddenDiv.classList.contains("close")) {
+                    hiddenDiv.classList.remove("close");
+                    hiddenDiv.style.height = "161px";
+                    img.src = "../static/photo/minus.jpg"
+                } else {
+                    hiddenDiv.classList.add("close");
+                    hiddenDiv.style.height = "0";
+                    img.src = "../static/photo/plus.jpg";
+                }
+            }
+            img.onclick = () => {
+                if (hiddenDiv.classList.contains("close")) {
+                    hiddenDiv.classList.remove("close");
+                    hiddenDiv.style.height = "161px";
+                    img.src = "../static/photo/minus.jpg"
+                } else {
+                    hiddenDiv.classList.add("close");
+                    hiddenDiv.style.height = "0";
+                    img.src = "../static/photo/plus.jpg";
+                }
+            }
+        }
+    } else {
+        let orderResult = document.createElement("div");
+        orderResult.textContent = "目前沒有訂單資料";
+        document.getElementById("orders").appendChild(orderResult);
+    }
+}
+
 
 // 左右按鈕輪播功能
 const buttons = document.querySelectorAll("[data-carousel-button]")
@@ -358,7 +453,6 @@ buttons.forEach(button => {
         let checkedInput = document.querySelector("[checked=checked]")
         inputBtn[newIndex].checked = true
             // checkedInput.checked = false
-
     })
 })
 
@@ -649,6 +743,7 @@ async function send_order(prime) {
             orderNo = data["data"]["number"]
             console.log("/thankyou?order=" + orderNo)
             location.href = "/thankyou?order=" + orderNo;
+            document.cookie = "shopwearCart=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         }
     } catch (error) {
         console.log(error);
@@ -911,6 +1006,7 @@ const showWearDetail = async() => {
     let data = await res.json();
     document.getElementById("wear_id").textContent = data["id"];
     document.getElementById("member_id").textContent = data["member_id"];
+    document.getElementById("member_name").href = "/mywear/" + data["member_id"];
     document.getElementById("member_name").textContent = data["member_name"];
     // document.getElementById("product_id").textContent = data["product_id"];
     document.getElementById("caption").textContent = data["caption"];
@@ -957,5 +1053,28 @@ const showWearDetail = async() => {
     document.getElementsByClassName("slide")[0].dataset.active = true;
     inputBtn = document.querySelectorAll(".data-switch-input-btn")
         // console.log(inputBtn = document.querySelectorAll(".data-switch-input-btn"))
+    showOtherWears(data["member_id"]);
+}
 
+const showOtherWears = async(memberId) => {
+    let otherWears = document.getElementById("other-wears");
+    apiAdress = "/api/mywear" + "?member=" + memberId + "&page=0";
+    let res = await fetch(apiAdress);
+    let result = await res.json();
+    for (i in result["data"]) {
+        data = result["data"][i]
+        let id = data["id"];
+        let photo = data["photo"];
+        // let member = data["member_id"];
+        // let caption = data["caption"];
+
+        let photoBox = document.createElement("div");
+        let aTag = document.createElement("a");
+        let img = document.createElement("img");
+        aTag.href = "/wear/" + id;
+        img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
+        aTag.appendChild(img);
+        photoBox.appendChild(aTag);
+        otherWears.appendChild(photoBox);
+    }
 }

@@ -179,11 +179,11 @@ class Members:
 
 class Orders:
     @staticmethod
-    def create_order(order_no, member_id, amount, address):
+    def create_order(order_no, member_id, date, amount, address):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "INSERT INTO orders(order_no, member_id, amount, address) VALUES(%s, %s, %s, %s)"
-        val = (order_no, member_id, amount, address)
+        sql = "INSERT INTO orders(order_no, member_id, date, amount, address) VALUES(%s, %s, %s, %s, %s)"
+        val = (order_no, member_id, date, amount, address)
         cursor.execute(sql, val)
         cnx.commit()
         cursor.close()
@@ -213,6 +213,22 @@ class Orders:
         cursor.close()
         cnx.close()
         return
+
+    @staticmethod
+    def check_orders(member_id):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "SELECT * FROM orders WHERE member_id=%s"
+        val = (member_id,)
+        cursor.execute(sql, val)
+        orders = cursor.fetchall()
+        # order_details=[]
+        # for i in range(len(orders)):
+        #     sql = "select * from orders join order_details on orders.order_no=order_details.order_no where order_details.order_no=%s"
+        #     val = (orders[i][1],)
+        cursor.close()
+        cnx.close()
+        return orders
 
 class Wears:
     @staticmethod

@@ -63,8 +63,8 @@ input {
     width: 100%;
     display: grid;
     height: 54px;
-    grid-template-columns: 1fr 76px 88px;
-    /* grid-template-rows: 1fr 1fr; */
+    grid-template-columns: 1fr 76px 76px 88px;
+    grid-template-rows: 1fr;
 }
 
 
@@ -79,7 +79,7 @@ input {
     font-weight: 700;
     font-size: 30px;
     cursor: pointer;
-    padding-left: 10px;
+    padding-left: 90px;
     text-decoration: none;
     background: #1800ca;
     background: linear-gradient(to top, #1800ca 0%, #4C63EE 100%);
@@ -90,7 +90,7 @@ input {
 
 /* navbar右邊兩排小字 */
 
-#nav-item1 {
+#nav-item0 {
     grid-column: 2/3;
     justify-self: right;
     align-self: center;
@@ -104,8 +104,24 @@ input {
     text-decoration: none;
 }
 
+#nav-item1 {
+    grid-column: 3/4;
+    justify-self: right;
+    align-self: center;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #2e2e2e;
+    border: none;
+    cursor: pointer;
+    background-color: #f8f8f8;
+    text-decoration: none;
+}
+
+#nav-item0-a,
 #nav-item1-a,
 #nav-item2-a,
+#nav-item0-a:visited,
 #nav-item1-a:visited,
 #nav-item2-a:visited {
     color: #2e2e2e;
@@ -113,7 +129,7 @@ input {
 
 #nav-item2,
 #mem-dropdown {
-    grid-column: 3/4;
+    grid-column: 4/5;
     justify-self: right;
     align-self: center;
     font-family: 'Noto Sans TC', sans-serif;
@@ -152,7 +168,8 @@ input {
 .mywear-pics-container,
 .mywear-option-container,
 .category-wrapper,
-.wear-single-container {
+.wear-single-container,
+.other-wears-wrapper {
     display: flex;
     width: 100%;
     justify-content: center;
@@ -244,6 +261,7 @@ input {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 3px;
 }
 
 #spinner {
@@ -314,6 +332,10 @@ input {
     border-right: 1px solid #d6d6d6;
 }
 
+#wear-caresoul img {
+    object-fit: cover;
+}
+
 #wear-desc>div {
     padding: 0 20px;
 }
@@ -350,6 +372,20 @@ input {
     justify-content: center; */
 }
 
+#other-wears {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-column-gap: 40px;
+    grid-template-rows: 300px;
+}
+
+#other-wears img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
 #product-desc {
     width: 100%;
     height: 80%;
@@ -361,6 +397,14 @@ input {
     /* height: 392px; */
 }
 
+#product-desc>div {
+    margin: 15px;
+}
+
+#product-desc>label {
+    margin: 15px;
+}
+
 #wear-desc {
     width: 100%;
     height: 100%;
@@ -368,11 +412,7 @@ input {
 
 #product_name,
 #product_price {
-    margin: 15px;
-}
-
-#product_price {
-    font-size: 30px;
+    font-size: 20px;
 }
 
 #product-desc>#price {
@@ -444,7 +484,7 @@ input {
     border-radius: 3px;
     color: white;
     border: none;
-    margin: 15px 0;
+    margin: 15px;
     width: 120px;
     height: 30px;
     font-size: 16px;
@@ -481,7 +521,7 @@ input {
 .slide>img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     /* border-radius: 5px; */
 }
 
@@ -824,6 +864,112 @@ input {
 }
 
 
+/* order */
+
+#orders-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    /* border-bottom: 1px solid #E8E8E8; */
+    background-color: #f8f8f8;
+}
+
+#orders {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+#table-header {
+    background: #2759e3;
+    color: #FFFFFF;
+}
+
+#orders table,
+#orders th,
+#orders td {
+    /* border: 0; */
+    border-collapse: collapse;
+    font-size: 14px;
+    font-weight: 400;
+    height: 20px;
+}
+
+#table-header td:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+#table-header td:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+#orders table {
+    width: 100%;
+    text-align: center;
+    margin: 20px 0 0;
+}
+
+#hidden-detail {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #E8E8E8;
+    overflow: hidden;
+    transition: height 300ms;
+    height: 0;
+}
+
+#plus-btn-img {
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+}
+
+#order-detail-btn {
+    font-weight: bold;
+    /* width: 110px; */
+    height: 30px;
+    font-size: 14px;
+    background: #f8f8f8;
+    color: #424242;
+    border: none;
+    cursor: pointer;
+    margin: 10px 0 10px;
+}
+
+#hidden-detail>div,
+#member-info>div {
+    margin: 5px 0 5px;
+}
+
+#order-detail {
+    height: 320px;
+    display: none;
+    z-index: 101;
+    border-radius: 6px;
+    background: white;
+    margin: 100px 10px 10px;
+}
+
+#order-detail>div {
+    margin: 10px 20px 10px;
+    font-weight: 700;
+}
+
+#order-detail>div>span {
+    font-weight: 400;
+}
+
+#order-detail-close-icon {
+    position: relative;
+    float: right;
+    margin: 25px 10px 10px;
+    z-index: 102;
+    background-color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+}
+
+
 /* login */
 
 #login-method {
@@ -970,7 +1116,7 @@ input {
 .pics-set {
     display: grid;
     grid-template-areas: "pic1 pic1 pic2" "pic1 pic1 pic3" "pic4 pic5 pic6" "pic7 pic8 pic8" "pic9 pic8 pic8" "pic10 pic11 pic12";
-    grid-gap: 25px;
+    grid-gap: 10px;
     margin: 0 0 25px;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-columns: 1fr 1fr 1fr;
@@ -980,6 +1126,7 @@ input {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 3px;
 }
 
 #pic1 {
@@ -1274,13 +1421,18 @@ input {
 }
 
 .upload-btn {
-    /* margin-left: 330px; */
     padding: 7px 20px;
-    background: #2d28d9;
-    border: 0;
+    background: #ffffff;
+    border: 1px solid #2d28d9;
     border-radius: 5px;
-    color: white;
+    color: #2d28d9;
     cursor: pointer;
+    font-weight: bold;
+}
+
+.upload-btn:hover {
+    background: #2d28d9;
+    color: white;
 }
 
 #file-ip-1-preview {
@@ -1380,12 +1532,14 @@ input {
 
 @media screen and (min-width:1200px) {
     #index-carousel,
-    .category {
+    .category,
+    #orders {
         width: 950px;
     }
     .product,
-    .wear-single {
-        width: 1000px;
+    .wear-single,
+    #other-wears {
+        width: 900px;
     }
     .wear-desc-content,
     .wear-pics,
@@ -1407,12 +1561,14 @@ input {
 
 @media screen and (max-width:1200px) {
     #index-carousel,
-    .category {
+    .category,
+    #orders {
         width: 950px;
     }
     .product,
-    .wear-single {
-        width: 1000px;
+    .wear-single,
+    #other-wears {
+        width: 900px;
     }
     .wear-desc-content,
     .wear-pics,
@@ -1430,14 +1586,16 @@ input {
 
 @media screen and (max-width:960px) {
     #index-carousel,
-    .category {
+    .category,
+    #orders {
         width: 100%;
     }
 }
 
 @media screen and (max-width:1000px) {
     .product,
-    .wear-single {
+    .wear-single,
+    #other-wears {
         width: 100%;
     }
     .wear-desc-content,

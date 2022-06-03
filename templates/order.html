@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
-
+    <script type="text/javascript" src="../static/script/script.js"></script>
 </head>
 
 <body id="body">
@@ -32,56 +32,25 @@
                     </select>
                 </div>
             </div>
-
-            <div class="main-container" id="main-container">
-
-                <div class="product-container">
-                    <div class="product">
-                        <div id="product-caresoul">
-                            <div class="carousel" data-carousel>
-                                <button class="carousel-button prev" data-carousel-button="prev"><img src="../static/photo/btn_leftArrow.png"></button>
-                                <button class="carousel-button next" data-carousel-button="next"><img src="../static/photo/btn_rightArrow.png"></button>
-                                <div class="data-switch-input">
-                                </div>
-                                <ul id="slide-list" data-slides>
-
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div id="product-desc">
-                            <div id="product_id" style="display: none;">21</div>
-                            <div id="product_name"></div>
-                            <div id="product_price"></div>
-                            <div id="description"></div>
-                            <div id="content"></div>
-                        </div>
-                        <!-- <div>數量</div> -->
-                        <!-- <button id="cart-btn">加入購物車</button> -->
-                    </div>
-                </div>
-
-
-                <div class="product-detail-container">
-                    <div class="product-detail" id="product-detail">
-
-                    </div>
+            <div id="orders-wrapper">
+                <div id="orders">
+                    <div style="color: #424242;font-size: 16px;font-weight: bold;margin: 40px 0 10px;">歷史訂單資料</div>
                 </div>
             </div>
+
         </div>
-        <!-- <div class="footer-container">
+        <!-- <div class="mem-footer-container">
             <div id="footer">SHOPWEAR</div>
         </div>
 
         <div id="end"></div> -->
     </div>
     <div id="footer">SHOPWEAR</div>
-    <script type="text/javascript" src="../static/script/script.js"></script>
 
     <script>
-        window.onpageshow = () => {
-            showProductDetail();
+        window.onload = () => {
             loggedIn();
+            showOrders();
             showCart();
         }
     </script>
