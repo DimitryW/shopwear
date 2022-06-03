@@ -512,7 +512,7 @@ def receive_order():
                 }
             return jsonify(order_response), 500
 
-@app.route("/api/check_orders", methods=["GET"])
+@app.route("/api/orders", methods=["GET"])
 def check_orders():
     if "shopwear_user" in request.cookies:
             user_token = request.cookies.get("shopwear_user")
@@ -538,8 +538,24 @@ def check_orders():
 
             return jsonify(res), status
 
-    
+@app.route("/api/order_details/<order_no>", methods=["GET"])
+def check_order_details(order_no): 
+    data = Orders.check_order_details(order_no)
+    res = {
+        "data":[]
+    }
+    for i in range(len(data)):
+        details={
+            "product_name": data[i][0],
+            "color": data[i][1],
+            "size": data[i][2],
+            "price": data[i][3],
+            "qty": data[i][4]
+        }
+        res["data"].append(details)
+    status=200
 
+    return jsonify(res), status
 
 # Wear資料API
 @app.route("/api/wears", methods=['GET'])
@@ -575,6 +591,9 @@ def api_mywear():
     res = {
         "total_page": (total//3) if total%3==0 else (total//3)+1,
         "next_page": page+1 if page < (total//3) else None,
+        "member_name" : data[0][4],
+        "member_photo" : data[0][5],
+        "total_post": total,
         "data":[]
     }
     
@@ -654,5 +673,5 @@ def upload_mywear():
     return jsonify(res), status
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
-    # app.run(debug=True, port=5000)
+    # app.run(host='0.0.0.0', port=3000)
+    app.run(debug=True, port=5000)

@@ -144,7 +144,9 @@ const showProductDetail = async() => {
     };
     document.getElementById("product-desc").append(btn);
     window.document.title = data["product_name"];
+    let spinner = document.createElement("div");
     let imgList = data["photo"];
+    spinner.id = "spinner";
     for (let i = 0; i < imgList.length; i++) {
         let input = document.createElement("input");
         let li = document.createElement("li");
@@ -162,6 +164,11 @@ const showProductDetail = async() => {
         li.appendChild(img);
         // li.appendChild(spinner);
         document.getElementById("slide-list").appendChild(li);
+        document.getElementById("slide-list").appendChild(spinner);
+        img.onload = () => {
+            img.style.display = "block";
+            spinner.style.display = "none";
+        }
     }
     if (imgList.length === 1) {
         document.getElementsByClassName("data-switch-input")[0].style.display = "none";
@@ -341,7 +348,7 @@ const goToCheckout = () => {
 
 // 查歷史訂單
 const showOrders = async() => {
-    let res = await fetch("/api/check_orders");
+    let res = await fetch("/api/orders");
     let data = await res.json();
     if (data["data"].length !== 0) {
         for (let i = data["data"].length - 1; i >= 0; i--) {
@@ -349,11 +356,12 @@ const showOrders = async() => {
             let orderTable = document.createElement("table");
             let btn = document.createElement("button");
             let img = document.createElement("img");
+            let order_no = data["data"][i]["order_no"];
             btn.setAttribute("data-id", data["data"][i]["id"]);
             btn.id = "order-detail-btn";
             btn.textContent = "詳細訂單資料";
             img.id = "plus-btn-img"
-            img.src = "../static/photo/plus.jpg";
+            img.src = "../static/photo/plus-1.jpg";
 
             let tableHeader = orderTable.insertRow(0);
             tableHeader.id = "table-header";
@@ -374,7 +382,7 @@ const showOrders = async() => {
             let cell1 = tableRow.insertCell(1);
             let cell2 = tableRow.insertCell(2);
             let cell3 = tableRow.insertCell(3);
-            cell0.innerHTML = data["data"][i]["order_no"];
+            cell0.innerHTML = order_no;
             cell1.innerHTML = data["data"][i]["date"];
             cell2.innerHTML = "NT$ " + String(data["data"][i]["amount"]) + " 元";
             cell3.innerHTML = data["data"][i]["payment"] === "paid" ? "已付款" : "未付款";
@@ -388,41 +396,31 @@ const showOrders = async() => {
             hiddenDiv.id = "hidden-detail";
             hiddenDiv.style.height = "0";
             hiddenDiv.classList.add("close");
-            // let attraction = document.createElement("div");
-            // let date = document.createElement("div");
-            // let time = document.createElement("div");
-            // let contactName = document.createElement("div");
-            // let contactNumber = document.createElement("div");
-            // date.id = "order-info-date";
-            // attraction.textContent = "景點 : " + data["data"][i]["attraction"];
-            // date.textContent = "出發日期 : " + data["data"][i]["date"];
-            // time.textContent = "時段 : " + data["data"][i]["time"];
-            // contactName.textContent = "聯絡人 : " + data["data"][i]["contact_name"];
-            // contactNumber.textContent = "連絡電話 : " + data["data"][i]["contact_phone"];
-            // let divs = [attraction, date, time, contactName, contactNumber];
-            // divs.forEach(div => { hiddenDiv.appendChild(div); });
+            hiddenDiv.style.overflowY = "auto";
             document.getElementById("orders").appendChild(hiddenDiv);
 
             btn.onclick = () => {
                 if (hiddenDiv.classList.contains("close")) {
                     hiddenDiv.classList.remove("close");
-                    hiddenDiv.style.height = "161px";
-                    img.src = "../static/photo/minus.jpg"
+                    hiddenDiv.style.height = "200px";
+                    img.src = "../static/photo/minus-1.jpg"
+                    checkOrderDetails(order_no, hiddenDiv);
                 } else {
                     hiddenDiv.classList.add("close");
                     hiddenDiv.style.height = "0";
-                    img.src = "../static/photo/plus.jpg";
+                    img.src = "../static/photo/plus-1.jpg";
+                    hiddenDiv.innerHTML = "";
                 }
             }
             img.onclick = () => {
                 if (hiddenDiv.classList.contains("close")) {
                     hiddenDiv.classList.remove("close");
-                    hiddenDiv.style.height = "161px";
-                    img.src = "../static/photo/minus.jpg"
+                    hiddenDiv.style.height = "200px";
+                    img.src = "../static/photo/minus-1.jpg"
                 } else {
                     hiddenDiv.classList.add("close");
                     hiddenDiv.style.height = "0";
-                    img.src = "../static/photo/plus.jpg";
+                    img.src = "../static/photo/plus-1.jpg";
                 }
             }
         }
@@ -433,6 +431,32 @@ const showOrders = async() => {
     }
 }
 
+// order_details
+const checkOrderDetails = async(order_no, hiddenDiv) => {
+    let res = await fetch("/api/order_details/" + order_no);
+    let data = await res.json();
+    for (i in data["data"]) {
+        console.log(data["data"])
+        console.log(data["data"][i]["product_name"])
+        let item = document.createElement("div");
+        let img = document.createElement("img");
+        let product_name = document.createElement("span");
+        let color = document.createElement("span");
+        let size = document.createElement("span");
+        let price = document.createElement("span");
+        let qty = document.createElement("span");
+        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + data["data"][i]["product_name"] + "/" + data["data"][i]["product_name"] + "-1.jpg";
+        product_name.innerHTML = data["data"][i]["product_name"];
+        color.innerHTML = data["data"][i]["color"];
+        size.innerHTML = data["data"][i]["size"];
+        price.innerHTML = "NT$ " + data["data"][i]["price"];
+        qty.innerHTML = "數量: " + data["data"][i]["qty"];
+        let divs = [img, product_name, color, size, price, qty];
+        divs.forEach(div => { item.appendChild(div); });
+        hiddenDiv.appendChild(item);
+    }
+
+}
 
 // 左右按鈕輪播功能
 const buttons = document.querySelectorAll("[data-carousel-button]")
@@ -481,7 +505,7 @@ const loggedIn = () => {
             if (result["data"]) {
                 console.log("LOGIN OK");
                 console.log(result["data"]["id"]);
-                document.getElementById("dorpdown-mywear").value = "mywear/" + result["data"]["id"];
+                document.getElementById("dorpdown-mywear").value = "https://dimalife.com/mywear/" + result["data"]["id"];
                 document.getElementById("nav-item2-a").style.display = "none";
                 document.getElementById("mem-dropdown").style.display = "block";
 

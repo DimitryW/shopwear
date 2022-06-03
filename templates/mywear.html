@@ -8,6 +8,7 @@
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
     <script type="text/javascript" src="../static/script/script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
         #wear-upload-spinner {
             display: none;
@@ -41,6 +42,95 @@
                 transform: rotate(359deg);
             }
         }
+        
+        .media-container {
+            position: relative;
+            display: inline-block;
+            margin: auto;
+            border-radius: 50%;
+            overflow: hidden;
+            width: 200px;
+            height: 200px;
+            vertical-align: middle
+        }
+        
+        .media-overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(180, 180, 180, 0.6);
+        }
+        
+        #media-input {
+            display: block;
+            width: 200px;
+            height: 200px;
+            line-height: 200px;
+            opacity: 0;
+            position: relative;
+            z-index: 9;
+        }
+        
+        .media-icon {
+            display: block;
+            color: #ffffff;
+            font-size: 2em;
+            height: 200px;
+            line-height: 200px;
+            position: absolute;
+            z-index: 0;
+            width: 100%;
+            text-align: center;
+            top: 0;
+        }
+        /* .media-object {} */
+        
+        .img-object {
+            width: 100%;
+            height: 100%;
+            display: block;
+            /* border: 1px solid silver; */
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            background: rgb(213, 213, 213);
+            cursor: pointer;
+            object-fit: cover;
+        }
+        
+        .media-control {
+            margin-top: 30px;
+        }
+        /* button */
+        
+        .btn {
+            margin: 10px 3px;
+            display: inline-block;
+            height: 38px;
+            padding: 0 30px;
+            color: #555;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 38px;
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            white-space: nowrap;
+            background-color: transparent;
+            border-radius: 4px;
+            border: 1px solid #bbb;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        
+        .btn>i {
+            color: #555;
+            font-size: 12px !important;
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -49,19 +139,20 @@
         <div class="topnav-container ">
             <div class="topnav">
                 <a id="nav-title" href="/">SHOPWEAR</a>
-                <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="/cart">購物車</a></button>
+                <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">WEAR</a></button>
+                <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="https://dimalife.com/cart">購物車</a></button>
                 <div id="cart-item" style="display: none;"></div>
-                <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="/login">會員登入</a></button>
+                <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://dimalife.com/login">會員登入</a></button>
                 <select class="mem-dropdown" id="mem-dropdown" onchange=" 
-                    if (this.selectedIndex==1) location = this.value;
-                    if (this.selectedIndex==2) location = this.value;
-                    if (this.selectedIndex==3) location = this.value;
-                    if (this.selectedIndex==4) logout();">
-                        <option value="" disabled selected>會員選單</option>
-                        <option class="drowpdown-mem-info" value="member"><a id="drowpdown-mem-info-a" href="/member">會員資料</a></option>
-                        <option class="drowpdown-mem-info" value="password"><a id="drowpdown-mem-info-a" href="/password">更改密碼</a></option>
-                        <option class="drowpdown-mem-info" id="dorpdown-mywear" ><a id="drowpdown-mem-info-a" href="/password">MyWear</a></option>
-                        <option class="dropdown-logout">登出</option>
+                if (this.selectedIndex==1) location = this.value;
+                if (this.selectedIndex==2) location = this.value;
+                if (this.selectedIndex==3) location = this.value;
+                if (this.selectedIndex==4) logout();">
+                    <option value="" disabled selected>會員選單</option>
+                    <option class="drowpdown-mem-info" value="https://dimalife.com/member"><a id="drowpdown-mem-info-a" href="dimalife.com/member">會員資料</a></option>
+                    <option class="drowpdown-mem-info" value="https://dimalife.com/password"><a id="drowpdown-mem-info-a" href="dimalife.com/password">更改密碼</a></option>
+                    <option class="drowpdown-mem-info" id="dorpdown-mywear" ><a id="drowpdown-mem-info-a" href="dimalife.com/password">MyWear</a></option>
+                    <option class="dropdown-logout">登出</option>
                 </select>
             </div>
         </div>
@@ -69,12 +160,37 @@
             <div class="mywear-container">
                 <div class="mywear-profile">
                     <div id="mywear-profile-pic">
-                        <img src="../static/photo/sample3.png">
+                        <!-- <img id="profile-pic"> -->
+                        <div class="media-container">
+                            <span class="media-overlay">
+                                <input type="file" id="media-input" accept="image/*">
+                                <i class="an an-write media-icon"></i>
+                            </span>
+                            <figure class="media-object">
+                                <img class="img-object">
+                            </figure>
+                        </div>
+                        <div class="media-control">
+                            <button class="btn edit-profile">
+                            <i class="an an-write"></i>上傳大頭貼</button>
+                            <button class="btn save-profile">
+                            <i class="an an-save"></i>確認儲存</button>
+                        </div>
+
+                        <div id="mywear-desc">
+                            <div id="member-name"></div>
+                            <div id="post-count"></div>
+                            <!-- <button>編輯個人檔案</button> -->
+                        </div>
                     </div>
 
-                    <div id="mywear-desc">
-                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatem beatae, corporis porro quisquam magni, ullam laborum culpa quae, et ex eligendi eum nobis a nemo voluptatum commodi consequuntur excepturi aliquid.
-                    </div>
+
+
+
+
+
+
+
                 </div>
             </div>
 
@@ -203,57 +319,7 @@
 
             <div class="mywear-pics-container" id="mywear-pics-container">
                 <div class="mywear-pics" id="mywear-pics">
-                    <!-- <div class="three-pics">
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="three-pics">
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="three-pics">
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div>
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                    </div> -->
+
                 </div>
             </div>
 
@@ -290,6 +356,9 @@
                                 console.log("WEAR NO OK")
                                 observer.unobserve(target);
                             } else {
+                                // document.getElementById("profile-pic").src = result["member_photo"];
+                                document.getElementById("member-name").innerHTML = result["member_name"];
+                                document.getElementById("post-count").innerHTML = result["total_post"] + " 則貼文";
                                 let photoWrapper = document.createElement("div");
                                 photoWrapper.className = "three-pics";
                                 let photoCount = 1;
@@ -332,6 +401,40 @@
         let myWearobserver = new IntersectionObserver(showMyWear, myWearOptions);
         const myWeartarget = document.getElementById("end");
         myWearobserver.observe(myWeartarget);
+    </script>
+
+    <script>
+        var btn_save = $(".save-profile"),
+            btn_edit = $(".edit-profile"),
+            img_object = $(".img-object"),
+            overlay = $(".media-overlay"),
+            media_input = $("#media-input");
+
+        btn_save.hide(0);
+        overlay.hide(0);
+
+        btn_edit.on("click", function() {
+            $(this).hide(0);
+            overlay.fadeIn(300);
+            btn_save.fadeIn(300);
+        });
+        btn_save.on("click", function() {
+            $(this).hide(0);
+            overlay.fadeOut(300);
+            btn_edit.fadeIn(300);
+        });
+
+        media_input.change(function() {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    img_object.attr("src", e.target.result);
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
     </script>
 
 </body>

@@ -230,6 +230,19 @@ class Orders:
         cnx.close()
         return orders
 
+    @staticmethod
+    def check_order_details(order_no):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "select product_name, color, size, order_details.price, qty from order_details\
+             join products on order_details.product_id=products.id where order_no=%s"
+        val = (order_no,)
+        cursor.execute(sql, val)
+        order_details = cursor.fetchall()
+        cursor.close()
+        cnx.close()
+        return order_details
+
 class Wears:
     @staticmethod
     def show_photos(index=0, limit=12):
@@ -250,7 +263,8 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT COUNT(*) FROM wears WHERE member_id=%s ORDER BY id DESC" , (member_id,))
         count = cursor.fetchone()[0]
-        sql = "SELECT * from wears WHERE member_id=%s LIMIT %s, %s"
+        sql = "SELECT wears.id, wears.photo, member_id, caption, name, members.photo\
+        from wears join members on wears.member_id=members.id WHERE member_id=%s LIMIT %s, %s"
         cursor.execute(sql, (member_id, index, limit))
         data = cursor.fetchall()
         cursor.close()
