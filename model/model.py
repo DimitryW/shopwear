@@ -4,7 +4,6 @@ import mysql.connector.pooling
 
 
 
-
 cnxpool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool", pool_size = 10, pool_reset_session=True, **dbconfig)
 
 
@@ -53,7 +52,7 @@ class Products:
     def check_product_details(product_id):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "SELECT * FROM products JOIN products_photos ON products.id = products_photos.product_id WHERE products.id=%s"
+        sql = "SELECT products.id, product_name, price, description, content, src, size_suggest FROM products JOIN products_photos ON products.id = products_photos.product_id WHERE products.id=%s"
         cursor.execute(sql, (product_id,) )
         data = cursor.fetchall()
         cursor.close()
@@ -288,6 +287,16 @@ class Wears:
         return (data, member_name, product_photos)
 
     @staticmethod
+    def upload_photo_sticker(photo, member_id):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        cursor.execute("UPDATE members SET photo=%s WHERE id=%s" , (photo, member_id))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+
+    @staticmethod
     def upload_wears(photo, member_id, product_id, caption):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
@@ -332,8 +341,8 @@ class Wears:
 
 #更新RDS資料
 
-# file_name = "D:/Coding/WeHelp/dimalife/stock - 複製.xlsx"
-# sheet =  "Product"
+# file_name = "D:/Coding/WeHelp/dimalife/products_updated.XLSX"
+# sheet =  "products"
 
 # df = pd.read_excel(io=file_name, sheet_name=sheet)
 #   # print first 5 rows of the dataframe
@@ -345,9 +354,8 @@ class Wears:
 # for index, row in df.iterrows():
 #     # print(row["product_name"])
 #     # print(row["qty"])
-#     cursor.execute("SELECT id FROM products where product_name=%s", (row["name"],))
-#     pid = cursor.fetchone()[0]
-#     cursor.execute("INSERT INTO stock(product_id, quantity, size,color) VALUES(%s,%s,%s,%s)", (pid, row["stock"],row["size"],row["color"]))
+#     cursor.execute("UPDATE products SET content=%s, size_suggest=%s where product_name=%s", (row["content"],row["size_suggestion"],row["product_name"]))
+    
 #     cnx.commit()
 
 # cursor.close()

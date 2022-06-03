@@ -165,7 +165,8 @@ def api_product(product_id):
         "price": data[0][2], 
         "description": data[0][3], 
         "content": data[0][4],
-        "photo" : [x[9] for x in data],
+        "photo" : [x[5] for x in data],
+        "size_suggest": data[0][6],
         "stock": stock
         }
         status=200
@@ -629,9 +630,7 @@ def api_wear_detail(wear_id):
 @app.route("/api/mywear/upload", methods=['POST'])
 def upload_mywear():
     if "shopwear_user" in request.cookies:
-        # message = request.form["text"]
         if "pic" not in request.files:
-            # BoardMsg.SaveMsg(message)
             # print("save msg")
             res = {
                 "error":True,
@@ -671,6 +670,40 @@ def upload_mywear():
             status = 400
 
     return jsonify(res), status
+
+# mywear上傳大頭貼
+@app.route("/api/mywear/photo_sticker", methods=["POST"])
+def photo_sticker():
+    if "shopwear_user" in request.cookies:
+        if "pic" not in request.files:
+            res = {
+                "error": True,
+                "message": "沒有檔案"
+                }
+            status=400
+            return jsonify(res), status
+        else:
+            user_token = request.cookies.get("shopwear_user")
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            member_data = Members.member_info(email, third_party)
+            member_id = member_data[0]
+            file = request.files["pic"]
+            file_name =  str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            s3.upload_fileobj(file, "vaapadshopwear", f"mywear/photo_sticker/{file_name}")
+            Wears.upload_photo_sticker(file_name, member_id)
+            # print("save pic")
+            res = {
+                "ok": True,
+                "pic_src":file_name
+                }
+            return jsonify(res)
+    else:
+        res = {
+                "error": True,
+                "message": "請先登入"}
+        return jsonify(res)
 
 if __name__ == "__main__":
     # app.run(host='0.0.0.0', port=3000)

@@ -71,6 +71,7 @@
             opacity: 0;
             position: relative;
             z-index: 9;
+            cursor: pointer;
         }
         
         .media-icon {
@@ -96,7 +97,6 @@
             top: 0px;
             left: 0px;
             background: rgb(213, 213, 213);
-            cursor: pointer;
             object-fit: cover;
         }
         
@@ -160,42 +160,34 @@
             <div class="mywear-container">
                 <div class="mywear-profile">
                     <div id="mywear-profile-pic">
-                        <!-- <img id="profile-pic"> -->
                         <div class="media-container">
                             <span class="media-overlay">
                                 <input type="file" id="media-input" accept="image/*">
                                 <i class="an an-write media-icon"></i>
                             </span>
                             <figure class="media-object">
-                                <img class="img-object">
+                                <img class="img-object" id="photo-sticker">
                             </figure>
                         </div>
                         <div class="media-control">
                             <button class="btn edit-profile">
                             <i class="an an-write"></i>上傳大頭貼</button>
                             <button class="btn save-profile">
-                            <i class="an an-save"></i>確認儲存</button>
+                            <i class="an an-save"></i>儲存大頭貼</button>
                         </div>
 
                         <div id="mywear-desc">
-                            <div id="member-name"></div>
-                            <div id="post-count"></div>
+                            <div id="member-name" style="font-weight: bold;"></div>
+                            <div id="post-count" style="margin: 10px;font-weight: bold;"></div>
                             <!-- <button>編輯個人檔案</button> -->
                         </div>
                     </div>
-
-
-
-
-
-
-
 
                 </div>
             </div>
 
             <div class="mywear-option-container">
-                <div id="show-submit-window" onclick="showSubmitWindow();" style="display: none;">上傳貼文</div>
+                <div id="show-submit-window" onclick="showSubmitWindow();">上傳貼文</div>
             </div>
 
             <div class="submit-window-block" id="submit-window-block">
@@ -356,7 +348,7 @@
                                 console.log("WEAR NO OK")
                                 observer.unobserve(target);
                             } else {
-                                // document.getElementById("profile-pic").src = result["member_photo"];
+                                document.getElementById("photo-sticker").src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + result["member_photo"];
                                 document.getElementById("member-name").innerHTML = result["member_name"];
                                 document.getElementById("post-count").innerHTML = result["total_post"] + " 則貼文";
                                 let photoWrapper = document.createElement("div");
@@ -420,6 +412,7 @@
         });
         btn_save.on("click", function() {
             $(this).hide(0);
+            submitPhotoSticker();
             overlay.fadeOut(300);
             btn_edit.fadeIn(300);
         });

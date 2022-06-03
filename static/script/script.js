@@ -85,6 +85,7 @@ const showProductDetail = async() => {
     document.getElementById("product_price").textContent = "NT$ " + data["price"];
     document.getElementById("description").textContent = data["description"];
     document.getElementById("content").textContent = data["content"];
+    document.getElementById("size-suggest").textContent = data["size_suggest"];
     let colorStock = document.createElement("div");
     colorStock.className = "color-stock"
     let colBox = document.createElement("div");
@@ -144,9 +145,8 @@ const showProductDetail = async() => {
     };
     document.getElementById("product-desc").append(btn);
     window.document.title = data["product_name"];
-    let spinner = document.createElement("div");
+    let proPhotos = document.getElementById("product-photos");
     let imgList = data["photo"];
-    spinner.id = "spinner";
     for (let i = 0; i < imgList.length; i++) {
         let input = document.createElement("input");
         let li = document.createElement("li");
@@ -162,13 +162,14 @@ const showProductDetail = async() => {
         // }
         document.getElementsByClassName("data-switch-input")[0].appendChild(input);
         li.appendChild(img);
+        proPhotos.append(img.cloneNode(true));
         // li.appendChild(spinner);
         document.getElementById("slide-list").appendChild(li);
-        document.getElementById("slide-list").appendChild(spinner);
-        img.onload = () => {
-            img.style.display = "block";
-            spinner.style.display = "none";
-        }
+        // document.getElementById("slide-list").appendChild(spinner);
+        // img.onload = () => {
+        //     img.style.display = "block";
+        //     spinner.style.display = "none";
+        // }
     }
     if (imgList.length === 1) {
         document.getElementsByClassName("data-switch-input")[0].style.display = "none";
@@ -409,7 +410,7 @@ const showOrders = async() => {
                     hiddenDiv.classList.add("close");
                     hiddenDiv.style.height = "0";
                     img.src = "../static/photo/plus-1.jpg";
-                    hiddenDiv.innerHTML = "";
+                    // hiddenDiv.innerHTML = "";
                 }
             }
             img.onclick = () => {
@@ -421,6 +422,7 @@ const showOrders = async() => {
                     hiddenDiv.classList.add("close");
                     hiddenDiv.style.height = "0";
                     img.src = "../static/photo/plus-1.jpg";
+                    // hiddenDiv.innerHTML = "";
                 }
             }
         }
@@ -433,6 +435,7 @@ const showOrders = async() => {
 
 // order_details
 const checkOrderDetails = async(order_no, hiddenDiv) => {
+    if (hiddenDiv.innerHTML !== "") { return };
     let res = await fetch("/api/order_details/" + order_no);
     let data = await res.json();
     for (i in data["data"]) {
@@ -473,7 +476,7 @@ buttons.forEach(button => {
         delete activeSlide.dataset.active
         slides.children[newIndex].dataset.active = true
 
-        let inputBtn = document.querySelectorAll("input")
+        let inputBtn = document.querySelectorAll(".data-switch-input input")
         let checkedInput = document.querySelector("[checked=checked]")
         inputBtn[newIndex].checked = true
             // checkedInput.checked = false
@@ -843,6 +846,31 @@ if (window.location.pathname === "/wear") {
 
 
 // mywear.html自動載入後續頁面的功能
+
+//mywear上傳大頭貼
+const submitPhotoSticker = async() => {
+    let formData = new FormData();
+    let file = document.getElementById('media-input');
+    formData.append("pic", file.files[0]);
+    console.log(1)
+    let res = await fetch("/api/mywear/photo_sticker", {
+        method: 'POST',
+        body: formData
+    })
+    let data = await res.json()
+    console.log(2)
+        // let text = document.getElementById("text-message").value;
+        // let content = document.getElementById("content");
+        // let textDiv = document.createElement("div");
+    let photoSticker = document.getElementById("photo-sticker");
+    // let hr = document.createElement("hr");
+    // textDiv.textContent = text;
+    if (data["error"]) {
+        console.log(data["message"]);
+    } else {
+        photoSticker.src = "http://d7h07qlpoj67x.cloudfront.net/mywear/photo_sticker/" + data["pic_src"];
+    }
+}
 
 // mywear.html PO文視窗
 const showSubmitWindow = () => {

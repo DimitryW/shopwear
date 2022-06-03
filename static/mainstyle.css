@@ -79,7 +79,7 @@ input {
     font-weight: 700;
     font-size: 30px;
     cursor: pointer;
-    padding-left: 90px;
+    padding-left: 80px;
     text-decoration: none;
     background: #1800ca;
     background: linear-gradient(to top, #1800ca 0%, #4C63EE 100%);
@@ -160,6 +160,8 @@ input {
 
 .carousel-container,
 .product-container,
+.product-detail-container,
+.product-photos-container,
 .member.info,
 .login-container,
 .wear-desc,
@@ -264,6 +266,10 @@ input {
     border-radius: 3px;
 }
 
+[id^="box"]>img:hover {
+    box-shadow: 0px 5px 15px 2px #c0c0c0;
+}
+
 #spinner {
     background-image: url("../static/photo/spinner6.gif");
     grid-area: img;
@@ -316,6 +322,22 @@ input {
     height: 600px;
     /* border-bottom: 1px solid #E8E8E8; */
     column-gap: 30px;
+}
+
+#product-detail {
+    margin: 50px 0 0;
+    padding: 20px 0 0;
+    border-top: 1px solid #e8e8e8;
+}
+
+#product-detail>div {
+    margin: 20px;
+}
+
+#product-photos>img {
+    height: 1000px;
+    display: block;
+    margin: 30px;
 }
 
 .wear-single {
@@ -880,8 +902,10 @@ input {
 }
 
 #table-header {
-    background: #3b3bdd;
-    color: #FFFFFF;
+    /* background: #3b3bdd;
+    color: #FFFFFF; */
+    background: #d9d9d9;
+    color: #2e2e2e;
 }
 
 #orders table,
@@ -1477,20 +1501,22 @@ input {
 }
 
 #show-submit-window {
-    background: #2d28d9;
-    color: white;
+    background: #f8f8f8;
+    color: #515151;
     width: 150px;
     height: 38px;
     text-align: center;
     border-radius: 5px;
     line-height: 38px;
     cursor: pointer;
+    font-weight: bold;
     font-size: 14px;
     letter-spacing: 0.1rem;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
     margin: 20px 0;
+    border: 1px solid #bbb;
 }
 
 .three-pics {
@@ -1571,6 +1597,7 @@ input {
         width: 950px;
     }
     .product,
+    #product-detail,
     .wear-single,
     #other-wears {
         width: 900px;
@@ -1600,6 +1627,7 @@ input {
         width: 950px;
     }
     .product,
+    #product-detail,
     .wear-single,
     #other-wears {
         width: 900px;
@@ -1628,6 +1656,7 @@ input {
 
 @media screen and (max-width:1000px) {
     .product,
+    #product-detail,
     .wear-single,
     #other-wears {
         width: 100%;
