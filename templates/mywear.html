@@ -144,16 +144,18 @@
                 <div id="cart-item" style="display: none;"></div>
                 <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://dimalife.com/login">會員登入</a></button>
                 <select class="mem-dropdown" id="mem-dropdown" onchange=" 
-                if (this.selectedIndex==1) location = this.value;
-                if (this.selectedIndex==2) location = this.value;
-                if (this.selectedIndex==3) location = this.value;
-                if (this.selectedIndex==4) logout();">
-                    <option value="" disabled selected>會員選單</option>
-                    <option class="drowpdown-mem-info" value="https://dimalife.com/member"><a id="drowpdown-mem-info-a" href="dimalife.com/member">會員資料</a></option>
-                    <option class="drowpdown-mem-info" value="https://dimalife.com/password"><a id="drowpdown-mem-info-a" href="dimalife.com/password">更改密碼</a></option>
-                    <option class="drowpdown-mem-info" id="dorpdown-mywear" ><a id="drowpdown-mem-info-a" href="dimalife.com/password">MyWear</a></option>
-                    <option class="dropdown-logout">登出</option>
-                </select>
+                    if (this.selectedIndex==1) location = this.value;
+                    if (this.selectedIndex==2) location = this.value;
+                    if (this.selectedIndex==3) location = this.value;
+                    if (this.selectedIndex==4) location = this.value;
+                    if (this.selectedIndex==5) logout();">
+                        <option value="" disabled selected>會員選單</option>
+                        <option class="drowpdown-mem-info" value="https://dimalife.com/member"><a id="drowpdown-mem-info-a" href="/member">會員資料</a></option>
+                        <option class="drowpdown-mem-info" value="https://dimalife.com/password"><a id="drowpdown-mem-info-a" href="/password">更改密碼</a></option>
+                        <option class="drowpdown-mem-info" value="https://dimalife.com/order"><a id="drowpdown-mem-info-a" href="/order">歷史訂單</a></option>
+                        <option class="drowpdown-mem-info" id="dorpdown-mywear" ><a id="drowpdown-mem-info-a" >MyWear</a></option>
+                        <option class="dropdown-logout">登出</option>
+                    </select>
             </div>
         </div>
         <div class="mywear-profile-wrapper">
@@ -192,7 +194,7 @@
 
             <div class="submit-window-block" id="submit-window-block">
                 <div id="submit-window">
-                    <div id="bar">建立貼文<img onclick="closeSubmitWindow();" src="../static/photo/close.png" style="height: 20px;float: right;cursor: pointer;margin: 2px 0 0;"></div>
+                    <div id="bar">建立貼文<img onclick="closeSubmitWindow();" src="../static/photo/close2.png" style="height: 20px;float: right;cursor: pointer;margin: 2px 0 0;"></div>
 
                     <!-- 1 -->
                     <div>
@@ -235,7 +237,7 @@
                     <div class="upload-container" id="upload-container-2">
                         <div style="width: 90%;">
                             <div id="select-cate">
-                                <div style="border-top: 1px solid #d9d9d9;">上衣</div>
+                                <div>上衣</div>
                                 <table>
                                     <tr>
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">T-SHIRT</td>
@@ -325,6 +327,7 @@
     <script>
         window.onload = () => {
             loggedIn();
+            showCart();
         }
     </script>
 
@@ -336,7 +339,7 @@
                 console.log("SCROLL showWear OK")
                 memberId = window.location.pathname.split("/")[2];
                 if (p != null) {
-                    src = "/api/mywear" + "?member=" + memberId + "&page=" + p;
+                    src = "/api/mywear?member=" + memberId + "&page=" + p;
 
                     fetch(src)
                         .then((response) => {

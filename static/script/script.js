@@ -551,7 +551,8 @@ const signin = () => {
         })
         .then((result) => {
             if (result["ok"]) {
-                window.history.back();
+                // window.history.go(-1);
+                window.location = document.referrer;
             } else {
                 console.log(result["message"])
                 document.getElementById("signin-message").innerHTML = "登入失敗，帳號或密碼錯誤或其他原因";
@@ -809,15 +810,22 @@ let showWear = (entry) => {
                             let id = data["id"];
                             let photo = data["photo"];
                             let member = data["member_id"];
+                            let member_name = data["member_name"];
                             let caption = data["caption"];
 
                             let photoBox = document.createElement("div");
                             let aTag = document.createElement("a");
+                            let nameDiv = document.createElement("div");
+                            let name = document.createElement("div");
                             let img = document.createElement("img");
 
                             photoBox.id = "pic" + photoCount;
                             aTag.href = "/wear/" + id;
+                            nameDiv.id = "wear-member-name";
+                            name.innerHTML = member_name;
                             img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
+                            nameDiv.appendChild(name);
+                            aTag.appendChild(nameDiv);
                             aTag.appendChild(img);
                             photoBox.appendChild(aTag);
                             photoWrapper.appendChild(photoBox);

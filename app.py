@@ -575,7 +575,8 @@ def api_wears():
             "id": data[i][0],
             "photo":str(data[i][2]) + "/" + data[i][1],
             "member_id": data[i][2], 
-            "caption": data[i][3]
+            "caption": data[i][3],
+            "member_name": data[i][4]
         }
         res["data"].append(photos)
     status=200
@@ -592,7 +593,7 @@ def api_mywear():
     res = {
         "total_page": (total//3) if total%3==0 else (total//3)+1,
         "next_page": page+1 if page < (total//3) else None,
-        "member_name" : data[0][4],
+        "member_name":data[0][4],
         "member_photo" : data[0][5],
         "total_post": total,
         "data":[]
@@ -706,5 +707,5 @@ def photo_sticker():
         return jsonify(res)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
-    # app.run(debug=True, port=5000)
+    # app.run(host='0.0.0.0', port=3000)
+    app.run(debug=True, port=5000)
