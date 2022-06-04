@@ -520,7 +520,7 @@ const loggedIn = () => {
 
 
                 if (window.location.pathname === "/login") {
-                    window.history.back();
+                    window.location = document.referrer;
                 }
             } else {
                 console.log("not login");
