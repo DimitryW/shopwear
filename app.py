@@ -188,7 +188,7 @@ def api_login():
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=40)
+        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=50)
         print(2)
         if id_info:
             # ID token is valid. 
@@ -197,7 +197,7 @@ def api_login():
             user_email = id_info['email']
             
             count = Members.check_member(user_name, user_email, "google")
-
+            print(user_name, user_email)
             if count==0:
                 Members.sign_up(user_name, user_email, "google", "", "", "google")
             
@@ -240,6 +240,7 @@ def user():
                     "data": {
                         "id": data[0],
                         "name": data[1],
+                        "nickname": data[10],
                         "gender":data[7],
                         "email": data[2],
                         "number": data[4],
@@ -354,7 +355,7 @@ def api_member():
                 email = decoded_jwt["email"]
                 third_party = decoded_jwt["third_party"]
                 data = request.get_json()
-                Members.update_member(data["name"], data["gender"], data["number"], data["address"], email, third_party)
+                Members.update_member(data["nickname"], data["gender"], data["number"], data["address"], email, third_party)
                 res = {
                     "ok": True
                     }
@@ -563,10 +564,11 @@ def check_order_details(order_no):
 def api_wears():
     page = request.args.get("page", default=0, type=int)
     (data, total) = Wears.show_photos(index=page*12)
+    total = (total//12) if total%12==0 else (total//12)+1
     
     res = {
-        "total_page": (total//12) if total%12==0 else (total//12)+1,
-        "next_page": page+1 if page < (total//12) else None,
+        "total_page": total,
+        "next_page": page+1 if page+1 < total else None,
         "data":[]
     }
     
@@ -576,7 +578,9 @@ def api_wears():
             "photo":str(data[i][2]) + "/" + data[i][1],
             "member_id": data[i][2], 
             "caption": data[i][3],
-            "member_name": data[i][4]
+            "member_nickname": data[i][4],
+            "member_name": data[i][5],
+            "photo_sticker": data[i][6]
         }
         res["data"].append(photos)
     status=200
@@ -589,11 +593,12 @@ def api_mywear():
     page = request.args.get("page", default=0, type=int)
     member_id = request.args.get("member", type=int)
     (data, total) = Wears.show_mywear(member_id, index=page*3)
+    total_page = (total//3) if total%3==0 else (total//3)+1
     
     res = {
-        "total_page": (total//3) if total%3==0 else (total//3)+1,
-        "next_page": page+1 if page < (total//3) else None,
-        "member_name":data[0][4],
+        "total_page": total_page,
+        "next_page": page+1 if page+1 < total_page else None,
+        "nickname":data[0][4],
         "member_photo" : data[0][5],
         "total_post": total,
         "data":[]
@@ -614,12 +619,13 @@ def api_mywear():
 #WEAR單頁API
 @app.route("/api/wear/<wear_id>", methods=['GET'])
 def api_wear_detail(wear_id):
-    (data, member_name, product_photos) = Wears.show_wear_detail(wear_id)
+    (data, member_names, product_photos) = Wears.show_wear_detail(wear_id)
     res = {
     "id": data[0][0],
     "photo":[str(data[0][2]) +"/"+ data[0][1]],
     "member_id":data[0][2],
-    "member_name":member_name,
+    "member_nickname":member_names[0],
+    "member_name":member_names[1],
     "caption": data[0][3], 
     "product_id" : [x[6] for x in data],
     "product_photos":product_photos
@@ -676,12 +682,14 @@ def upload_mywear():
 @app.route("/api/mywear/photo_sticker", methods=["POST"])
 def photo_sticker():
     if "shopwear_user" in request.cookies:
+        print(0)
         if "pic" not in request.files:
             res = {
                 "error": True,
                 "message": "沒有檔案"
                 }
             status=400
+            print(1)
             return jsonify(res), status
         else:
             user_token = request.cookies.get("shopwear_user")
@@ -694,7 +702,7 @@ def photo_sticker():
             file_name =  str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             s3.upload_fileobj(file, "vaapadshopwear", f"mywear/photo_sticker/{file_name}")
             Wears.upload_photo_sticker(file_name, member_id)
-            # print("save pic")
+            print("save pic")
             res = {
                 "ok": True,
                 "pic_src":file_name
@@ -707,5 +715,5 @@ def photo_sticker():
         return jsonify(res)
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port=3000)
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=3000)
+    # app.run(debug=True, port=5000)

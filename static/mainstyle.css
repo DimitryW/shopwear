@@ -65,6 +65,7 @@ input {
     height: 54px;
     grid-template-columns: 1fr 76px 76px 88px;
     grid-template-rows: 1fr;
+    box-shadow: 0 4px 5px -5px grey;
 }
 
 
@@ -183,7 +184,7 @@ input {
 /*index.html*/
 
 .category {
-    margin: 0 0 0 50px;
+    /* margin: 0 0 0 50px; */
     height: 40px;
     line-height: 40px;
 }
@@ -406,6 +407,10 @@ input {
     height: 100%;
     object-fit: cover;
     border-radius: 3px;
+}
+
+#other-wears img:hover {
+    box-shadow: 0px 5px 15px 2px #c0c0c0;
 }
 
 #product-desc {
@@ -1195,9 +1200,24 @@ input {
     color: white;
 }
 
+#wear-photo-sticker {
+    display: none;
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: auto;
+    opacity: 90%;
+    margin-bottom: 10px;
+}
+
+#wear-member-name:hover #wear-photo-sticker {
+    display: block;
+}
+
 .pics-set img {
     width: 100%;
-    height: 125%;
+    height: 100%;
     object-fit: cover;
     border-radius: 3px;
 }
@@ -1307,7 +1327,7 @@ input {
     font-size: 20px;
     font-weight: bold;
     border-bottom: 1px solid #d0d0d0;
-    background: linear-gradient(to top, #3422c6 0%, #4e67fb 100%);
+    background: linear-gradient(to top, #4738bd 0%, #566be5 100%);
     color: white;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -1432,6 +1452,8 @@ input {
     letter-spacing: 0.1rem;
     text-transform: uppercase;
     text-decoration: none;
+    /* white-space: nowrap; */
+    /* background-color: transparent;*/
 }
 
 #select-cate table tr td {
@@ -1575,6 +1597,7 @@ input {
 .three-pics {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 350px;
     grid-gap: 25px;
 }
 
@@ -1584,9 +1607,13 @@ input {
 
 .three-pics img {
     width: 100%;
-    height: 125%;
+    height: 100%;
     object-fit: cover;
     border-radius: 3px;
+}
+
+.three-pics img:hover {
+    box-shadow: 0px 5px 15px 2px #c0c0c0;
 }
 
 .mem-footer-container,

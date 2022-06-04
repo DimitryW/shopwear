@@ -152,11 +152,11 @@ class Members:
         return
 
     @staticmethod
-    def update_member(name, gender, number, address, email, third_party):
+    def update_member(nickname, gender, number, address, email, third_party):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "UPDATE members SET name=%s, gender=%s, number=%s, address=%s WHERE email=%s AND third_party=%s"
-        val = (name, gender, number, address, email, third_party)
+        sql = "UPDATE members SET nickname=%s, gender=%s, number=%s, address=%s WHERE email=%s AND third_party=%s"
+        val = (nickname, gender, number, address, email, third_party)
         cursor.execute(sql, val)
         cnx.commit()
         cursor.close()
@@ -247,9 +247,9 @@ class Wears:
     def show_photos(index=0, limit=12):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        cursor.execute("SELECT COUNT(*) from products")
+        cursor.execute("SELECT COUNT(*) from wears")
         count = cursor.fetchone()[0]
-        sql = "SELECT wears.id, wears.photo, member_id, caption, members.name from wears join members where wears.member_id=members.id ORDER BY id DESC LIMIT %s, %s"
+        sql = "SELECT wears.id, wears.photo, member_id, caption, members.nickname, members.name, members.photo from wears join members where wears.member_id=members.id ORDER BY id DESC LIMIT %s, %s"
         cursor.execute(sql, (index, limit))
         data = cursor.fetchall()
         cursor.close()
@@ -262,8 +262,8 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT COUNT(*) FROM wears WHERE member_id=%s ORDER BY id DESC" , (member_id,))
         count = cursor.fetchone()[0]
-        sql = "SELECT wears.id, wears.photo, member_id, caption, name, members.photo\
-        from wears join members on wears.member_id=members.id WHERE member_id=%s LIMIT %s, %s"
+        sql = "SELECT wears.id, wears.photo, member_id, caption, nickname, members.photo\
+        from wears join members on wears.member_id=members.id WHERE member_id=%s ORDER BY wears.id DESC LIMIT %s, %s"
         cursor.execute(sql, (member_id, index, limit))
         data = cursor.fetchall()
         cursor.close()
@@ -276,15 +276,15 @@ class Wears:
         cursor = cnx.cursor(buffered=True)
         cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
         data = cursor.fetchall()
-        cursor.execute("SELECT name FROM members WHERE id=%s" , (data[0][2],))
-        member_name = cursor.fetchone()[0]
+        cursor.execute("SELECT nickname, name FROM members WHERE id=%s" , (data[0][2],))
+        member_names = cursor.fetchone()
         product_photos=[]
         for i in range(len(data)):
             cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
             product_photos.append(cursor.fetchone()[0]) 
         cursor.close()
         cnx.close()
-        return (data, member_name, product_photos)
+        return (data, member_names, product_photos)
 
     @staticmethod
     def upload_photo_sticker(photo, member_id):

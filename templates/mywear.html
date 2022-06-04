@@ -168,7 +168,7 @@
                                 <i class="an an-write media-icon"></i>
                             </span>
                             <figure class="media-object">
-                                <img class="img-object" id="photo-sticker">
+                                <img class="img-object" id="photo-sticker" src="../static/photo/member-icon.png">
                             </figure>
                         </div>
                         <div class="media-control">
@@ -319,9 +319,9 @@
 
         </div>
     </div>
-
+    <div id="end" style="height: 20px;"></div>
     <div id="footer">SHOPWEAR</div>
-    <div id="end"></div>
+
 
 
     <script>
@@ -333,8 +333,10 @@
 
     <script>
         let p = 0;
+
         // 觸發條件後的回呼函式
         let showMyWear = (entry) => {
+            console.log("p: " + p)
             if (entry[0].isIntersecting) {
                 console.log("SCROLL showWear OK")
                 memberId = window.location.pathname.split("/")[2];
@@ -346,17 +348,18 @@
                             return response.json();
                         })
                         .then((result) => {
-                            p = result.nextPage;
+                            p = result["next_page"];
                             if (result.error) {
                                 console.log("WEAR NO OK")
                                 observer.unobserve(target);
                             } else {
-                                document.getElementById("photo-sticker").src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + result["member_photo"];
-                                document.getElementById("member-name").innerHTML = result["member_name"];
+                                if (result["member_photo"] !== null) {
+                                    document.getElementById("photo-sticker").src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + result["member_photo"];
+                                }
+                                document.getElementById("member-name").innerHTML = result["nickname"];
                                 document.getElementById("post-count").innerHTML = result["total_post"] + " 則貼文";
                                 let photoWrapper = document.createElement("div");
                                 photoWrapper.className = "three-pics";
-                                let photoCount = 1;
                                 for (let i in result.data) {
                                     data = result["data"][i]
                                     let id = data["id"];
@@ -369,19 +372,18 @@
                                     let img = document.createElement("img");
 
                                     // photoBox.id = "pic" + photoCount;
-                                    // a.href = 
+                                    aTag.href = "/wear/" + id;
                                     img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
                                     aTag.appendChild(img);
                                     photoBox.appendChild(aTag);
                                     photoWrapper.appendChild(photoBox);
-                                    photoCount++;
                                 }
 
                                 document.getElementById("mywear-pics").appendChild(photoWrapper)
                             }
                         })
                 } else {
-                    observer.unobserve(target);
+                    observer.unobserve(myWeartarget);
                     console.log("unobserved");
                 };
             }

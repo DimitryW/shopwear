@@ -643,6 +643,7 @@ const showMemberInfo = async() => {
     if (data["data"]) {
         document.getElementById("mem-name").value = data['data']["name"];
         document.getElementById("mem-email").value = data['data']["email"];
+        if (data['data']['nickname'] !== "") { document.getElementById("mem-nickname").value = data['data']['nickname'] }
         if (data['data']['gender'] !== "") { document.getElementById("gender").value = data['data']['gender'] }
         if (data['data']["number"] !== "") { document.getElementById("mem-number").value = data['data']["number"] }
         if (data['data']["address"] !== "") { document.getElementById("mem-add").value = data['data']["address"] }
@@ -652,12 +653,12 @@ const showMemberInfo = async() => {
 
 //更新會員資料 PATCH
 const updateMember = async() => {
-    let name = document.getElementById("mem-name").value;
+    let nickname = document.getElementById("mem-nickname").value;
     let gender = document.getElementById("gender").value
     let number = document.getElementById("mem-number").value;
     let address = document.getElementById("mem-add").value;
     let body = {
-        "name": name,
+        "nickname": nickname,
         "gender": gender,
         "number": number,
         "address": address
@@ -797,7 +798,7 @@ let showWear = (entry) => {
                     return response.json();
                 })
                 .then((result) => {
-                    page = result.nextPage;
+                    page = result["next_page"];
                     if (result.error) { // 先確認有無此資料
                         console.log("WEAR NO OK")
                         observer.unobserve(target); // 沒有資料的話記得要關閉observer，不然之後很難再打開
@@ -809,23 +810,32 @@ let showWear = (entry) => {
                             data = result["data"][i]
                             let id = data["id"];
                             let photo = data["photo"];
-                            let member = data["member_id"];
+                            let photo_sticker = data["photo_sticker"];
+                            // let member = data["member_id"];
+                            let member_nickname = data["member_nickname"];
                             let member_name = data["member_name"];
-                            let caption = data["caption"];
+                            // let caption = data["caption"];
 
                             let photoBox = document.createElement("div");
                             let aTag = document.createElement("a");
-                            let nameDiv = document.createElement("div");
+                            let wrapper = document.createElement("div");
+                            let nameBox = document.createElement("div");
+                            let mem_photo = document.createElement("img");
                             let name = document.createElement("div");
                             let img = document.createElement("img");
 
+                            if (data["photo_sticker"] === null) { mem_photo.style.display = "none"; }
                             photoBox.id = "pic" + photoCount;
                             aTag.href = "/wear/" + id;
-                            nameDiv.id = "wear-member-name";
-                            name.innerHTML = member_name;
+                            wrapper.id = "wear-member-name";
+                            mem_photo.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + photo_sticker;
+                            name.innerHTML = member_nickname !== "" ? member_nickname : member_name;
+                            mem_photo.id = "wear-photo-sticker";
                             img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
-                            nameDiv.appendChild(name);
-                            aTag.appendChild(nameDiv);
+                            nameBox.appendChild(mem_photo);
+                            nameBox.appendChild(name);
+                            wrapper.appendChild(nameBox)
+                            aTag.appendChild(wrapper);
                             aTag.appendChild(img);
                             photoBox.appendChild(aTag);
                             photoWrapper.appendChild(photoBox);
@@ -1054,6 +1064,7 @@ const submitMywear = async() => {
     let data = await res.json();
     if (data["ok"]) {
         closeSubmitWindow();
+        window.location.reload();
     }
     console.log(data["file_name"]);
 }
@@ -1066,8 +1077,8 @@ const showWearDetail = async() => {
     let data = await res.json();
     document.getElementById("wear_id").textContent = data["id"];
     document.getElementById("member_id").textContent = data["member_id"];
-    document.getElementById("member_name").href = "/mywear/" + data["member_id"];
-    document.getElementById("member_name").textContent = data["member_name"];
+    document.getElementById("member_nickname").href = "/mywear/" + data["member_id"];
+    document.getElementById("member_nickname").textContent = data["member_nickname"] !== "" ? data["member_nickname"] : data["member_name"];
     // document.getElementById("product_id").textContent = data["product_id"];
     document.getElementById("caption").textContent = data["caption"];
 
