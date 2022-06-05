@@ -824,11 +824,15 @@ let showWear = (entry) => {
                             let name = document.createElement("div");
                             let img = document.createElement("img");
 
-                            if (data["photo_sticker"] === null) { mem_photo.style.display = "none"; }
+
                             photoBox.id = "pic" + photoCount;
                             aTag.href = "/wear/" + id;
                             wrapper.id = "wear-member-name";
-                            mem_photo.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + photo_sticker;
+                            if (data["photo_sticker"] === null) {
+                                mem_photo.src = "../static/photo/member-icon-1.png";
+                            } else {
+                                mem_photo.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + photo_sticker;
+                            }
                             name.innerHTML = member_nickname !== "" ? member_nickname : member_name;
                             mem_photo.id = "wear-photo-sticker";
                             img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
@@ -1079,6 +1083,7 @@ const showWearDetail = async() => {
     document.getElementById("member_id").textContent = data["member_id"];
     document.getElementById("member_nickname").href = "/mywear/" + data["member_id"];
     document.getElementById("member_nickname").textContent = data["member_nickname"] !== "" ? data["member_nickname"] : data["member_name"];
+    if (data["photo_sticker"] !== null) { document.getElementById("photo-sticker").src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + data["photo_sticker"]; };
     // document.getElementById("product_id").textContent = data["product_id"];
     document.getElementById("caption").textContent = data["caption"];
 

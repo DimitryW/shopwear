@@ -276,15 +276,15 @@ class Wears:
         cursor = cnx.cursor(buffered=True)
         cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
         data = cursor.fetchall()
-        cursor.execute("SELECT nickname, name FROM members WHERE id=%s" , (data[0][2],))
-        member_names = cursor.fetchone()
+        cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (data[0][2],))
+        member_data = cursor.fetchone()
         product_photos=[]
         for i in range(len(data)):
             cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
             product_photos.append(cursor.fetchone()[0]) 
         cursor.close()
         cnx.close()
-        return (data, member_names, product_photos)
+        return (data, member_data, product_photos)
 
     @staticmethod
     def upload_photo_sticker(photo, member_id):
