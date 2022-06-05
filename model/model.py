@@ -276,17 +276,28 @@ class Wears:
         member_id=data[0][2]
         print("member_id")
         print(member_id)
-        cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
-        member_data = cursor.fetchone()
-        print(cnx.is_connected() )
+        # cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
+        # member_data = cursor.fetchone()
+        # print(cnx.is_connected() )
         product_photos=[]
         for i in range(len(data)):
             cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
             product_photos.append(cursor.fetchone()[0]) 
         cursor.close()
         cnx.close()
-        return (data, member_data, product_photos)
-
+        # return (data, member_data, product_photos)
+        return (data, product_photos)
+    @staticmethod
+    def show_mem_detail(member_id):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor(buffered=True)
+        cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
+        member_data = cursor.fetchone()
+        
+        cursor.close()
+        cnx.close()
+        # return (data, member_data, product_photos)
+        return member_data
     @staticmethod
     def upload_photo_sticker(photo, member_id):
         cnx = cnxpool.get_connection()
