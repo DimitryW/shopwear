@@ -295,6 +295,7 @@ class Wears:
         member_data = cursor.fetchone()
         print("member_data")
         print(member_data)
+        print(cnx.is_connected() )
         cursor.close()
         cnx.close()
         # return (data, member_data, product_photos)
