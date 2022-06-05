@@ -7,6 +7,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
+    <style>
+        .spinner {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        
+        .spinner div {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 10px solid transparent;
+            border-top-color: #3436cb;
+            border-radius: 50%;
+            animation: spinnerOne 1.2s linear infinite;
+        }
+        
+        .spinner div:nth-child(2) {
+            border: 10px solid transparent;
+            border-bottom-color: #3436cb;
+            animation: spinnerTwo 1.2s linear infinite;
+        }
+        
+        @keyframes spinnerOne {
+            0% {
+                transform: rotate(0deg);
+                border-width: 10px;
+            }
+            50% {
+                transform: rotate(180deg);
+                border-width: 1px;
+            }
+            100% {
+                transform: rotate(360deg);
+                border-width: 10px;
+            }
+        }
+        
+        @keyframes spinnerTwo {
+            0% {
+                transform: rotate(0deg);
+                border-width: 1px;
+            }
+            50% {
+                transform: rotate(180deg);
+                border-width: 10px;
+            }
+            100% {
+                transform: rotate(360deg);
+                border-width: 1px;
+            }
+        }
+    </style>
 
 </head>
 
@@ -47,6 +100,10 @@
                                 <div class="data-switch-input">
                                 </div>
                                 <ul id="slide-list" data-slides>
+                                    <div class="spinner" id="index-spinner" style="position: absolute;left: 50%;transform: translate(-50%, -50%);">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
 
                                 </ul>
                             </div>

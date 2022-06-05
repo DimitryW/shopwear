@@ -164,7 +164,10 @@ const showProductDetail = async() => {
         let input = document.createElement("input");
         let li = document.createElement("li");
         let img = document.createElement("img");
-        // let spinner = document.createElement("div");
+        img.onload = () => {
+                document.getElementById("index-spinner").style.display = "none";
+            }
+            // let spinner = document.createElement("div");
         addAttributes(input, inputAttributes);
         li.setAttribute("class", "slide");
         img.src = "https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/" + imgList[i];
