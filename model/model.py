@@ -290,7 +290,7 @@ class Wears:
     @staticmethod
     def show_mem_detail(member_id):
         cnx = cnxpool.get_connection()
-        cursor = cnx.cursor(buffered=True)
+        cursor = cnx.cursor()
         cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
         member_data = cursor.fetchone()
         
