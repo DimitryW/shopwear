@@ -273,6 +273,8 @@ class Wears:
         cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
         data = cursor.fetchall()
         member_id=data[0][2]
+        print("member_id")
+        print(member_id)
         cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
         member_data = cursor.fetchone()
         product_photos=[]
