@@ -291,7 +291,7 @@ class Wears:
     def show_mem_detail(member_id):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        cursor.execute("SELECT nickname, members.name, photo FROM members WHERE id=%s" , (member_id,))
+        cursor.execute("SELECT nickname, mem_name, photo FROM members WHERE id=%s" , (member_id,))
         member_data = cursor.fetchone()
         print("member_data")
         print(member_data)
