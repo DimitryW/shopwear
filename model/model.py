@@ -55,14 +55,7 @@ class Products:
         sql = "SELECT products.id, product_name, price, description, content, src, size_suggest FROM products JOIN products_photos ON products.id = products_photos.product_id WHERE products.id=%s"
         cursor.execute(sql, (product_id,) )
         data = cursor.fetchall()
-        cursor.close()
-        cnx.close()
-        return data
-    
-    @staticmethod
-    def check_stock(product_id):
-        cnx = cnxpool.get_connection()
-        cursor = cnx.cursor()
+
         sql = "select color from stock where product_id=%s group by color"
         cursor.execute(sql, (product_id,) )
         colors = cursor.fetchall()
@@ -71,9 +64,12 @@ class Products:
             sql = "select size from stock where product_id=%s and color=%s"
             cursor.execute(sql, (product_id, colors[i][0]) )
             stock_list[colors[i][0]] = [size[0] for size in cursor.fetchall()]
+
         cursor.close()
         cnx.close()
-        return stock_list
+        return (data, stock_list)
+    
+    
 
 class Products_Photos:
     @staticmethod

@@ -157,8 +157,8 @@ def api_select_product():
 @app.route("/api/product/<product_id>", methods=["GET"])
 def api_product(product_id):
     try:
-        data = Products.check_product_details(product_id)
-        stock = Products.check_stock(product_id)
+        data, stock = Products.check_product_details(product_id)
+        # stock = Products.check_stock(product_id)
         res = {
         "id": data[0][0],
         "product_name":data[0][1],
