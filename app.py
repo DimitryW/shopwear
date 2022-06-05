@@ -599,6 +599,7 @@ def api_mywear():
         "total_page": total_page,
         "next_page": page+1 if page+1 < total_page else None,
         "nickname":data[0][4],
+        "member_name":data[0][6],
         "member_photo" : data[0][5],
         "total_post": total,
         "data":[]

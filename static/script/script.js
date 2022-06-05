@@ -9,7 +9,6 @@ const showProducts = async(page = 0, category = "", subcategory = "") => {
     let res = await fetch(apiAddress);
     let data = await res.json();
     document.getElementById("catalogue").innerHTML = "";
-
     for (i of data["data"]) {
         let box = document.createElement("a");
         let spinner = document.createElement("div");
@@ -24,11 +23,17 @@ const showProducts = async(page = 0, category = "", subcategory = "") => {
         name.id = "product-name";
         price.textContent = "NT$ " + i["price"];
         price.id = "price";
+        let imgLength = data['data'].length;
+        console.log(i["id"])
+
         img.onload = () => {
-            img.style.display = "block";
-            spinner.style.display = "none";
+            // img.style.display = "block";
+            // spinner.style.display = "none";
+            document.getElementById("index-spinner").style.display = 'none';
+            // loadedImg(imgLength);
         }
-        box.appendChild(spinner);
+
+        // box.appendChild(spinner);
         box.appendChild(img);
         box.appendChild(name);
         box.appendChild(price);
@@ -60,6 +65,14 @@ const showProducts = async(page = 0, category = "", subcategory = "") => {
     document.getElementById(liId).style.border = "1px solid #d8d8d8";
 }
 
+
+// let loaded_images_total = 0;
+// const loadedImg = (x) => {
+//     loaded_images_total++;
+//     if (loaded_images_total == x) {
+//         document.getElementById("index-spinner").style.display = 'none';
+//     }
+// }
 
 // product頁面
 
@@ -1052,6 +1065,7 @@ const selectProduct = async(subcategory) => {
 // mywear.html 上傳檔案
 const submitMywear = async() => {
     document.getElementById("wear-upload-spinner").style.display = 'block';
+    document.getElementById("upload-backdrop").style.display = 'block';
     let formData = new FormData();
     let file = document.getElementById("file-upload");
     let itemIds = [];

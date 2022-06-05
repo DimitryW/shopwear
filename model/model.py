@@ -262,7 +262,7 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT COUNT(*) FROM wears WHERE member_id=%s ORDER BY id DESC" , (member_id,))
         count = cursor.fetchone()[0]
-        sql = "SELECT wears.id, wears.photo, member_id, caption, nickname, members.photo\
+        sql = "SELECT wears.id, wears.photo, member_id, caption, nickname, members.photo, members.name\
         from wears join members on wears.member_id=members.id WHERE member_id=%s ORDER BY wears.id DESC LIMIT %s, %s"
         cursor.execute(sql, (member_id, index, limit))
         data = cursor.fetchall()
