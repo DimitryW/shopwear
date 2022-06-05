@@ -4,7 +4,7 @@ import mysql.connector.pooling
 
 
 
-cnxpool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool", pool_size = 10, pool_reset_session=True, **dbconfig)
+cnxpool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool", pool_size = 20, pool_reset_session=True, **dbconfig)
 
 
 
@@ -293,7 +293,8 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
         member_data = cursor.fetchone()
-        
+        print("member_data")
+        print(member_data)
         cursor.close()
         cnx.close()
         # return (data, member_data, product_photos)
