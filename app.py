@@ -627,9 +627,9 @@ def api_wear_detail(wear_id):
     "id": data[0][0],
     "photo":[str(data[0][2]) +"/"+ data[0][1]],
     "member_id":data[0][2],
-    "member_nickname":member_data[10],
+    "member_nickname":member_data[0],
     "member_name":member_data[1],
-    "photo_sticker": member_data[9],
+    "photo_sticker": member_data[2],
     "caption": data[0][3], 
     "product_id" : [x[6] for x in data],
     "product_photos":product_photos
