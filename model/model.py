@@ -272,7 +272,8 @@ class Wears:
         cursor = cnx.cursor(buffered=True)
         cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
         data = cursor.fetchall()
-        cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (data[0][2],))
+        member_id=data[0][2]
+        cursor.execute("SELECT nickname, name, photo FROM members WHERE id=%s" , (member_id,))
         member_data = cursor.fetchone()
         product_photos=[]
         for i in range(len(data)):

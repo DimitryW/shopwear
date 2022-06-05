@@ -594,7 +594,7 @@ def api_mywear():
     member_id = request.args.get("member", type=int)
     (data, total) = Wears.show_mywear(member_id, index=page*3)
     total_page = (total//3) if total%3==0 else (total//3)+1
-    
+    print(data[0][4])
     res = {
         "total_page": total_page,
         "next_page": page+1 if page+1 < total_page else None,
