@@ -622,7 +622,6 @@ def api_mywear():
 def api_wear_detail(wear_id):
     (data, member_data, product_photos) = Wears.show_wear_detail(wear_id)
     # (data, product_photos) = Wears.show_wear_detail(wear_id)
-    member_data = Wears.show_mem_detail(data[0][2])
     res = {
     "id": data[0][0],
     "photo":[str(data[0][2]) +"/"+ data[0][1]],
