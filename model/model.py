@@ -1,3 +1,4 @@
+import stat
 from config import dbconfig
 import mysql.connector
 import mysql.connector.pooling
@@ -272,17 +273,21 @@ class Wears:
         cursor = cnx.cursor(buffered=True)
         cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
         data = cursor.fetchall()
-        print(cnx.is_connected() )
+        # print(cnx.is_connected() )
         cursor.execute("SELECT * FROM members WHERE id=%s" , (data[0][2],))
         member_data = cursor.fetchone()
-        print(cnx.is_connected() )
+        # print(member_data)
+        # print(cnx.is_connected() )
         product_photos=[]
         for i in range(len(data)):
-            cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
-            product_photos.append(cursor.fetchone()[0]) 
+            if data[i][6]!=None:
+                cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
+                product_photos.append(cursor.fetchone()[0]) 
+        cursor.execute("SELECT COUNT(*) FROM likes WHERE wear_id=%s" , (data[0][0],))
+        likes = cursor.fetchone()[0]
         cursor.close()
         cnx.close()
-        return (data, member_data, product_photos)
+        return (data, member_data, product_photos, likes)
         
     # @staticmethod
     # def show_mem_detail(member_id):
@@ -318,18 +323,50 @@ class Wears:
         cursor.execute("SELECT LAST_INSERT_ID()")
         wears_id = cursor.fetchone()[0]
         
-        for i in range(len(product_id)):
+        if len(product_id)==0:
             sql = "INSERT INTO wears_products(wears_id, product_id) VALUES(%s, %s)"
-            val = (wears_id, product_id[i])
+            val = (wears_id, None)
             cursor.execute(sql, val)
             cnx.commit()
+        else:
+            for i in range(len(product_id)):
+                sql = "INSERT INTO wears_products(wears_id, product_id) VALUES(%s, %s)"
+                val = (wears_id, product_id[i])
+                cursor.execute(sql, val)
+                cnx.commit()
             # print(product_id[i])
         
         cursor.close()
         cnx.close()
         return
 
-    
+class Likes:
+    @staticmethod
+    def update_like(wear_id, email, third_party, status):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "INSERT INTO likes(wear_id, member_id, status)\
+             VALUES(%s, (SELECT id FROM members WHERE email=%s AND third_party=%s), %s) ON DUPLICATE KEY UPDATE status=%s"
+        val=(wear_id, email, third_party, status, status)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+
+    @staticmethod
+    def check_like(email, third_party, wear_id):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "SELECT COUNT(*) FROM likes WHERE member_id=(SELECT id FROM members WHERE email=%s AND third_party=%s)\
+            AND wear_id=%s"
+        val=(email, third_party, wear_id)
+        cursor.execute(sql, val)
+        like_count = cursor.fetchone()[0]
+        cursor.close()
+        cnx.close()
+        return like_count
+
 
 
 #建立圖片路徑資料

@@ -18,7 +18,7 @@ const showProducts = async(page = 0, category = "", subcategory = "") => {
         box.id = "box" + i["id"];
         box.href = "/product/" + i["id"];
         spinner.id = "spinner";
-        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
+        img.src = "https://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
         name.textContent = i["product_name"];
         name.id = "product-name";
         price.textContent = "NT$ " + i["price"];
@@ -464,7 +464,7 @@ const checkOrderDetails = async(order_no, hiddenDiv) => {
         let size = document.createElement("span");
         let price = document.createElement("span");
         let qty = document.createElement("span");
-        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + data["data"][i]["product_name"] + "/" + data["data"][i]["product_name"] + "-1.jpg";
+        img.src = "https://d1pxx4pixmike8.cloudfront.net/shopwear/" + data["data"][i]["product_name"] + "/" + data["data"][i]["product_name"] + "-1.jpg";
         product_name.innerHTML = data["data"][i]["product_name"];
         color.innerHTML = data["data"][i]["color"];
         size.innerHTML = data["data"][i]["size"];
@@ -513,6 +513,7 @@ window.onclick = e => {
 // member
 // 檢查會員登入狀況
 const loggedIn = () => {
+    // console.log("/api/user")
     fetch("/api/user", {
             method: "GET",
             headers: headers
@@ -534,9 +535,8 @@ const loggedIn = () => {
                     }
                 }
 
-
                 if (window.location.pathname === "/login") {
-                    window.location = document.referrer;
+                    window.location = "/";
                 }
             } else {
                 console.log("not login");
@@ -568,7 +568,10 @@ const signin = () => {
         .then((result) => {
             if (result["ok"]) {
                 // window.history.go(-1);
-                window.location = document.referrer;
+                if (document.referrer === '') {
+                    window.location = '/';
+                } else { window.location = document.referrer; }
+
             } else {
                 console.log(result["message"])
                 document.getElementById("signin-message").innerHTML = "登入失敗，帳號或密碼錯誤或其他原因";
@@ -840,23 +843,23 @@ let showWear = (entry) => {
                             let name = document.createElement("div");
                             let img = document.createElement("img");
 
-
                             photoBox.id = "pic" + photoCount;
                             aTag.href = "/wear/" + id;
                             wrapper.id = "wear-member-name";
                             if (data["photo_sticker"] === null) {
                                 mem_photo.src = "../static/photo/member-icon-1.png";
                             } else {
-                                mem_photo.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + photo_sticker;
+                                mem_photo.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + photo_sticker;
                             }
                             name.innerHTML = member_nickname !== "" ? member_nickname : member_name;
                             mem_photo.id = "wear-photo-sticker";
-                            img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
+                            img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
                             nameBox.appendChild(mem_photo);
                             nameBox.appendChild(name);
                             wrapper.appendChild(nameBox)
                             aTag.appendChild(wrapper);
                             aTag.appendChild(img);
+
                             photoBox.appendChild(aTag);
                             photoWrapper.appendChild(photoBox);
                             photoCount++;
@@ -906,7 +909,7 @@ const submitPhotoSticker = async() => {
     if (data["error"]) {
         console.log(data["message"]);
     } else {
-        photoSticker.src = "http://d7h07qlpoj67x.cloudfront.net/mywear/photo_sticker/" + data["pic_src"];
+        photoSticker.src = "https://d7h07qlpoj67x.cloudfront.net/mywear/photo_sticker/" + data["pic_src"];
     }
 }
 
@@ -965,22 +968,23 @@ const closeSubmitWindow = () => {
     switchBtnPrev();
     nextStep('upload-container-2', 'upload-container-1');
 }
-const submitWindow = () => {
 
-    }
-    // 拖曳上傳圖片功能
-    // function uploadFiles() {
-    //     var files = document.getElementById('file-upload').files;
-    //     if (files.length == 0) {
-    //         alert("Please first choose or drop any file(s)...");
-    //         return;
-    //     }
-    //     var filenames = "";
-    //     for (var i = 0; i < files.length; i++) {
-    //         filenames += files[i].name + "\n";
-    //     }
-    //     alert("Selected file(s) :\n____________________\n" + filenames);
-    // }
+// const submitWindow = () => {
+
+//     }
+// 拖曳上傳圖片功能
+// function uploadFiles() {
+//     var files = document.getElementById('file-upload').files;
+//     if (files.length == 0) {
+//         alert("Please first choose or drop any file(s)...");
+//         return;
+//     }
+//     var filenames = "";
+//     for (var i = 0; i < files.length; i++) {
+//         filenames += files[i].name + "\n";
+//     }
+//     alert("Selected file(s) :\n____________________\n" + filenames);
+// }
 
 const showPreview = (event) => {
     if (event.target.files.length > 0) {
@@ -1048,7 +1052,7 @@ const selectProduct = async(subcategory) => {
             }
             // box.href = "/product/" + i["id"];
         spinner.id = "spinner";
-        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
+        img.src = "https://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
         name.textContent = i["product_name"];
         name.id = "sub-item-name";
         // price.textContent = "NT$ " + i["price"];
@@ -1071,12 +1075,15 @@ const submitMywear = async() => {
     document.getElementById("upload-backdrop").style.display = 'block';
     let formData = new FormData();
     let file = document.getElementById("file-upload");
-    let itemIds = [];
-    for (i of document.getElementById('selected-item-1').children) {
-        itemIds.push(i.children[1].id)
-    }
     formData.append("pic", file.files[0]);
-    formData.append("text", itemIds);
+    let itemIds = [];
+    let items = document.getElementById('selected-item-1').children
+    if (items.length !== 0) {
+        for (i of items) {
+            itemIds.push(i.children[1].id)
+        }
+        formData.append("id", itemIds);
+    }
     formData.append("caption", "");
     let res = await fetch("/api/mywear/upload", {
         method: "POST",
@@ -1091,6 +1098,57 @@ const submitMywear = async() => {
 }
 
 //WEAR單頁資料
+// update Like API
+const updateLike = async() => {
+        let wear_id = document.getElementById('wear_id').innerHTML;
+        let like_stat = document.getElementsByClassName('like-text')[0].innerHTML;
+        let body = {
+            "wear_id": wear_id,
+            "like_stat": like_stat
+        }
+        let data = await fetch("/api/like", { method: "POST", headers: headers, body: JSON.stringify(body) });
+        let res = await data.json();
+        if (res["ok"]) {
+            console.log("已更新LIKE");
+        }
+    }
+    // Like button
+const createDOMFromString = (domString) => {
+    const div = document.createElement('div')
+    div.innerHTML = domString
+    return div
+}
+
+class LikeButton {
+    constructor() {
+        this.state = { isLiked: false }
+    }
+
+    changeLikeText() {
+        const likeText = this.element.querySelector('.like-text')
+        const likeIcon = this.element.querySelector('.like-icon')
+        this.state.isLiked = !this.state.isLiked
+        likeText.innerHTML = this.state.isLiked ? 'liked' : 'noLike'
+        likeIcon.innerHTML = this.state.isLiked ? '❤️' : '🤍'
+        console.log(this.state.isLiked)
+        updateLike();
+    }
+
+
+    render() {
+        this.element = createDOMFromString(`
+          <button class='like-button'>
+          <span class='like-text'>noLike</span>
+          <span class='like-icon'>🤍</span>
+          </button>
+        `)
+        this.element.addEventListener('click', this.changeLikeText.bind(this), false)
+            // this.element.addEventListener('click', this.changeLikeIcon.bind(this), false)
+        return this.element
+    }
+}
+
+
 
 const showWearDetail = async() => {
     let apiAddress = "/api/wear/" + window.location.pathname.split("/")[2];
@@ -1100,7 +1158,7 @@ const showWearDetail = async() => {
     document.getElementById("member_id").textContent = data["member_id"];
     document.getElementById("member_nickname").href = "/mywear/" + data["member_id"];
     document.getElementById("member_nickname").textContent = data["member_nickname"] !== "" ? data["member_nickname"] : data["member_name"];
-    if (data["photo_sticker"] !== null) { document.getElementById("photo-sticker").src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + data["photo_sticker"]; };
+    if (data["photo_sticker"] !== null) { document.getElementById("photo-sticker").src = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + data["photo_sticker"]; };
     // document.getElementById("product_id").textContent = data["product_id"];
     document.getElementById("caption").textContent = data["caption"];
 
@@ -1114,7 +1172,7 @@ const showWearDetail = async() => {
         // let spinner = document.createElement("div");
         addAttributes(input, inputAttributes);
         li.setAttribute("class", "slide");
-        img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + imgList[i];
+        img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + imgList[i];
         // spinner.id = "spinner";
         // img.onload = () => {
         //     img.style.display = "block";
@@ -1134,13 +1192,20 @@ const showWearDetail = async() => {
         let box = document.createElement("a");
         let img = document.createElement("img");
         let span = document.createElement("span");
-        img.src = "http://d1pxx4pixmike8.cloudfront.net/shopwear/" + data["product_photos"][j];
+        img.src = "https://d1pxx4pixmike8.cloudfront.net/shopwear/" + data["product_photos"][j];
         span.textContent = data["product_photos"][j].split("/")[0];
         box.href = "/product/" + data["product_id"][j];
         box.appendChild(img);
-        box.appendChild(span)
-        document.getElementById("wear-products").appendChild(box)
+        box.appendChild(span);
+        document.getElementById("wear-products").appendChild(box);
     }
+
+    let likeWrapper = document.getElementById("like-wrapper");
+    let likeButton1 = new LikeButton();
+    console.log(likeButton1)
+    console.log(likeButton1.state)
+    likeWrapper.appendChild(likeButton1.render());
+    // likeButton1.element.click()
 
     document.getElementsByClassName("data-switch-input-btn")[0].checked = true;
     document.getElementsByClassName("slide")[0].dataset.active = true;
@@ -1148,6 +1213,10 @@ const showWearDetail = async() => {
         // console.log(inputBtn = document.querySelectorAll(".data-switch-input-btn"))
     showOtherWears(data["member_id"]);
 }
+
+
+
+
 
 const showOtherWears = async(memberId) => {
     let otherWears = document.getElementById("other-wears");
@@ -1165,7 +1234,7 @@ const showOtherWears = async(memberId) => {
         let aTag = document.createElement("a");
         let img = document.createElement("img");
         aTag.href = "/wear/" + id;
-        img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
+        img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
         aTag.appendChild(img);
         photoBox.appendChild(aTag);
         otherWears.appendChild(photoBox);

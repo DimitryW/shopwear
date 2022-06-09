@@ -374,6 +374,13 @@ input {
     object-fit: cover;
 }
 
+#wear-products {
+    background-image: url("../static/photo/clothes.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 200px 200px;
+}
+
 #wear-products>a {
     display: flex;
     margin: 10px 0;
@@ -404,6 +411,20 @@ input {
     /* display: flex; */
     /* position: relative;
     justify-content: center; */
+}
+
+.like-button {
+    border: none;
+    height: 60px;
+    background: transparent;
+}
+
+.like-text {
+    display: none;
+}
+
+.like-icon {
+    font-size: 25px;
 }
 
 #other-wears {

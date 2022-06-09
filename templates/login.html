@@ -32,14 +32,15 @@
                 .then(result => {
                     console.log(result)
                     if (result["ok"]) {
-                        // window.location = "/member";
-                        window.history.back();
+                        if (document.referrer === "") {
+                            window.location = "/";
+                        } else {
+                            window.location = document.referrer;
+                        }
                     }
                 })
         }
-        window.onpageshow = function() {
-            loggedIn();
-            showCart();
+        window.onload = function() {
 
             google.accounts.id.initialize({
                 client_id: "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com",
@@ -56,8 +57,11 @@
                 } // customization attributes
             );
             // google.accounts.id.prompt(); // also display the One Tap dialog
+            loggedIn();
+            showCart();
         }
     </script>
+
 </head>
 
 <body id="body">
