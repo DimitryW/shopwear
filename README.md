@@ -1,1 +1,60 @@
-# shopwear
+<h1><p align="center">SHOPWEAR</p></h1>
+
+![image](https://user-images.githubusercontent.com/63653055/173226002-6e312809-b48c-4b9a-a296-8c97776ad3e8.png)
+
+
+<!-- <table>
+  <tr>
+    <td valign="top"><img src="https://user-images.githubusercontent.com/63653055/173225243-032798f6-7a7c-427f-9bb7-24d7d44a7310.png"/></td>
+    <td valign="top"><img src="https://user-images.githubusercontent.com/63653055/173225221-fc3f9294-07cc-468b-b451-cf9396f7bbce.png"/></td>
+    <td valign="top"><img src="https://user-images.githubusercontent.com/63653055/173225399-8f8cab30-5cbd-42af-8126-4b9d8106ab48.png"/></td>
+  </tr>
+</table> -->
+
+<h1><p align="center"><a href="https://www.dimalife.com">Live Demo</a></p></h1>
+
+*"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."*  
+Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
+Of course, you can share yours, too!
+
+
+## How to use 
+
+### 1. Login  
+
+Go to [login](https://www.dimalife.com/login) page and you can log in directly as a guest via the green "訪客帳號登入" button.
+
+<p align="center"><img src="https://user-images.githubusercontent.com/63653055/173237803-91ccb42d-4f80-4a9a-af50-d4691490bd69.png" style="width:60%;"/></p>
+
+### 2. Basic shopping routine
+* Select any item you like on the home page and direct to the product details page.
+* When item is add in cart, notification will show on the top right navigation bar.
+* In the checkout page, confirm and make payment.
+* After payment is done, you can check the order in history orders.
+![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/buy.gif)
+
+### 3.  Upload and share your dressings.
+* Go to member's **MyWear** page.
+* Click "上傳貼文" the ipload button.
+* Choose or drag your photo.
+* Select the clothes item.
+* Upload.
+* Then you can check out the photo either in you member's page or on the **Wear穿搭牆** page.
+* The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
+![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
+
+## Backend skills
+* Built with Flask app and deployed by Docker.
+* Deployed on AWS EC2 service.
+* Use of AWS RDS(MySql) for data manipulation.
+* Use of AWS S3 storage and Cloudfront for CDN service.
+* Use Nginx as web server.
+
+![image](https://user-images.githubusercontent.com/63653055/173238632-6aa74484-aae0-4a5f-b33b-1bb1b02830cc.png)
+
+## Deployment 
+`docker pull grayfen/shopwear`
+
+
+
+

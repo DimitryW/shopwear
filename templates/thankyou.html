@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>SHOPWEAR</title>
+    <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
+    <script type="text/javascript" src="../static/script/script.js"></script>
+</head>
+
+<body id="body">
+    <div class="page_container">
+        <div class="page-wrapper">
+            <div class="topnav-container ">
+                <div class="topnav">
+                    <a id="nav-title" href="/">SHOPWEAR</a>
+                    <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">WEAR</a></button>
+                    <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="https://dimalife.com/cart">購物車</a></button>
+                    <div id="cart-item" style="display: none;"></div>
+                    <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://dimalife.com/login">會員登入</a></button>
+                    <select class="mem-dropdown" id="mem-dropdown" onchange=" 
+                    if (this.selectedIndex==1) location = this.value;
+                    if (this.selectedIndex==2) location = this.value;
+                    if (this.selectedIndex==3) location = this.value;
+                    if (this.selectedIndex==4) location = this.value;
+                    if (this.selectedIndex==5) logout();">
+                        <option value="" disabled selected>會員選單</option>
+                        <option class="drowpdown-mem-info" value="https://dimalife.com/member"><a id="drowpdown-mem-info-a" href="/member">會員資料</a></option>
+                        <option class="drowpdown-mem-info" value="https://dimalife.com/password"><a id="drowpdown-mem-info-a" href="/password">更改密碼</a></option>
+                        <option class="drowpdown-mem-info" value="https://dimalife.com/order"><a id="drowpdown-mem-info-a" href="/order">歷史訂單</a></option>
+                        <option class="drowpdown-mem-info" id="dorpdown-mywear" ><a id="drowpdown-mem-info-a" >MyWear</a></option>
+                        <option class="dropdown-logout">登出</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="main-container" id="main-container">
+
+
+                <div id="thankyou" style="text-align: center; margin: 100px 0;font-size: 20px; color: #2e2e2e;">
+                    <!-- <div><img src="../static/photo/cart.png" style="width: 200px;"> </div> -->
+                    謝謝您，訂單已成立，您可至會員專區查詢訂單資料。
+                    <div style="margin: 30px;">訂單編號 : <span>{{order_no}}</span></div>
+                </div>
+
+                <button id="keep-buy" style="width: 100%;"><a href="/order" style="border-bottom: 2px solid #4a61e8;">查詢訂單資料</a></button>
+
+
+            </div>
+
+        </div>
+
+        <!-- <div class="footer-container">
+            <div id="footer">SHOPWEAR</div>
+        </div>
+
+        <div id="end"></div> -->
+    </div>
+    <div id="footer">SHOPWEAR</div>
+
+
+    <script>
+        window.onload = () => {
+            loggedIn();
+        }
+    </script>
+</body>
+
+</html>
