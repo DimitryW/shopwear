@@ -13,14 +13,48 @@
 
 <h1><p align="center"><a href="https://www.dimalife.com">Live Demo</a></p></h1>
 
-*"As a online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."*  
+*"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."*  
 Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
 Of course, you can share yours, too!
 
 
-<h2>How to use</h2>
-<h3>1. </h3>
+## How to use 
 
-Go to [login](https://www.dimalife.com/login) page and you can log in directly as a guest via the green "guest login" button.
+### 1. Login  
 
-<p align="center"><img src="https://user-images.githubusercontent.com/63653055/173227465-3d3df97e-bb65-48ca-8b5b-2bd0d3b522eb.png" style="width:60%;"/></p>
+Go to [login](https://www.dimalife.com/login) page and you can log in directly as a guest via the green "訪客帳號登入" button.
+
+<p align="center"><img src="https://user-images.githubusercontent.com/63653055/173237803-91ccb42d-4f80-4a9a-af50-d4691490bd69.png" style="width:60%;"/></p>
+
+### 2. Basic shopping routine
+* Select any item you like on the home page and direct to the product details page.
+* When item is add in cart, notification will show on the top right navigation bar.
+* In the checkout page, confirm and make payment.
+* After payment is done, you can check the order in history orders.
+![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/buy.gif)
+
+### 3.  Upload and share your dressings.
+* Go to member's **MyWear** page.
+* Click "上傳貼文" the ipload button.
+* Choose or drag your photo.
+* Select the clothes item.
+* Upload.
+* Then you can check out the photo either in you member's page or on the **Wear穿搭牆** page.
+* The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
+![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
+
+## Backend skills
+* Built with Flask app and deployed by Docker.
+* Deployed on AWS EC2 service.
+* Use of AWS RDS(MySql) for data manipulation.
+* Use of AWS S3 storage and Cloudfront for CDN service.
+* Use Nginx as web server.
+
+![image](https://user-images.githubusercontent.com/63653055/173238632-6aa74484-aae0-4a5f-b33b-1bb1b02830cc.png)
+
+## Deployment 
+`docker pull grayfen/shopwear`
+
+
+
+
