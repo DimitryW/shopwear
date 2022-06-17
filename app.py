@@ -69,7 +69,7 @@ def orders():
     return render_template("order.html")
 
 # 登入頁面
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login")
 def login():
     return render_template("login.html")
 
@@ -101,64 +101,76 @@ def wear_single_page(wear_id):
 #全部產品資料
 @app.route("/api/products", methods=["GET"])
 def api_product_index():
-    page = request.args.get("page", default=0, type=int)
-    # print(page)
-    category = request.args.get("category", default="", type=str)
-    # print(category)
-    subcategory = request.args.get("subcategory", default="", type=str)
-    # print(subcategory)
-    (data, total) = Products.show_products(category, subcategory, index=page*12)
-    
-    res = {
-        "total_page": (total//12) if total%12==0 else (total//12)+1,
-        "next_page": page+1 if page < (total//12) else None,
-        "data":[]
-    }
-    
-    for i in range(len(data)):
-        product={
-            "id": data[i][0],
-            "product_name":data[i][1],
-            "price": data[i][2], 
-            "description": data[i][3], 
-            "content": data[i][4],
-            "photo" : data[i][1] + "/" + data[i][1] + "-1.jpg"
+    try:
+        page = request.args.get("page", default=0, type=int)
+        category = request.args.get("category", default="", type=str)
+        subcategory = request.args.get("subcategory", default="", type=str)
+        (data, total) = Products.show_products(category, subcategory, index=page*12)
+        
+        res = {
+            "total_page": (total//12) if total%12==0 else (total//12)+1,
+            "next_page": page+1 if page < (total//12) else None,
+            "data":[]
         }
-        res["data"].append(product)
-    status=200
+        
+        for i in range(len(data)):
+            product={
+                "id": data[i][0],
+                "product_name":data[i][1],
+                "price": data[i][2], 
+                "description": data[i][3], 
+                "content": data[i][4],
+                "photo" : data[i][1] + "/" + data[i][1] + "-1.jpg"
+            }
+            res["data"].append(product)
+        status=200
+    except:
+        res = {
+        "error":True,
+        "message": "內部伺服器錯誤"
+        }
+        status=500
 
     return jsonify(res), status
 
+# 篩選產品子類別
 @app.route("/api/selectproducts", methods=["GET"])
 def api_select_product():
-    subcategory = request.args.get("subcategory", default="", type=str)
-    # print(subcategory)
-    data = Products.show_subcategory(subcategory)
-    
-    res = {
-        "data":[]
-    }
-    
-    for i in range(len(data)):
-        product={
-            "id": data[i][0],
-            "product_name":data[i][1],
-            # "price": data[i][2], 
-            # "description": data[i][3], 
-            # "content": data[i][4],
-            "photo" : data[i][1] + "/" + data[i][1] + "-1.jpg"
+    try:
+        subcategory = request.args.get("subcategory", default="", type=str)
+        # print(subcategory)
+        data = Products.show_subcategory(subcategory)
+        
+        res = {
+            "data":[]
         }
-        res["data"].append(product)
-    status=200
+        
+        for i in range(len(data)):
+            product={
+                "id": data[i][0],
+                "product_name":data[i][1],
+                # "price": data[i][2], 
+                # "description": data[i][3], 
+                # "content": data[i][4],
+                "photo" : data[i][1] + "/" + data[i][1] + "-1.jpg"
+            }
+            res["data"].append(product)
+        status=200
+
+    except:
+        res = {
+        "error":True,
+        "message": "內部伺服器錯誤"
+        }
+        status=500
 
     return jsonify(res), status
 
-# 單一產品資料
+# 單一產品詳細資料
 @app.route("/api/product/<product_id>", methods=["GET"])
 def api_product(product_id):
     try:
         data, stock = Products.check_product_details(product_id)
-        # stock = Products.check_stock(product_id)
         res = {
         "id": data[0][0],
         "product_name":data[0][1],
@@ -172,9 +184,11 @@ def api_product(product_id):
         status=200
     except:
         res = {
-        "error":True
+        "error":True,
+        "message": "內部伺服器錯誤"
         }
         status=500
+
     return jsonify(res), status
 
 
@@ -183,13 +197,11 @@ def api_product(product_id):
 def api_login():
     data = request.get_json()
     token = data["token"]
-    # print(1)
-    
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
-        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(), "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=52)
-        # print(2)
+        id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(),\
+             "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=55)
         if id_info:
             # ID token is valid. 
             # user_id = id_info['sub']
@@ -197,7 +209,6 @@ def api_login():
             user_email = id_info['email']
             
             count = Members.check_member(user_name, user_email, "google")
-            # print(user_name, user_email)
             if count==0:
                 Members.sign_up(user_name, user_email, "google", "", "", "google")
             
@@ -228,6 +239,7 @@ def api_login():
 # 會員註冊、登入與登出
 @app.route("/api/user", methods=["GET", "POST", "PATCH", "DELETE"])
 def user():
+    # 會員登入狀態
     if request.method == "GET":
         try:
             if "shopwear_user" in request.cookies:
@@ -262,16 +274,26 @@ def user():
             status = 500
         return jsonify(loggedin_api), status
 
-# sign up
+# 註冊
     elif request.method == "POST":
         request_data = request.get_json()
         name = request_data["name"]
         email = request_data["email"]
         password = request_data["password"]
+        cfm_password = request_data["cfmPassword"]
         number = request_data["number"]
         address = request_data["address"]
         re_name = "^([\u4e00-\u9fa5]{2,20}|[a-zA-Z.\s]{2,20})$"
         re_email = "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$"
+
+        if password != cfm_password:
+            signup_api = {
+                "error": True,
+                "message": "註冊失敗，確認密碼不相符。"
+            }
+            status = 400
+            res = make_response((signup_api), status)
+            return res
 
         if (re.search(re_name, name)!=None) & (re.search(re_email, email)!=None):
             member_count = Members.count_member(email, False)
@@ -281,6 +303,8 @@ def user():
                 "message": "註冊失敗，輸入格式錯誤。"
             }
             status = 400
+            res = make_response((signup_api), status)
+            return res
 
         if member_count == 0:
             Members.sign_up(name, email, password, number, address, False)
@@ -288,7 +312,7 @@ def user():
                 "ok": True
             }
             status = 200
-
+            
         elif member_count == 1:
             signup_api = {
                 "error": True,
@@ -305,7 +329,7 @@ def user():
         res = make_response((signup_api), status)
         return res
         
-# sign in
+# 登入
     elif request.method == "PATCH":
         request_data = request.get_json()
         email = request_data["email"]
@@ -335,7 +359,7 @@ def user():
 
         return res
         
-# log out
+# 登出
     elif request.method == "DELETE":
         loggedout_api = {
             "ok": True
@@ -344,8 +368,29 @@ def user():
         res.set_cookie("shopwear_user", "", expires=0)
         return res
 
+# 訪客帳號
+@app.route("/api/guest", methods=["PATCH"])
+def guest_siginin():
+    try:
+        request_data = request.get_json()
+        email = request_data["email"]
+        password = request_data["password"]
+        encoded_jwt = jwt.encode({"third_party": False, "email": email}, jwt_key, algorithm="HS256")
+        signin_api = {
+            "ok": True
+        }
+        res = make_response((signin_api),200)
+        res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
+    except:
+        signin_api = {
+                "error": True,
+                "message": "伺服器內部錯誤"
+            }
+        res = make_response((signin_api), 500)
+    
+    return res
 
-#更新會員資料API
+#更新會員資料
 @app.route("/api/member", methods=["PATCH"])
 def api_member():
     try:
@@ -376,7 +421,7 @@ def api_member():
 
     return jsonify(res), status
 
-#更新會員密碼API
+#更新會員密碼
 @app.route("/api/password", methods=["PATCH"])
 def api_password():
     try:
@@ -433,7 +478,7 @@ def api_password():
 
     return jsonify(res), status
 
-#建立訂單與付款
+#建立訂單與確認付款
 @app.route("/api/orders", methods=["POST"])
 def receive_order():
     user_token = request.cookies.get("shopwear_user")
@@ -451,14 +496,13 @@ def receive_order():
             date = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
             member_data = Members.member_info(email, third_party)
             member_id = member_data[0]
-            name = member_data[1]
-            phone = member_data[4]
+            name = order_data["name"]
+            phone = order_data["phone"]
             order_no = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
             # 資料庫建立訂單
             Orders.create_order(order_no, member_id, date, amount, address)
             for i in range(len(items)):
-                # print(items[i]["prod_id"])
                 Orders.create_order_details(order_no, items[i]["prod_id"], items[i]["prod_color"], items[i]["prod_size"], items[i]["prod_price"], items[i]["prod_qty"])
             
             # Tappay請求
@@ -481,9 +525,8 @@ def receive_order():
                 "x-api-key": x_api_key}
             response = requests.post(url, json=myobj, headers=header)
             tappay_response = json.loads(response.text)
-            # print(tappay_response)
+            # 確認 Tappay請求結果
             if tappay_response["status"]==0:
-                print("taypay payment ok")
                 Orders.pay_order(order_no, tappay_response["status"])
                 order_response = {
                     "data": {
@@ -514,243 +557,335 @@ def receive_order():
                 }
             return jsonify(order_response), 500
 
+# 查歷史訂單
 @app.route("/api/orders", methods=["GET"])
 def check_orders():
-    if "shopwear_user" in request.cookies:
-            user_token = request.cookies.get("shopwear_user")
-            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
-            email = decoded_jwt["email"]
-            third_party = decoded_jwt["third_party"]
-            member_data = Members.member_info(email, third_party)
-            data = Orders.check_orders(member_data[0])
-            res = {
-                "data":[]
-            }
-            for i in range(len(data)):
-                order={
-                    "id": data[i][0],
-                    "order_no":data[i][1],
-                    "date" : data[i][3],
-                    "amount": data[i][4],
-                    "payment": data[i][5],
-                    "address": data[i][6]
-                }
-                res["data"].append(order)
-            status=200
-
-            return jsonify(res), status
-
-@app.route("/api/order_details/<order_no>", methods=["GET"])
-def check_order_details(order_no): 
-    data = Orders.check_order_details(order_no)
-    res = {
-        "data":[]
-    }
-    for i in range(len(data)):
-        details={
-            "product_name": data[i][0],
-            "color": data[i][1],
-            "size": data[i][2],
-            "price": data[i][3],
-            "qty": data[i][4]
-        }
-        res["data"].append(details)
-    status=200
-
-    return jsonify(res), status
-
-# Wear資料API
-@app.route("/api/wears", methods=['GET'])
-def api_wears():
-    page = request.args.get("page", default=0, type=int)
-    (data, total) = Wears.show_photos(index=page*12)
-    total = (total//12) if total%12==0 else (total//12)+1
-    
-    res = {
-        "total_page": total,
-        "next_page": page+1 if page+1 < total else None,
-        "data":[]
-    }
-    
-    for i in range(len(data)):
-        photos={
-            "id": data[i][0],
-            "photo":str(data[i][2]) + "/" + data[i][1],
-            "member_id": data[i][2], 
-            "caption": data[i][3],
-            "member_nickname": data[i][4],
-            "member_name": data[i][5],
-            "photo_sticker": data[i][6]
-        }
-        res["data"].append(photos)
-    status=200
-
-    return jsonify(res), status
-
-# MyWear資料API
-@app.route("/api/mywear", methods=['GET'])
-def api_mywear():
-    page = request.args.get("page", default=0, type=int)
-    member_id = request.args.get("member", type=int)
-    (data, total) = Wears.show_mywear(member_id, index=page*3)
-    total_page = (total//3) if total%3==0 else (total//3)+1
-    # print(data[0][4])
-    res = {
-        "total_page": total_page,
-        "next_page": page+1 if page+1 < total_page else None,
-        "nickname":data[0][4],
-        "member_name":data[0][6],
-        "member_photo" : data[0][5],
-        "total_post": total,
-        "data":[]
-    }
-    
-    for i in range(len(data)):
-        photos={
-            "id": data[i][0],
-            "photo":data[i][1],
-            "member_id": data[i][2], 
-            "caption": data[i][3]
-        }
-        res["data"].append(photos)
-    status=200
-
-    return jsonify(res), status
-
-#WEAR單頁API
-@app.route("/api/wear/<wear_id>", methods=['GET'])
-def api_wear_detail(wear_id):
-    (data, member_data, product_photos, likes) = Wears.show_wear_detail(wear_id)
-    # (data, product_photos) = Wears.show_wear_detail(wear_id)
-    res = {
-    "id": data[0][0],
-    "photo":[str(data[0][2]) +"/"+ data[0][1]],
-    "member_id":data[0][2],
-    "member_nickname":member_data[10],
-    "member_name":member_data[1],
-    "photo_sticker": member_data[9],
-    "caption": data[0][3], 
-    "product_id" : [x[6] for x in data],
-    "product_photos":product_photos,
-    "likes": likes,
-    "user_like": None
-    }
-    if "shopwear_user" in request.cookies:
-        user_token = request.cookies.get("shopwear_user")
-        decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
-        email = decoded_jwt["email"]
-        third_party = decoded_jwt["third_party"]
-        like_count = Likes.check_like(email, third_party, wear_id)
-        res["likes"] = like_count 
-        res["user_like"] = 1 if like_count > 0 else None
-    status=200
-    return jsonify(res), status
-
-# mywear上傳貼文
-@app.route("/api/mywear/upload", methods=['POST'])
-def upload_mywear():
-    if "shopwear_user" in request.cookies:
-        print("s3 1")
-        if "pic" not in request.files:
-            # print("save msg")
-            res = {
-                "error":True,
-                "message": "沒有檔案"
-                }
-            status=400
-            print("s3 err")
-            return jsonify(res), status
-        else:
-            user_token = request.cookies.get("shopwear_user")
-            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
-            email = decoded_jwt["email"]
-            third_party = decoded_jwt["third_party"]
-            member_data = Members.member_info(email, third_party)
-            member_id = member_data[0]
-            file = request.files["pic"]
-            if "id" in request.files:
-                id_list = [int(x) for x in request.form["id"].split(",")]
-            else:
-                id_list=[]
-            caption = request.form["caption"]
-            file_name = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
-            Wears.upload_wears(file_name, member_id, id_list, caption)
-            print("s3 2")
-            res = {
-                "ok": True,
-                "file_name": file_name,
-                "id":id_list,
-                "caption":caption
-                }
-            # print(res)
-            status = 200
-            
-    else:
-            res = {
-                "error": True,
-                "message": "請先登入會員"
-            }
-            status = 400
-
-    return jsonify(res), status
-
-# mywear上傳大頭貼
-@app.route("/api/mywear/photo_sticker", methods=["POST"])
-def photo_sticker():
-    if "shopwear_user" in request.cookies:
-        print(0)
-        if "pic" not in request.files:
-            res = {
-                "error": True,
-                "message": "沒有檔案"
-                }
-            status=400
-            print(1)
-            return jsonify(res), status
-        else:
-            user_token = request.cookies.get("shopwear_user")
-            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
-            email = decoded_jwt["email"]
-            third_party = decoded_jwt["third_party"]
-            member_data = Members.member_info(email, third_party)
-            member_id = member_data[0]
-            file = request.files["pic"]
-            file_name =  str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            s3.upload_fileobj(file, "vaapadshopwear", f"mywear/photo_sticker/{file_name}")
-            Wears.upload_photo_sticker(file_name, member_id)
-            print("save pic")
-            res = {
-                "ok": True,
-                "pic_src":file_name
-                }
-            return jsonify(res)
-    else:
-        res = {
-                "error": True,
-                "message": "請先登入"}
-        return jsonify(res)
-
-@app.route("/api/like", methods=["POST"])
-def update_like():
     if "shopwear_user" in request.cookies:
         user_token = request.cookies.get("shopwear_user")
         decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
         email = decoded_jwt["email"]
         third_party = decoded_jwt["third_party"]
-        data = request.get_json()
-        wear_id = data["wear_id"]
-        like_stat=data["like_stat"]
-        Likes.update_like(wear_id, email, third_party, like_stat)
-        res={
-            "ok": True
+        member_data = Members.member_info(email, third_party)
+        data = Orders.check_orders(member_data[0])
+        res = {
+            "data":[]
         }
+        for i in range(len(data)):
+            order={
+                "id": data[i][0],
+                "order_no":data[i][1],
+                "date" : data[i][3],
+                "amount": data[i][4],
+                "payment": data[i][5],
+                "address": data[i][6]
+            }
+            res["data"].append(order)
         status=200
     else:
         res = {
                 "error": True,
-                "message": "請先登入"}
-        status=400
+                "message": "請先登入會員"
+            }
+        status = 400
+    return jsonify(res), status
+
+#查詳細訂單資料
+@app.route("/api/order_details/<order_no>", methods=["GET"])
+def check_order_details(order_no): 
+    try:
+        data = Orders.check_order_details(order_no)
+        res = {
+            "data":[]
+        }
+        for i in range(len(data)):
+            details={
+                "product_name": data[i][0],
+                "color": data[i][1],
+                "size": data[i][2],
+                "price": data[i][3],
+                "qty": data[i][4]
+            }
+            res["data"].append(details)
+        status=200
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
+
+    return jsonify(res), status
+
+# Wear穿搭牆資料
+@app.route("/api/wears", methods=['GET'])
+def api_wears():
+    try:
+        page = request.args.get("page", default=0, type=int)
+        (data, total) = Wears.show_photos(index=page*12)
+        total = (total//12) if total%12==0 else (total//12)+1
+        
+        res = {
+            "total_page": total,
+            "next_page": page+1 if page+1 < total else None,
+            "data":[]
+        }
+        
+        for i in range(len(data)):
+            photos={
+                "id": data[i][0],
+                "photo":str(data[i][2]) + "/" + data[i][1],
+                "member_id": data[i][2], 
+                "caption": data[i][3],
+                "member_nickname": None if (data[i][4]=="" or data[i][4]==None) else data[i][4],
+                "member_name": data[i][5],
+                "photo_sticker": data[i][6]
+            }
+            res["data"].append(photos)
+        status=200
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
+
+    return jsonify(res), status
+
+# MyWear資料
+@app.route("/api/mywear", methods=['GET'])
+def api_mywear():
+    try:
+        page = request.args.get("page", default=0, type=int)
+        member_id = request.args.get("member", type=int)
+        (data, total) = Wears.show_mywear(member_id, index=page*3)
+        total_page = (total//3) if total%3==0 else (total//3)+1
+        if total==0:
+            res = {
+            "total_page": total_page,
+            "next_page": page+1 if page+1 < total_page else None,
+            "nickname": data[1],
+            "member_name": data[0],
+            "member_photo" : data[2],
+            "total_post": total,
+            "data":[]
+        }
+        else:
+            res = {
+                "total_page": total_page,
+                "next_page": page+1 if page+1 < total_page else None,
+                "nickname":data[0][4],
+                "member_name":data[0][6],
+                "member_photo" : data[0][5],
+                "total_post": total,
+                "data":[]
+            }
+        
+            for i in range(len(data)):
+                photos={
+                    "id": data[i][0],
+                    "photo":data[i][1],
+                    "member_id": data[i][2], 
+                    "caption": data[i][3]
+                }
+                res["data"].append(photos)
+        status=200
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
+
+    return jsonify(res), status
+
+# WEAR貼文資料
+@app.route("/api/wear/<wear_id>", methods=['GET'])
+def api_wear_detail(wear_id):
+    try:
+        (data, member_data, product_photos, likes) = Wears.show_wear_detail(wear_id)
+        # (data, product_photos) = Wears.show_wear_detail(wear_id)
+        res = {
+        "id": data[0][0],
+        "photo":[str(data[0][2]) +"/"+ data[0][1]],
+        "member_id":data[0][2],
+        "member_nickname": None if (member_data[10]=="" or member_data[10]==None) else member_data[10],
+        "member_name":member_data[1],
+        "photo_sticker": member_data[9],
+        "caption": data[0][3], 
+        "product_id" : [x[6] for x in data],
+        "product_photos":product_photos,
+        "likes": likes,
+        "user_like": None,
+        "user_id": None
+        }
+        if "shopwear_user" in request.cookies:
+            user_token = request.cookies.get("shopwear_user")
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            user_data = Members.member_info(email, third_party)
+            user_id = user_data[0]
+            like_stat = Likes.check_like(email, third_party, wear_id)
+            res["user_like"] = 1 if like_stat=="liked"  else 0
+            res["user_id"] = user_id
+        status=200
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
+    return jsonify(res), status
+
+# 刪除Wear貼文
+@app.route("/api/wear/<wear_id>", methods=['DELETE'])
+def delete_wear(wear_id):
+    try:
+        if "shopwear_user" in request.cookies:
+            user_token = request.cookies.get("shopwear_user")
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            Wears.delete_wear(wear_id, email, third_party)
+            res = {
+                "ok": True
+            }
+            status=200
+        else:
+            res = {
+                    "error": True,
+                    "message": "請先登入會員"
+                }
+            status = 401
+    except:
+        res = {
+                "error": True,
+                "message": "伺服器內部錯誤"
+            }
+        status = 500
+
+    return jsonify(res), status
+
+
+# mywear上傳貼文
+@app.route("/api/mywear/upload", methods=['POST'])
+def upload_mywear():
+    try:
+        if "shopwear_user" in request.cookies:
+            if "pic" not in request.files:
+                res = {
+                    "error":True,
+                    "message": "沒有檔案"
+                    }
+                status=400
+                return jsonify(res), status
+            else:
+                user_token = request.cookies.get("shopwear_user")
+                decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
+                email = decoded_jwt["email"]
+                third_party = decoded_jwt["third_party"]
+                member_data = Members.member_info(email, third_party)
+                member_id = member_data[0]
+                file = request.files["pic"]
+                if "id" in request.form:
+                    id_list = [int(x) for x in request.form["id"].split(",")]
+                else:
+                    id_list=[]
+                caption = request.form["caption"]
+                file_name = str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                s3.upload_fileobj(file, "vaapadshopwear", f"mywear/{member_id}/{file_name}")
+                Wears.upload_wears(file_name, member_id, id_list, caption)
+                res = {
+                    "ok": True,
+                    "file_name": file_name,
+                    "id":id_list,
+                    "caption":caption
+                    }
+                status = 200
+        else:
+            res = {
+                "error": True,
+                "message": "請先登入會員"
+            }
+            status = 401
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
+
+    return jsonify(res), status
+
+# mywear會員上傳大頭貼
+@app.route("/api/mywear/photo_sticker", methods=["POST"])
+def photo_sticker():
+    try:
+        if "shopwear_user" in request.cookies:
+            if "pic" not in request.files:
+                res = {
+                    "error": True,
+                    "message": "沒有檔案"
+                    }
+                status=400
+                return jsonify(res), status
+            else:
+                user_token = request.cookies.get("shopwear_user")
+                decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"]) 
+                email = decoded_jwt["email"]
+                third_party = decoded_jwt["third_party"]
+                member_data = Members.member_info(email, third_party)
+                member_id = member_data[0]
+                file = request.files["pic"]
+                file_name =  str(member_id) + "-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                s3.upload_fileobj(file, "vaapadshopwear", f"mywear/photo_sticker/{file_name}")
+                Wears.upload_photo_sticker(file_name, member_id)
+                res = {
+                    "ok": True,
+                    "pic_src":file_name
+                    }
+                return jsonify(res)
+        else:
+            res = {
+                    "error": True,
+                    "message": "請先登入"}
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
+    return jsonify(res)
+
+# 按讚資料
+@app.route("/api/like", methods=["POST"])
+def update_like():
+    try:
+        if "shopwear_user" in request.cookies:
+            user_token = request.cookies.get("shopwear_user")
+            decoded_jwt = jwt.decode(user_token, jwt_key, algorithms=["HS256"])
+            email = decoded_jwt["email"]
+            third_party = decoded_jwt["third_party"]
+            data = request.get_json()
+            wear_id = data["wear_id"]
+            like_stat=data["like_stat"]
+            new_likes = Likes.update_like(wear_id, email, third_party, like_stat)
+            res={
+                "ok": True,
+                "likes": new_likes
+            }
+            status=200
+        else:
+            res = {
+                    "error": True,
+                    "message": "請先登入"}
+            status=400
+    except:
+        res = {
+            "error": True,
+            "message": "伺服器內部錯誤"
+            }
+        status=500
     return jsonify(res), status
 
 
@@ -758,5 +893,5 @@ def update_like():
 
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port=3000)
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=3000)
+    # app.run(debug=True, port=5000)

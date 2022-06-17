@@ -88,7 +88,8 @@
         }
         /* .media-object {} */
         
-        .img-object {
+        .img-object,
+        .indicator {
             width: 100%;
             height: 100%;
             display: block;
@@ -98,18 +99,23 @@
             left: 0px;
             background: rgb(213, 213, 213);
             object-fit: cover;
+            cursor: pointer;
         }
         
-        .media-control {
-            margin-top: 30px;
+        .img-object:hover {
+            filter: brightness(0.95);
         }
+        /* .media-control {
+            margin-top: 30px;
+        } */
         /* button */
         
         .btn {
+            width: 120px;
             margin: 10px 3px;
             display: inline-block;
             height: 38px;
-            padding: 0 30px;
+            /* padding: 0 30px; */
             color: #555;
             text-align: center;
             font-size: 14px;
@@ -129,7 +135,7 @@
         .btn>i {
             color: #555;
             font-size: 12px !important;
-            margin-right: 10px;
+            /* margin-right: 10px; */
         }
     </style>
     <style>
@@ -189,10 +195,14 @@
 
 <body id="body">
     <div class="page-wrapper">
+        <div id="mywear-backdrop" style="display: none;width: 100%;height: 100%;position: absolute;z-index: 6;background: #5f5f5f;opacity: 50%;"></div>
         <div class="topnav-container ">
             <div class="topnav">
-                <a id="nav-title" href="/">SHOPWEAR</a>
-                <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">WEAR</a></button>
+                <a href="/">
+                    <img id="shopwear" src="../static/photo/shopwear-2.png" style="height: 40px;position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);">
+                </a>
+                <!-- <a id="nav-title" href="/">SHOPWEAR</a> -->
+                <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">穿搭牆</a></button>
                 <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="https://dimalife.com/cart">購物車</a></button>
                 <div id="cart-item" style="display: none;"></div>
                 <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://dimalife.com/login">會員登入</a></button>
@@ -222,14 +232,24 @@
                             </span>
                             <figure class="media-object">
                                 <img class="img-object" id="photo-sticker" src="../static/photo/member-icon1.png">
+                                <div>
+                                    <img class="indicator" id="indicator" src="../static/photo/add_pic-1.png" style="display: none; height: 130%;width: 130%;top: 50%;left: 50%;transform: translate(-50%, -50%);border-radius: 50%;object-fit: contain;opacity: 90%;background: rgb(213, 213, 213);">
+                                </div>
                             </figure>
                         </div>
-                        <div class="media-control">
-                            <button class="btn edit-profile">
-                            <i class="an an-write"></i>上傳大頭貼</button>
-                            <button class="btn save-profile">
-                            <i class="an an-save"></i>儲存大頭貼</button>
+                        <div id="upload-sticker" style="display: flex; height: 50px;">
+                            <div class="media-control" id="m-c-upload" style="display:none ;">
+                                <button class="btn edit-profile">
+                                <i class="an an-write"></i>上傳大頭貼</button>
+                                <button class="btn save-profile">
+                                <i class="an an-save"></i>確認上傳</button>
+                            </div>
+                            <div id="m-c-cancel" style="display:none ;">
+                                <button class="btn" id="m-c-cancel-btn" onclick="switchUploadSticker('off')">
+                                    <i class="an an-write"></i>取消</button>
+                            </div>
                         </div>
+
 
                         <div id="mywear-desc">
                             <div id="member-name" style="font-weight: bold;"></div>
@@ -247,14 +267,14 @@
 
             <div class="submit-window-block" id="submit-window-block">
                 <div id="submit-window">
-                    <div id="bar">建立貼文<img onclick="closeSubmitWindow();" src="../static/photo/close2.png" style="height: 20px;float: right;cursor: pointer;margin: 2px 0 0;"></div>
+                    <div id="bar">建立貼文<img onclick="closeSubmitWindow();" src="../static/photo/close2.png" style="width: 20px;height: 20px;float: right;cursor: pointer;margin: 2px 0 0;"></div>
 
                     <!-- 1 -->
                     <div>
                         <div class="upload-container" id="upload-container-1">
                             <div id="upload-backdrop" style="display: none; width: 100%;height: 100%;position: absolute;z-index: 5;backdrop-filter: blur(1px);background: white;opacity: 50%;"></div>
                             <label for="file-upload" class="custom-file-upload" id="upload-label">新增相片或拖曳</label>
-                            <input type="file" id="file-upload" onchange="showPreview(event);" />
+                            <input type="file" id="file-upload" accept="image/*" onchange="showPreview(event);" />
                             <div class="preview" id="preview-container">
                                 <img id="preview-cncl-btn" onclick="closePreviewImg();" src="../static/photo/cancel.png">
                                 <img id="file-ip-1-preview">
@@ -321,10 +341,10 @@
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">SUITPANTS</td>
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">PANTS</td>
                                     </tr>
-                                    <tr>
+                                    <!-- <tr>
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">OTHERS</td>
                                         <td></td>
-                                    </tr>
+                                    </tr> -->
                                 </table>
                                 <div>外套類</div>
                                 <table>
@@ -338,7 +358,7 @@
                                     </tr>
                                     <tr>
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">DENIM</td>
-                                        <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">OTHERS</td>
+                                        <!-- <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">OTHERS</td> -->
                                     </tr>
                                 </table>
                             </div>
@@ -371,6 +391,10 @@
             </div>
 
             <div class="mywear-pics-container" id="mywear-pics-container">
+                <div class="spinner" id="three-pics-spinner" style="margin: 60px auto;position: absolute;left: 50%;transform: translate(-50%, -50%);">
+                    <div></div>
+                    <div></div>
+                </div>
                 <div class="mywear-pics" id="mywear-pics">
 
                 </div>
@@ -379,7 +403,7 @@
         </div>
     </div>
     <div id="end" style="height: 20px;"></div>
-    <div id="footer">SHOPWEAR</div>
+    <div id="footer">Copyright © 2022 SHOPWEAR / Dimitry Wu</div>
 
 
 
@@ -391,8 +415,9 @@
     </script>
 
     <script>
-        let p = 0;
+        let stickerSrc = "../static/photo/member-icon1.png";
 
+        let p = 0;
         // 觸發條件後的回呼函式
         let showMyWear = (entry) => {
             console.log("p: " + p)
@@ -413,10 +438,18 @@
                                 observer.unobserve(target);
                             } else {
                                 if (result["member_photo"] !== null) {
-                                    document.getElementById("photo-sticker").src = "http://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + result["member_photo"];
+                                    stickerSrc = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + result["member_photo"];
+                                    document.getElementById("photo-sticker").src = stickerSrc;
                                 }
+
                                 document.getElementById("member-name").innerHTML = result["nickname"] !== null ? result["nickname"] : result["member_name"];
                                 document.getElementById("post-count").innerHTML = result["total_post"] + " 則貼文";
+                                if (result["total_page"] === 0) {
+                                    document.getElementById("three-pics-spinner").style.display = "none";
+                                    observer.unobserve(myWeartarget);
+                                    console.log("unobserved");
+                                    return
+                                }
                                 let photoWrapper = document.createElement("div");
                                 photoWrapper.className = "three-pics";
                                 for (let i in result.data) {
@@ -432,7 +465,10 @@
 
                                     // photoBox.id = "pic" + photoCount;
                                     aTag.href = "/wear/" + id;
-                                    img.src = "http://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
+                                    img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
+                                    img.onload = () => {
+                                        document.getElementById("three-pics-spinner").style.display = "none";
+                                    }
                                     aTag.appendChild(img);
                                     photoBox.appendChild(aTag);
                                     photoWrapper.appendChild(photoBox);
@@ -447,6 +483,7 @@
                 };
             }
         }
+
 
         // 觸發條件
         let myWearOptions = {
@@ -473,15 +510,18 @@
             $(this).hide(0);
             overlay.fadeIn(300);
             btn_save.fadeIn(300);
+            $("#indicator").fadeIn(300);
         });
         btn_save.on("click", function() {
             $(this).hide(0);
             submitPhotoSticker();
             overlay.fadeOut(300);
             btn_edit.fadeIn(300);
+            $("#indicator").fadeOut(300);
         });
 
         media_input.change(function() {
+            $("#indicator").hide(0);
             if (this.files && this.files[0]) {
                 var reader = new FileReader();
 

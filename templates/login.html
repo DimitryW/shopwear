@@ -69,8 +69,11 @@
         <div class="page-wrapper">
             <div class="topnav-container ">
                 <div class="topnav">
-                    <a id="nav-title" href="/">SHOPWEAR</a>
-                    <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">WEAR</a></button>
+                    <a href="/">
+                        <img id="shopwear" src="../static/photo/shopwear-2.png" style="height: 40px;position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);">
+                    </a>
+                    <!-- <a id="nav-title" href="/">SHOPWEAR</a> -->
+                    <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">穿搭牆</a></button>
                     <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="https://dimalife.com/cart">購物車</a></button>
                     <div id="cart-item" style="display: none;"></div>
                     <button class="nav-item2" id="nav-item2"><a id="nav-item2-a" style="text-decoration: none;" href="https://dimalife.com/login">會員登入</a></button>
@@ -110,6 +113,7 @@
                                 <input id="signin-password" type="password" placeholder="密碼">
                                 <!-- <div id="reset-pw">忘記密碼</div> -->
                                 <button id="signin-btn" onclick="signin()">登入</button>
+                                <button id="signin-btn" onclick="guestSignin()" style="background: #29b029;margin: 10px 10px 20px;">訪客帳號登入</button>
                                 <div class="google-signin" style="margin: 0 10px 0;">
                                     <div id="buttonDiv"></div>
                                     <!-- <div>GOOGLE 登入</div> -->
@@ -120,10 +124,10 @@
                         <!-- 註冊 -->
                         <div class="login" id="signup-block" style="display: none;">
                             <div id="login-form">
-                                <input id="signup-name" type="text" placeholder="姓名">
-                                <input id="signup-email" type="text" placeholder="信箱">
-                                <input id="signup-password" type="password" placeholder="密碼">
-                                <input id="confirm-password" type="password" placeholder="確認密碼">
+                                <input id="signup-name" type="text" placeholder="姓名(必填)">
+                                <input id="signup-email" type="text" placeholder="信箱(必填)">
+                                <input id="signup-password" type="password" placeholder="密碼(必填)">
+                                <input id="confirm-password" type="password" placeholder="確認密碼(必填)">
                                 <input id="signup-number" type="tel" placeholder="手機">
                                 <input id="signup-address" type="text" placeholder="地址">
                                 <div id="signup-message"></div>
@@ -143,7 +147,7 @@
         </div>
         <div id="end"></div> -->
     </div>
-    <div id="footer">SHOPWEAR</div>
+    <div id="footer">Copyright © 2022 SHOPWEAR / Dimitry Wu</div>
 
 
 
