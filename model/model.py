@@ -1,14 +1,11 @@
-import stat
 from config import dbconfig
 import mysql.connector
 import mysql.connector.pooling
 
 
-
 cnxpool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool", pool_size = 20, pool_reset_session=True, **dbconfig)
 
-
-
+# 產品資料查詢
 class Products:
     @staticmethod
     def show_products(category, subcategory, index=0, limit=12):
@@ -71,7 +68,7 @@ class Products:
         return (data, stock_list)
     
     
-
+# 產品照片
 class Products_Photos:
     @staticmethod
     def show_photos(product_id):
@@ -87,6 +84,7 @@ class Products_Photos:
         cnx.close()
         return list_of_data
 
+# 會員資料
 class Members:
     @staticmethod
     def check_member(name, email, third_party):
@@ -172,7 +170,7 @@ class Members:
         cnx.close()
         return
 
-
+# 訂單資料
 class Orders:
     @staticmethod
     def create_order(order_no, member_id, date, amount, address):
@@ -218,10 +216,6 @@ class Orders:
         val = (member_id,)
         cursor.execute(sql, val)
         orders = cursor.fetchall()
-        # order_details=[]
-        # for i in range(len(orders)):
-        #     sql = "select * from orders join order_details on orders.order_no=order_details.order_no where order_details.order_no=%s"
-        #     val = (orders[i][1],)
         cursor.close()
         cnx.close()
         return orders
@@ -230,8 +224,8 @@ class Orders:
     def check_order_details(order_no):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "select product_name, color, size, order_details.price, qty from order_details\
-             join products on order_details.product_id=products.id where order_no=%s"
+        sql = "SELECT product_name, color, size, order_details.price, qty FROM order_details\
+             JOIN products ON order_details.product_id=products.id WHERE order_no=%s"
         val = (order_no,)
         cursor.execute(sql, val)
         order_details = cursor.fetchall()
@@ -239,6 +233,7 @@ class Orders:
         cnx.close()
         return order_details
 
+# 分享貼文資料
 class Wears:
     @staticmethod
     def show_photos(index=0, limit=12):
@@ -246,7 +241,7 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT COUNT(*) from wears")
         count = cursor.fetchone()[0]
-        sql = "SELECT wears.id, wears.photo, member_id, caption, members.nickname, members.name, members.photo from wears join members where wears.member_id=members.id ORDER BY id DESC LIMIT %s, %s"
+        sql = "SELECT wears.id, wears.photo, member_id, caption, members.nickname, members.name, members.photo FROM wears JOIN members ON wears.member_id=members.id ORDER BY id DESC LIMIT %s, %s"
         cursor.execute(sql, (index, limit))
         data = cursor.fetchall()
         cursor.close()
@@ -259,10 +254,20 @@ class Wears:
         cursor = cnx.cursor()
         cursor.execute("SELECT COUNT(*) FROM wears WHERE member_id=%s ORDER BY id DESC" , (member_id,))
         count = cursor.fetchone()[0]
-        sql = "SELECT wears.id, wears.photo, member_id, caption, nickname, members.photo, members.name\
-        from wears join members on wears.member_id=members.id WHERE member_id=%s ORDER BY wears.id DESC LIMIT %s, %s"
-        cursor.execute(sql, (member_id, index, limit))
-        data = cursor.fetchall()
+        if count==0:
+            sql = "SELECT name, nickname, photo FROM members WHERE id=%s"
+            val = (member_id,)
+            cursor.execute(sql, val)
+            data = cursor.fetchone()
+            # print(data)
+        else:
+            sql = "SELECT wears.id, wears.photo, member_id, caption, nickname, members.photo, members.name\
+                FROM wears JOIN members ON wears.member_id=members.id WHERE member_id=%s ORDER BY wears.id DESC LIMIT %s, %s"
+            val = (member_id, index, limit)
+            cursor.execute(sql, val)
+            data = cursor.fetchall()
+
+        # print(data)
         cursor.close()
         cnx.close()
         return (data, count)
@@ -271,37 +276,23 @@ class Wears:
     def show_wear_detail(wear_id):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor(buffered=True)
-        cursor.execute("SELECT * FROM wears join wears_products on wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
+        cursor.execute("SELECT * FROM wears JOIN wears_products ON wears.id=wears_products.wears_id WHERE wears.id=%s" , (wear_id,))
         data = cursor.fetchall()
         # print(cnx.is_connected() )
         cursor.execute("SELECT * FROM members WHERE id=%s" , (data[0][2],))
         member_data = cursor.fetchone()
-        # print(member_data)
         # print(cnx.is_connected() )
         product_photos=[]
         for i in range(len(data)):
             if data[i][6]!=None:
                 cursor.execute("SELECT src FROM products_photos WHERE product_id=%s" , (data[i][6],))
                 product_photos.append(cursor.fetchone()[0]) 
-        cursor.execute("SELECT COUNT(*) FROM likes WHERE wear_id=%s" , (data[0][0],))
+        cursor.execute("SELECT COUNT(*) FROM likes WHERE wear_id=%s and status='liked'" , (data[0][0],))
         likes = cursor.fetchone()[0]
         cursor.close()
         cnx.close()
         return (data, member_data, product_photos, likes)
         
-    # @staticmethod
-    # def show_mem_detail(member_id):
-    #     cnx = cnxpool.get_connection()
-    #     cursor = cnx.cursor()
-    #     cursor.execute("SELECT * FROM members WHERE id=%s" , (member_id,))
-    #     member_data = cursor.fetchone()
-    #     print("member_data")
-    #     print(member_data)
-    #     print(cnx.is_connected() )
-    #     cursor.close()
-    #     cnx.close()
-    #     # return (data, member_data, product_photos)
-    #     return member_data
     @staticmethod
     def upload_photo_sticker(photo, member_id):
         cnx = cnxpool.get_connection()
@@ -334,12 +325,24 @@ class Wears:
                 val = (wears_id, product_id[i])
                 cursor.execute(sql, val)
                 cnx.commit()
-            # print(product_id[i])
         
         cursor.close()
         cnx.close()
         return
 
+    @staticmethod
+    def delete_wear(wear_id, email, third_party):
+        cnx = cnxpool.get_connection()
+        cursor = cnx.cursor()
+        sql = "DELETE FROM wears WHERE id=%s AND member_id=(SELECT id FROM members WHERE email=%s AND third_party=%s)"
+        val=(wear_id, email, third_party)
+        cursor.execute(sql, val)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return
+    
+# 案讚資料
 class Likes:
     @staticmethod
     def update_like(wear_id, email, third_party, status):
@@ -350,61 +353,22 @@ class Likes:
         val=(wear_id, email, third_party, status, status)
         cursor.execute(sql, val)
         cnx.commit()
+        cursor.execute("SELECT COUNT(*) FROM likes WHERE wear_id=%s and status='liked'" , (wear_id,))
+        Likes = cursor.fetchone()[0]
         cursor.close()
         cnx.close()
-        return
+        return Likes
 
     @staticmethod
     def check_like(email, third_party, wear_id):
         cnx = cnxpool.get_connection()
         cursor = cnx.cursor()
-        sql = "SELECT COUNT(*) FROM likes WHERE member_id=(SELECT id FROM members WHERE email=%s AND third_party=%s)\
+        sql = "SELECT COUNT(*), status FROM likes WHERE member_id=(SELECT id FROM members WHERE email=%s AND third_party=%s)\
             AND wear_id=%s"
         val=(email, third_party, wear_id)
         cursor.execute(sql, val)
-        like_count = cursor.fetchone()[0]
+        like_stat = cursor.fetchone()[1]
         cursor.close()
         cnx.close()
-        return like_count
+        return like_stat
 
-
-
-#建立圖片路徑資料
-# import os
-# path = "D:/Coding/WeHelp/dimalife/shopwear photos/吳先生"
-# cnx = cnxpool.get_connection()
-# cursor = cnx.cursor()
-# for i in os.listdir(path):
-#     cursor.execute("SELECT id FROM products where product_name=%s", (i,))
-#     pid = cursor.fetchone()[0]
-#     for j in os.listdir(path + "\\" + i):
-#         # print(i)
-#         # print(j)
-#         src = i+"/"+j
-#         cursor.execute("INSERT INTO products_photos(product_id, src) VALUES(%s, %s)", (pid, src))
-#         cnx.commit()
-# cursor.close()
-# cnx.close()
-
-
-#更新RDS資料
-
-# file_name = "D:/Coding/WeHelp/dimalife/products_updated.XLSX"
-# sheet =  "products"
-
-# df = pd.read_excel(io=file_name, sheet_name=sheet)
-#   # print first 5 rows of the dataframe
-# # print(df)
-
-# cnx = cnxpool.get_connection()
-# cursor = cnx.cursor()
-
-# for index, row in df.iterrows():
-#     # print(row["product_name"])
-#     # print(row["qty"])
-#     cursor.execute("UPDATE products SET content=%s, size_suggest=%s where product_name=%s", (row["content"],row["size_suggestion"],row["product_name"]))
-    
-#     cnx.commit()
-
-# cursor.close()
-# cnx.close()

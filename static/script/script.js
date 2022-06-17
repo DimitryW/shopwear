@@ -3,7 +3,8 @@ let headers = {
     "Content-type": "application/json"
 };
 
-// 首頁
+// Index
+// 顯示首頁產品
 const showProducts = async(page = 0, category = "", subcategory = "") => {
     let apiAddress = "/api/products?page=" + String(page) + "&category=" + category + "&subcategory=" + subcategory;
     let res = await fetch(apiAddress);
@@ -66,16 +67,10 @@ const showProducts = async(page = 0, category = "", subcategory = "") => {
 }
 
 
-// let loaded_images_total = 0;
-// const loadedImg = (x) => {
-//     loaded_images_total++;
-//     if (loaded_images_total == x) {
-//         document.getElementById("index-spinner").style.display = 'none';
-//     }
-// }
+
 
 // product頁面
-
+// 顯示產品資料
 const inputAttributes = {
     name: "switch-button",
     type: "radio",
@@ -88,11 +83,11 @@ function addAttributes(element, attributes) {
     });
 }
 
-//產品資料
 const showProductDetail = async() => {
     let apiAddress = "/api/product/" + window.location.pathname.split("/")[2];
     let res = await fetch(apiAddress);
     let data = await res.json();
+    // 基本資料
     document.getElementById("product_id").textContent = data["id"];
     document.getElementById("product_name").textContent = data["product_name"];
     document.getElementById("product_price").textContent = "NT$ " + data["price"];
@@ -103,6 +98,10 @@ const showProductDetail = async() => {
     colorStock.className = "color-stock"
     let colBox = document.createElement("div");
     colBox.className = "col-box";
+    let colText = document.createElement("span");
+    colText.innerHTML = "顏色";
+    colBox.appendChild(colText);
+    // 顏色尺寸選擇按鈕
     for (i in data["stock"]) {
         let colLabl = document.createElement("label");
         colLabl.className = "labl";
@@ -119,6 +118,9 @@ const showProductDetail = async() => {
 
     let sizeBox = document.createElement("div");
     sizeBox.className = "size-box";
+    let sizeText = document.createElement("span");
+    sizeText.innerHTML = "尺寸";
+    sizeBox.appendChild(sizeText);
     for (j of Object.values(data["stock"])[0]) {
         let labl = document.createElement("label");
         labl.className = "labl";
@@ -149,6 +151,7 @@ const showProductDetail = async() => {
     document.getElementById("product-desc").append(qtyLabl);
     document.getElementById("product-desc").append(qty);
 
+    // 加入購物車按鈕
     let btn = document.createElement("button");
     btn.id = "cart-btn";
     btn.textContent = "加入購物車";
@@ -158,6 +161,8 @@ const showProductDetail = async() => {
     };
     document.getElementById("product-desc").append(btn);
     window.document.title = data["product_name"];
+
+    //產品輪播照片
     let proPhotos = document.getElementById("product-photos");
     let imgList = data["photo"];
     for (let i = 0; i < imgList.length; i++) {
@@ -172,10 +177,9 @@ const showProductDetail = async() => {
         li.setAttribute("class", "slide");
         img.src = "https://vaapadshopwear.s3.us-west-2.amazonaws.com/shopwear/" + imgList[i];
         // spinner.id = "spinner";
-        // img.onload = () => {
-        //     img.style.display = "block";
-        //     spinner.style.display = "none";
-        // }
+        img.onload = () => {
+            document.getElementById("index-spinner").style.display = "none";
+        }
         document.getElementsByClassName("data-switch-input")[0].appendChild(input);
         li.appendChild(img);
         proPhotos.append(img.cloneNode(true));
@@ -199,7 +203,7 @@ const showProductDetail = async() => {
 
 }
 
-//A Function to Get a Cookie
+// 建立 Cookie
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -233,7 +237,7 @@ const addCart = () => {
     } else {
         currentItem = getCookie("shopwearCart");
         currentItem = currentItem + arr + "&";
-        document.cookie = "shopwearCart=" + currentItem + "; max-age=604800; path=/";
+        document.cookie = "shopwearCart=" + currentItem + "; max-age=604800;  path=/";
     }
 
 }
@@ -259,12 +263,10 @@ const showCart = () => {
             let price = combo[4];
             let qty = combo[5];
             let pic = combo[6];
-            // console.log(combo);
             c++;
 
             //顯示購物清單
             if (window.location.pathname === "/cart" || window.location.pathname === "/checkout") {
-                // console.log("CART")
                 let tableRow = table.insertRow(c);
                 tableRow.id = "tr" + c;
                 let cell0 = tableRow.insertCell(0); //pic
@@ -284,12 +286,10 @@ const showCart = () => {
                 cancelBtn.appendChild(btnImg);
                 let trId = "tr" + c;
                 let itemCookie = i + "&";
-                // let newCcookie = cookie.replace(itemCookie, "");
+
                 //取消購物車 功能
                 cancelBtn.addEventListener("click", () => {
                     document.getElementById(trId).remove();
-                    // console.log(itemCookie)
-                    // console.log("shopwearCart=" + getCookie("shopwearCart").replace(itemCookie, "") + "; path=/")
                     //重設Cookie
                     document.cookie = "shopwearCart=" + getCookie("shopwearCart").replace(itemCookie, "") + "; max-age=604800; path=/";
                     //重設購物車圖示
@@ -346,7 +346,7 @@ const showCart = () => {
 }
 
 
-//購物車歸 0 時
+//購物車歸 0 
 const keepBuy = () => {
     if (document.getElementById("confirm-cart").style.display !== "block") {
         document.getElementById("cart").style.display = "none";
@@ -367,6 +367,10 @@ const goToCheckout = () => {
 const showOrders = async() => {
     let res = await fetch("/api/orders");
     let data = await res.json();
+    if (data["error"]) {
+        window.location = "/login";
+    }
+    // 建立訂單基本資料<table>
     if (data["data"].length !== 0) {
         for (let i = data["data"].length - 1; i >= 0; i--) {
             let orderInfo = document.createElement("div");
@@ -378,7 +382,7 @@ const showOrders = async() => {
             btn.id = "order-detail-btn";
             btn.textContent = "詳細訂單資料";
             img.id = "plus-btn-img"
-            img.src = "../static/photo/plus-1.jpg";
+            img.src = "../static/photo/plus-1.png";
 
             let tableHeader = orderTable.insertRow(0);
             tableHeader.id = "table-header";
@@ -416,16 +420,17 @@ const showOrders = async() => {
             hiddenDiv.style.overflowY = "auto";
             document.getElementById("orders").appendChild(hiddenDiv);
 
+            //展開查詢訂單詳細資料功能
             btn.onclick = () => {
                 if (hiddenDiv.classList.contains("close")) {
                     hiddenDiv.classList.remove("close");
                     hiddenDiv.style.height = "200px";
-                    img.src = "../static/photo/minus-1.jpg"
+                    img.src = "../static/photo/minus-1.png"
                     checkOrderDetails(order_no, hiddenDiv);
                 } else {
                     hiddenDiv.classList.add("close");
                     hiddenDiv.style.height = "0";
-                    img.src = "../static/photo/plus-1.jpg";
+                    img.src = "../static/photo/plus-1.png";
                     // hiddenDiv.innerHTML = "";
                 }
             }
@@ -433,11 +438,11 @@ const showOrders = async() => {
                 if (hiddenDiv.classList.contains("close")) {
                     hiddenDiv.classList.remove("close");
                     hiddenDiv.style.height = "200px";
-                    img.src = "../static/photo/minus-1.jpg"
+                    img.src = "../static/photo/minus-1.png"
                 } else {
                     hiddenDiv.classList.add("close");
                     hiddenDiv.style.height = "0";
-                    img.src = "../static/photo/plus-1.jpg";
+                    img.src = "../static/photo/plus-1.png";
                     // hiddenDiv.innerHTML = "";
                 }
             }
@@ -449,7 +454,7 @@ const showOrders = async() => {
     }
 }
 
-// order_details
+// 詳細訂單資料
 const checkOrderDetails = async(order_no, hiddenDiv) => {
     if (hiddenDiv.innerHTML !== "") { return };
     let res = await fetch("/api/order_details/" + order_no);
@@ -538,11 +543,20 @@ const loggedIn = () => {
                 if (window.location.pathname === "/login") {
                     window.location = "/";
                 }
+                if (window.location.pathname.split("/")[1] === "mywear" && parseInt(window.location.pathname.split("/")[2]) === result["data"]["id"]) {
+                    // console.log("KKKKK")
+                    document.getElementById("photo-sticker").addEventListener("click", () => { switchUploadSticker("on") });
+                    document.getElementById("show-submit-window").style.display = "block";
+                }
+
             } else {
                 console.log("not login");
                 // document.getElementById("nav-item1-a").addEventListener("click", signinWindow);
                 if (window.location.pathname === "/member" || window.location.pathname === "/checkout" || window.location.pathname === "/password") {
                     location.href = "/";
+                }
+                if (window.location.pathname.split('/')[1] === "wear") {
+                    document.getElementById("like-backdrop").style.display = "block";
                 }
             }
         })
@@ -550,12 +564,40 @@ const loggedIn = () => {
 
 // 會員登入功能 PATCH
 const signin = () => {
-    let email = document.getElementById("signin-email").value;
-    let password = document.getElementById("signin-password").value;
+        let email = document.getElementById("signin-email").value;
+        let password = document.getElementById("signin-password").value;
+        // 串接API
+        let body = {
+            "email": email,
+            "password": password
+        };
+        fetch("/api/user", {
+                method: "PATCH",
+                headers: headers,
+                body: JSON.stringify(body)
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((result) => {
+                if (result["ok"]) {
+                    // window.history.go(-1);
+                    if (document.referrer === '') {
+                        window.location = '/';
+                    } else { window.location = document.referrer; }
+
+                } else {
+                    console.log(result["message"])
+                    document.getElementById("signin-message").innerHTML = "登入失敗，帳號或密碼錯誤或其他原因";
+                }
+            })
+    }
+    // 訪客登入
+const guestSignin = () => {
     // 串接API
     let body = {
-        "email": email,
-        "password": password
+        "email": "guest@mail.com",
+        "password": "pass"
     };
     fetch("/api/user", {
             method: "PATCH",
@@ -584,6 +626,7 @@ const signup = () => {
     let name = document.getElementById("signup-name").value;
     let email = document.getElementById("signup-email").value;
     let password = document.getElementById("signup-password").value;
+    let cfmPassword = document.getElementById("confirm-password").value;
     let number = document.getElementById("signup-number").value;
     let address = document.getElementById("signup-address").value;
     // 表單驗證
@@ -594,12 +637,17 @@ const signup = () => {
         document.getElementById("signup-message").innerHTML = "欄位不可為空，請輸入資料!";
         return;
     }
-    if (!nameRegex.test(name)) {
-        document.getElementById("signup-message").innerHTML = "請輸入正確姓名格式";
-        return;
-    }
+    // if (!nameRegex.test(name)) {
+    //     document.getElementById("signup-message").innerHTML = "請輸入正確姓名格式";
+    //     return;
+    // }
     if (!emailRegex.test(email)) {
         document.getElementById("signup-message").innerHTML = "請輸入正確信箱格式";
+        return;
+    }
+
+    if (password !== cfmPassword) {
+        document.getElementById("signup-message").innerHTML = "確認密碼不相同";
         return;
     }
     // if (!pwRegex.test(password)) {
@@ -611,6 +659,7 @@ const signup = () => {
         "name": name,
         "email": email,
         "password": password,
+        "cfmPassword": cfmPassword,
         "number": number,
         "address": address
     };
@@ -688,7 +737,7 @@ const updateMember = async() => {
         document.getElementById('update-member-msg').style.display = "flex";
         setTimeout(function() {
             document.getElementById('update-member-msg').style.display = "none";
-        }, 1500)
+        }, 2500)
     }
 }
 
@@ -704,7 +753,7 @@ const changePw = async() => {
         document.getElementById("error-pw-msg").innerHTML = "欄位不可為空，請輸入資料!";
         setTimeout(function() {
             document.getElementById('noUpdate-pw-msg').style.display = "none";
-        }, 2000)
+        }, 2500)
         return;
     }
     let body = {
@@ -724,24 +773,26 @@ const changePw = async() => {
         document.getElementById("error-pw-msg").innerHTML = data["message"];
         setTimeout(function() {
             document.getElementById('noUpdate-pw-msg').style.display = "none";
-        }, 2000)
+        }, 2500)
     }
     if (data["ok"]) {
         document.getElementById("okUpdate-pw-msg").style.display = "flex";
         document.getElementById("ok-pw-msg").innerHTML = "更新密碼成功";
         setTimeout(function() {
             document.getElementById('okUpdate-pw-msg').style.display = "none";
-        }, 2000)
+        }, 2500)
     }
 
 }
 
 
 
-// tappay
+// tappay金流
 async function send_order(prime) {
     let tappayRequestBody = {
         "prime": prime,
+        "name": document.getElementById("receiver-name").value,
+        "phone": document.getElementById("receiver-number").value,
         "order": {
             "amount": parseInt(document.getElementById("cart-total").textContent.split(" ")[1]),
             "items": [],
@@ -751,7 +802,6 @@ async function send_order(prime) {
     let cookie = getCookie("shopwearCart");
     let item = cookie.split("&").filter(Boolean); //去掉split("&")後留下的空string ""
     for (i of item) {
-        // console.log(i)
         combo = i.replace(/[[\]]/g, '').replace(/['"]+/g, "").split(",")
         let id = combo[0];
         let name = combo[1];
@@ -800,7 +850,7 @@ async function send_order(prime) {
 
 
 
-// wear.html自動載入後續頁面的功能
+// wear.html下滑自動載入頁面功能
 
 // page
 let page = 0;
@@ -842,6 +892,8 @@ let showWear = (entry) => {
                             let mem_photo = document.createElement("img");
                             let name = document.createElement("div");
                             let img = document.createElement("img");
+                            let spinner = document.createElement("div");
+                            spinner.id = "wear-spinner";
 
                             photoBox.id = "pic" + photoCount;
                             aTag.href = "/wear/" + id;
@@ -851,14 +903,19 @@ let showWear = (entry) => {
                             } else {
                                 mem_photo.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + photo_sticker;
                             }
-                            name.innerHTML = member_nickname !== "" ? member_nickname : member_name;
+                            name.innerHTML = member_nickname !== null ? member_nickname : member_name;
                             mem_photo.id = "wear-photo-sticker";
                             img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + photo;
+
                             nameBox.appendChild(mem_photo);
                             nameBox.appendChild(name);
                             wrapper.appendChild(nameBox)
                             aTag.appendChild(wrapper);
                             aTag.appendChild(img);
+                            aTag.appendChild(spinner);
+                            img.onload = () => {
+                                spinner.style.display = "none";
+                            }
 
                             photoBox.appendChild(aTag);
                             photoWrapper.appendChild(photoBox);
@@ -893,23 +950,20 @@ const submitPhotoSticker = async() => {
     let formData = new FormData();
     let file = document.getElementById('media-input');
     formData.append("pic", file.files[0]);
-    console.log(1)
     let res = await fetch("/api/mywear/photo_sticker", {
         method: 'POST',
         body: formData
     })
     let data = await res.json()
-    console.log(2)
-        // let text = document.getElementById("text-message").value;
-        // let content = document.getElementById("content");
-        // let textDiv = document.createElement("div");
     let photoSticker = document.getElementById("photo-sticker");
-    // let hr = document.createElement("hr");
-    // textDiv.textContent = text;
     if (data["error"]) {
         console.log(data["message"]);
     } else {
-        photoSticker.src = "https://d7h07qlpoj67x.cloudfront.net/mywear/photo_sticker/" + data["pic_src"];
+        photoSticker.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + data["pic_src"];
+        document.getElementById("m-c-upload").style.display = "none";
+        document.getElementById("m-c-cancel").style.display = "none";
+        document.getElementsByClassName("media-overlay")[0].style.display = "none";
+        document.getElementById("indicator").style.display = "none";
     }
 }
 
@@ -920,6 +974,8 @@ const showSubmitWindow = () => {
     document.getElementById("wear-upload-msg").innerHTML = "";
     document.getElementById("selected-item-1").innerHTML = "";
     document.getElementById("selected-item-2").innerHTML = "";
+    document.getElementById("mywear-backdrop").style.display = 'block';
+
 }
 const nextStep = (prev, next) => {
     if (document.getElementById('file-upload').value === "") {
@@ -964,27 +1020,30 @@ const closeSubmitWindow = () => {
     document.getElementById("upload-container-1").style.display = 'flex';
     document.getElementById("upload-container-2").style.display = 'none';
     document.getElementById("upload-container-3").style.display = 'none';
+    document.getElementById("upload-backdrop").style.display = 'none';
+    document.getElementById("mywear-backdrop").style.display = 'none';
     switchBtnNext("");
     switchBtnPrev();
     nextStep('upload-container-2', 'upload-container-1');
 }
 
-// const submitWindow = () => {
+// 切換上傳大頭貼按鈕
+const switchUploadSticker = (x) => {
+    if (x === "on") {
+        document.getElementById("m-c-upload").style.display = "block";
+        document.getElementById("m-c-cancel").style.display = "block";
+        document.getElementsByClassName("edit-profile")[0].style.display = "inline-block";
+        document.getElementsByClassName("save-profile")[0].style.display = "none";
+    }
+    if (x === "off") {
+        document.getElementById("m-c-upload").style.display = "none";
+        document.getElementById("m-c-cancel").style.display = "none";
+        document.getElementsByClassName("media-overlay")[0].style.display = "none";
+        document.getElementById("indicator").style.display = "none";
+        document.getElementById("photo-sticker").src = stickerSrc;
+    }
+}
 
-//     }
-// 拖曳上傳圖片功能
-// function uploadFiles() {
-//     var files = document.getElementById('file-upload').files;
-//     if (files.length == 0) {
-//         alert("Please first choose or drop any file(s)...");
-//         return;
-//     }
-//     var filenames = "";
-//     for (var i = 0; i < files.length; i++) {
-//         filenames += files[i].name + "\n";
-//     }
-//     alert("Selected file(s) :\n____________________\n" + filenames);
-// }
 
 const showPreview = (event) => {
     if (event.target.files.length > 0) {
@@ -1007,7 +1066,7 @@ const closePreviewImg = () => {
     document.getElementById("selected-item-2").innerHTML = "";
 }
 
-// selected item
+// 搭配的產品項目
 const selectedItem = (id, name) => {
     let wrapper = document.createElement("div");
     let close = document.createElement("img");
@@ -1027,9 +1086,10 @@ const selectedItem = (id, name) => {
 }
 
 const closeCate = () => {
-        document.getElementById("cate-catalogue").innerHTML = "";
-    }
-    //select category
+    document.getElementById("cate-catalogue").innerHTML = "";
+}
+
+//select category
 const selectProduct = async(subcategory) => {
     let apiAddress = "/api/selectproducts?subcategory=" + subcategory;
     let res = await fetch(apiAddress);
@@ -1046,11 +1106,10 @@ const selectProduct = async(subcategory) => {
         let itemName = i["product_name"];
         box.id = "sub-item" + id;
         box.onclick = () => {
-                console.log(id);
-                selectedItem(id, itemName);
+            console.log(id);
+            selectedItem(id, itemName);
 
-            }
-            // box.href = "/product/" + i["id"];
+        }
         spinner.id = "spinner";
         img.src = "https://d1pxx4pixmike8.cloudfront.net/shopwear/" + i["photo"];
         name.textContent = i["product_name"];
@@ -1080,8 +1139,11 @@ const submitMywear = async() => {
     let items = document.getElementById('selected-item-1').children
     if (items.length !== 0) {
         for (i of items) {
+            console.log(i)
             itemIds.push(i.children[1].id)
         }
+        console.log("ITEM")
+        console.log(itemIds)
         formData.append("id", itemIds);
     }
     formData.append("caption", "");
@@ -1093,26 +1155,29 @@ const submitMywear = async() => {
     if (data["ok"]) {
         closeSubmitWindow();
         window.location.reload();
+        document.getElementById("upload-backdrop").style.display = "none";
     }
-    console.log(data["file_name"]);
+    console.log(data);
 }
 
 //WEAR單頁資料
 // update Like API
 const updateLike = async() => {
-        let wear_id = document.getElementById('wear_id').innerHTML;
-        let like_stat = document.getElementsByClassName('like-text')[0].innerHTML;
-        let body = {
-            "wear_id": wear_id,
-            "like_stat": like_stat
-        }
-        let data = await fetch("/api/like", { method: "POST", headers: headers, body: JSON.stringify(body) });
-        let res = await data.json();
-        if (res["ok"]) {
-            console.log("已更新LIKE");
-        }
+    let wear_id = document.getElementById('wear_id').innerHTML;
+    let like_stat = document.getElementsByClassName('like-text')[0].innerHTML;
+    let body = {
+        "wear_id": wear_id,
+        "like_stat": like_stat
     }
-    // Like button
+    let data = await fetch("/api/like", { method: "POST", headers: headers, body: JSON.stringify(body) });
+    let res = await data.json();
+    if (res["ok"]) {
+        console.log("已更新LIKE");
+        document.getElementById("like-count").innerHTML = res["likes"] + " 個讚"
+    }
+}
+
+// Like button
 const createDOMFromString = (domString) => {
     const div = document.createElement('div')
     div.innerHTML = domString
@@ -1146,10 +1211,14 @@ class LikeButton {
             // this.element.addEventListener('click', this.changeLikeIcon.bind(this), false)
         return this.element
     }
+
+    removeListener() {
+        button.removeEventListener('click', this.boundEventHandler)
+    }
 }
 
 
-
+// 顯示貼文詳細資料
 const showWearDetail = async() => {
     let apiAddress = "/api/wear/" + window.location.pathname.split("/")[2];
     let res = await fetch(apiAddress);
@@ -1157,14 +1226,17 @@ const showWearDetail = async() => {
     document.getElementById("wear_id").textContent = data["id"];
     document.getElementById("member_id").textContent = data["member_id"];
     document.getElementById("member_nickname").href = "/mywear/" + data["member_id"];
-    document.getElementById("member_nickname").textContent = data["member_nickname"] !== "" ? data["member_nickname"] : data["member_name"];
+    document.getElementById("wear-single-member").href = "/mywear/" + data["member_id"];
+    document.getElementById("member_nickname").textContent = data["member_nickname"] !== null ? data["member_nickname"] : data["member_name"];
     if (data["photo_sticker"] !== null) { document.getElementById("photo-sticker").src = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + data["photo_sticker"]; };
     // document.getElementById("product_id").textContent = data["product_id"];
     document.getElementById("caption").textContent = data["caption"];
 
-    // window.document.title = data["product_name"];
+    if (data["user_id"] === data["member_id"]) {
+        document.getElementById("delete-dots").style.display = "block";
+    }
+
     let imgList = data["photo"];
-    // console.log(imgList)
     for (let i = 0; i < imgList.length; i++) {
         let input = document.createElement("input");
         let li = document.createElement("li");
@@ -1173,14 +1245,8 @@ const showWearDetail = async() => {
         addAttributes(input, inputAttributes);
         li.setAttribute("class", "slide");
         img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + imgList[i];
-        // spinner.id = "spinner";
-        // img.onload = () => {
-        //     img.style.display = "block";
-        //     spinner.style.display = "none";
-        // }
         document.getElementsByClassName("data-switch-input")[0].appendChild(input);
         li.appendChild(img);
-        // li.appendChild(spinner);
         document.getElementById("slide-list").appendChild(li);
     }
     if (imgList.length === 1) {
@@ -1200,24 +1266,24 @@ const showWearDetail = async() => {
         document.getElementById("wear-products").appendChild(box);
     }
 
+    // render likeButton status
     let likeWrapper = document.getElementById("like-wrapper");
     let likeButton1 = new LikeButton();
-    console.log(likeButton1)
-    console.log(likeButton1.state)
     likeWrapper.appendChild(likeButton1.render());
-    // likeButton1.element.click()
+    if (data["user_like"] === 1) {
+        document.getElementsByClassName('like-icon')[0].innerHTML = '❤️';
+        likeButton1.state.isLiked = true;
+    }
+    document.getElementById("like-count").innerHTML = data["likes"] + " 個讚"
 
     document.getElementsByClassName("data-switch-input-btn")[0].checked = true;
     document.getElementsByClassName("slide")[0].dataset.active = true;
     inputBtn = document.querySelectorAll(".data-switch-input-btn")
-        // console.log(inputBtn = document.querySelectorAll(".data-switch-input-btn"))
     showOtherWears(data["member_id"]);
 }
 
 
-
-
-
+// 顯示其他貼文
 const showOtherWears = async(memberId) => {
     let otherWears = document.getElementById("other-wears");
     apiAdress = "/api/mywear" + "?member=" + memberId + "&page=0";
@@ -1227,8 +1293,6 @@ const showOtherWears = async(memberId) => {
         data = result["data"][i]
         let id = data["id"];
         let photo = data["photo"];
-        // let member = data["member_id"];
-        // let caption = data["caption"];
 
         let photoBox = document.createElement("div");
         let aTag = document.createElement("a");
@@ -1238,5 +1302,20 @@ const showOtherWears = async(memberId) => {
         aTag.appendChild(img);
         photoBox.appendChild(aTag);
         otherWears.appendChild(photoBox);
+    }
+}
+
+// 刪除貼文
+const deleteWear = async() => {
+    let wearId = document.getElementById("wear_id").innerHTML;
+    let memberId = document.getElementById("member_id").innerHTML;
+    apiAdd = "/api/wear/" + wearId;
+    let body = {
+        "member_id": memberId
+    }
+    let data = await fetch(apiAdd, { method: "DELETE", headers: headers, body: body })
+    let res = await data.json();
+    if (res["ok"]) {
+        window.location = "/mywear/" + memberId;
     }
 }
