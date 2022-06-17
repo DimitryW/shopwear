@@ -43,7 +43,7 @@ Go to [login](https://www.dimalife.com/login) page and you can log in directly a
 * The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
 ![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
 
-## Backend skills
+## Backend cloud deployment
 * Built with Flask app and deployed by Docker.
 * Deployed on AWS EC2 service.
 * Use of AWS RDS(MySql) for data manipulation.
