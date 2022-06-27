@@ -4,6 +4,7 @@
 
 Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
 Of course, you can share yours, too!
+
 ![image](https://user-images.githubusercontent.com/63653055/173226002-6e312809-b48c-4b9a-a296-8c97776ad3e8.png)
 
 
@@ -58,8 +59,13 @@ Test account and password : guest@mail.com / pass
 3. "Wear" page for sharing photos
     * User can post his/her photos of dressing styles and upload to Wear page.
     * Each photo can relate to the items sold on the website.
-    * * Like button for each post.
+    * Like button for each post.
 
+## Backend Technique
+
+### Deployment
+    * Docker Image
+    
 * Built with Flask app and deployed via Docker.
 * Deployed on AWS EC2 service.
 * Use of AWS RDS(MySql) for data storage and queries.
