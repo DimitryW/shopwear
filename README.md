@@ -30,7 +30,7 @@ Test account and password : guest@mail.com / pass
 * When item is add in cart, notification will show on the top right navigation bar.
 * In the checkout page, confirm and make payment.
 * After payment is done, you can check the order in history orders.
-![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/buy.gif)
+![image](https://github.com/DimitryW/shopwear/blob/480a782e110bd6c89e0a4867357fdcc35b8fee68/readme-demo/buy%20(1).gif)
 
 ### 3.  Upload and share your dressings.
 * Go to member's **MyWear** page.
@@ -40,7 +40,7 @@ Test account and password : guest@mail.com / pass
 * Upload.
 * Then you can check out the photo either in you member's page or on the **Wear穿搭牆** page.
 * The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
-![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
+[![image](https://github.com/DimitryW/shopwear/blob/480a782e110bd6c89e0a4867357fdcc35b8fee68/readme-demo/mywear%20(1)%20(1).gif)
 
 ## Contents
   * [Main Features](#main-features)
