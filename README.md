@@ -44,7 +44,7 @@ Test account and password : guest@mail.com / pass
 ![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
 
 ## Contents
-  * [Main Features](#main features)
+  * [Main Features](#main-features)
 
 
 ## Main Features
