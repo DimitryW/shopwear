@@ -89,6 +89,11 @@ Test account and password : guest@mail.com / pass
   
 ### Database
   * MySQL
+  * 3NF
+  * Query Optimization
+  * Database Schema
+  ![image](https://github.com/DimitryW/shopwear/blob/bccb44336cc95ed62bcaccea1a7fa54adb31c7c4/readme-demo/%E5%9C%96%E7%89%872.png)
+  
 
 ### Networking
   * HTTP & HTTPS
