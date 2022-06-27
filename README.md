@@ -45,6 +45,16 @@ Test account and password : guest@mail.com / pass
 
 ## Contents
   * [Main Features](#main-features)
+  * [Backend Technique](#backend-technique)
+    * [Language / Web Framework](#language-/-web-framework)
+    * [Deployment](#deployment)
+    * [AWS Cloud Service](#aws-cloud-service)
+    * [Database](#database)
+    * [Networking](#networking)
+    * [Version Control](#version-control)
+  * [Architecture](#architecture)
+  * [Frontend Technique](#frontend-technique)
+  * [Contact](#contact)
 
 
 ## Main Features
@@ -71,23 +81,23 @@ Test account and password : guest@mail.com / pass
 ### Deployment
   * Docker Image
     
-## AWS Cloud Service
+### AWS Cloud Service
   * EC2
   * RDS
   * S3
   * CloudFront
   * ELB
   
-## Database
+### Database
   * MySQL
 
-## Networking
+### Networking
   * HTTP & HTTPS
   * DNS
   * NGINX
   * SSL(Let's Encrypt)
 
-## Version Control
+### Version Control
   * GitHub
 
 ## Architecture
