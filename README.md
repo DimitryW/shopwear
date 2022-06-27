@@ -15,7 +15,7 @@ Of course, you can share yours, too!
   </tr>
 </table> -->
 
-<h1><p align="center"><a href="https://www.dimalife.com">Live Demo</a></p></h1>
+<h2><p align="center"><a href="https://www.dimalife.com">Website</a></p></h1>
 
 
 
