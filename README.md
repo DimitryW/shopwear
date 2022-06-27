@@ -1,6 +1,7 @@
 <h1><p align="center">SHOPWEAR</p></h1>
 
-*"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."*  
+>"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."  
+
 Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
 Of course, you can share yours, too!
 ![image](https://user-images.githubusercontent.com/63653055/173226002-6e312809-b48c-4b9a-a296-8c97776ad3e8.png)
