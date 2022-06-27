@@ -43,17 +43,15 @@ Go to [login](https://www.dimalife.com/login) page and you can log in directly a
 * The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
 ![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
 
-## Backend cloud deployment
-* Built with Flask app and deployed by Docker.
+## Cloud deployment
+* Built with Flask app and deployed via Docker.
 * Deployed on AWS EC2 service.
-* Use of AWS RDS(MySql) for data manipulation.
-* Use of AWS S3 storage and Cloudfront for CDN service.
-* Use Nginx as web server.
+* Use of AWS RDS(MySql) for data storage and queries.
+* Use of AWS S3 storage and Cloudfront for files distribution.
+* Use Nginx as web server/reverse proxy.
 
 ![image](https://user-images.githubusercontent.com/63653055/173238632-6aa74484-aae0-4a5f-b33b-1bb1b02830cc.png)
 
-## Deployment 
-`docker pull grayfen/shopwear`
 
 
 
