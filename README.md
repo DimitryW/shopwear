@@ -44,7 +44,7 @@ Test account and password : guest@mail.com / pass
 ![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
 
 
-[## Main Features]
+## [Main Features]
 1. Member system
    * User authentication with JWT.
    * Google-Signin(OAuth2.0).
@@ -87,6 +87,7 @@ Test account and password : guest@mail.com / pass
 ## Version Control
   * GitHub
 
+## Architecture
 ![image](https://user-images.githubusercontent.com/63653055/173238632-6aa74484-aae0-4a5f-b33b-1bb1b02830cc.png)
 
 ## Frontend Technique
