@@ -105,6 +105,7 @@ Test account and password : guest@mail.com / pass
   * GitHub
 
 ## Architecture
+  * Cloud deployment
 ![image](https://user-images.githubusercontent.com/63653055/173238632-6aa74484-aae0-4a5f-b33b-1bb1b02830cc.png)
 
 ## Frontend Technique
