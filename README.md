@@ -5,8 +5,7 @@
 Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
 Of course, you can share yours, too!
 
-![image](https://user-images.githubusercontent.com/63653055/173226002-6e312809-b48c-4b9a-a296-8c97776ad3e8.png)
-
+![image](https://user-images.githubusercontent.com/63653055/175864030-ca73c811-2e20-4e44-a549-1d234f96959c.png)
 
 <!-- <table>
   <tr>
