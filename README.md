@@ -43,8 +43,11 @@ Test account and password : guest@mail.com / pass
 * The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
 ![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
 
+## Contents
+  * [Main Features](#Main Features)
 
-## [Main Features]
+
+## Main Features
 1. Member system
    * User authentication with JWT.
    * Google-Signin(OAuth2.0).
