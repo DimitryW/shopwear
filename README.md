@@ -1,5 +1,8 @@
 <h1><p align="center">SHOPWEAR</p></h1>
 
+*"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."*  
+Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
+Of course, you can share yours, too!
 ![image](https://user-images.githubusercontent.com/63653055/173226002-6e312809-b48c-4b9a-a296-8c97776ad3e8.png)
 
 
@@ -13,18 +16,13 @@
 
 <h1><p align="center"><a href="https://www.dimalife.com">Live Demo</a></p></h1>
 
-*"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."*  
-Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
-Of course, you can share yours, too!
 
 
-## How to use 
+## How to Use 
 
-### 1. Login  
+### 1. Login with test acount
 
-Go to [login](https://www.dimalife.com/login) page and you can log in directly as a guest via the green "訪客帳號登入" button.
-
-<p align="center"><img src="https://user-images.githubusercontent.com/63653055/173237803-91ccb42d-4f80-4a9a-af50-d4691490bd69.png" style="width:60%;"/></p>
+Test account and password : guest@mail.com / pass
 
 ### 2. Basic shopping routine
 * Select any item you like on the home page and direct to the product details page.
@@ -43,7 +41,24 @@ Go to [login](https://www.dimalife.com/login) page and you can log in directly a
 * The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
 ![image](https://github.com/DimitryW/shopwear/blob/b9c12ffee9f92dac50483b7f7688f0d7dc833515/mywear%20(1).gif)
 
-## Cloud deployment
+
+## Main Features
+1. Member system
+   * User authentication with JWT.
+   * Google-Signin(OAuth2.0).
+   * Each user has his/her member home page.
+   * User can update his/her member info.
+  
+2. Order system
+   * User can add items in the shopping cart for later checkout process.
+   * Checkout with third-party payment system.
+   * User can check history orders in member system.
+
+3. "Wear" page for sharing photos
+    * User can post his/her photos of dressing styles and upload to Wear page.
+    * Each photo can relate to the items sold on the website.
+    * * Like button for each post.
+
 * Built with Flask app and deployed via Docker.
 * Deployed on AWS EC2 service.
 * Use of AWS RDS(MySql) for data storage and queries.
