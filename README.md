@@ -1,6 +1,4 @@
-<h1><p align="center">SHOPWEAR</p></h1>
-
->"As an online shopper, I want to see other people's sharing of how they dress, so that I can gain more insight and inspiration to know what clothes to buy."  
+<h1><p align="center">SHOPWEAR</p></h1>  
 
 Shopwear is a E-commerce website for clothing. You can not only shop online, but also see other people's dressing styles and sharing on it. 
 Of course, you can share yours, too!
@@ -15,69 +13,28 @@ Of course, you can share yours, too!
   </tr>
 </table> -->
 
-<h2><p align="center"><a href="https://www.dimalife.com">Website</a></p></h1>
+<h2><p align="center"><a href="https://www.dimalife.com">Website Link</a></p></h1>
 
-
-
-## How to Use 
-
-### 1. Login with test acount
-
-Test account and password : guest@mail.com / pass
-
-### 2. Basic shopping routine
-* Select any item you like on the home page and direct to the product details page.
-* When item is add in cart, notification will show on the top right navigation bar.
-* In the checkout page, confirm and make payment.
-* After payment is done, you can check the order in history orders.
-![image](https://github.com/DimitryW/shopwear/blob/480a782e110bd6c89e0a4867357fdcc35b8fee68/readme-demo/buy%20(1).gif)
-
-### 3.  Upload and share your dressings.
-* Go to member's **MyWear** page.
-* Click "上傳貼文" the ipload button.
-* Choose or drag your photo.
-* Select the clothes item.
-* Upload.
-* Then you can check out the photo either in you member's page or on the **Wear穿搭牆** page.
-* The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
-[![image](https://github.com/DimitryW/shopwear/blob/480a782e110bd6c89e0a4867357fdcc35b8fee68/readme-demo/mywear%20(1)%20(1).gif)
-
-## Contents
-  * [Main Features](#main-features)
+## Table of Contents
+  
   * [Backend Technique](#backend-technique)
-    * [Language / Web Framework](#language-/-web-framework)
-    * [Deployment](#deployment)
+    * [Language/Web Framework](https://github.com/DimitryW/shopwear/edit/main/README.md#language--web-framework)
+    * [Containerization](#containerization)
     * [AWS Cloud Service](#aws-cloud-service)
     * [Database](#database)
     * [Networking](#networking)
     * [Version Control](#version-control)
   * [Architecture](#architecture)
   * [Frontend Technique](#frontend-technique)
+  * [Main Features](#main-features)
+  * [How to Use](how-to-use)
   * [Contact](#contact)
-
-
-## Main Features
-1. Member system
-   * User authentication with JWT.
-   * Google-Signin(OAuth2.0).
-   * Each user has his/her member home page.
-   * User can update his/her member info.
-  
-2. Order system
-   * User can add items in the shopping cart for later checkout process.
-   * Checkout with third-party payment system.
-   * User can check history orders in member system.
-
-3. "Wear" page for sharing photos
-    * User can post his/her photos of dressing styles and upload to Wear page.
-    * Each photo can relate to the items sold on the website.
-    * Like button for each post.
 
 ## Backend Technique
 ### Language / Web Framework
   * Python/Flask
   
-### Deployment
+### Containerization
   * Docker Image
     
 ### AWS Cloud Service
@@ -113,6 +70,49 @@ Test account and password : guest@mail.com / pass
   * JavaScript
   * CSS
   * AJAX
+  
+
+## Main Features
+1. Member system
+   * User authentication with JWT.
+   * Google-Signin(OAuth2.0).
+   * Each user has his/her member home page.
+   * User can update his/her member info.
+  
+2. Order system
+   * User can add items in the shopping cart for later checkout process.
+   * Checkout with third-party payment system.
+   * User can check history orders in member system.
+
+3. "Wear" page for sharing photos
+    * User can post his/her photos of dressing styles and upload to Wear page.
+    * Each photo can relate to the items sold on the website.
+    * Like button for each post.
+    
+    
+## How to Use 
+
+### 1. Login with test acount
+
+Test account and password : guest@mail.com / pass
+
+### 2. Basic shopping routine
+* Select any item you like on the home page and direct to the product details page.
+* When item is add in cart, notification will show on the top right navigation bar.
+* In the checkout page, confirm and make payment.
+* After payment is done, you can check the order in history orders.
+![image](https://github.com/DimitryW/shopwear/blob/480a782e110bd6c89e0a4867357fdcc35b8fee68/readme-demo/buy%20(1).gif)
+
+### 3.  Upload and share your dressings.
+* Go to member's **MyWear** page.
+* Click "上傳貼文" the ipload button.
+* Choose or drag your photo.
+* Select the clothes item.
+* Upload.
+* Then you can check out the photo either in you member's page or on the **Wear穿搭牆** page.
+* The photo is connected with the clothes on SHOPWEAR, and you can click to check the clothes product.
+[![image](https://github.com/DimitryW/shopwear/blob/480a782e110bd6c89e0a4867357fdcc35b8fee68/readme-demo/mywear%20(1)%20(1).gif)
+
 
 ## Contact
   :technologist: 吳佳俞 Chia-Yu, Wu
