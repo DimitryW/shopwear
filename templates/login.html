@@ -8,7 +8,8 @@
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script type="text/javascript" src="../static/script/script.js"></script>
+    <script type="text/javascript" src="../static/script/main.js"></script>
+    <script type="text/javascript" src="../static/script/member.js"></script>
     <script>
         function handleCredentialResponse(response) {
             // console.log("Encoded JWT ID token: " + response.credential);
@@ -109,11 +110,11 @@
                         <!-- 登入 -->
                         <div class="login" id="signin-block">
                             <div id="login-form">
-                                <input id="signin-email" type="text" placeholder="信箱">
-                                <input id="signin-password" type="password" placeholder="密碼">
+                                <input id="signin-email" type="text" placeholder="信箱" value="guest@mail.com">
+                                <input id="signin-password" type="password" placeholder="密碼" value="pass">
                                 <!-- <div id="reset-pw">忘記密碼</div> -->
                                 <button id="signin-btn" onclick="signin()">登入</button>
-                                <button id="signin-btn" onclick="guestSignin()" style="background: #29b029;margin: 10px 10px 20px;">訪客帳號登入</button>
+                                <!-- <button id="signin-btn" onclick="guestSignin()" style="background: #29b029;margin: 10px 10px 20px;">訪客帳號登入</button> -->
                                 <div class="google-signin" style="margin: 0 10px 0;">
                                     <div id="buttonDiv"></div>
                                     <!-- <div>GOOGLE 登入</div> -->
@@ -142,22 +143,10 @@
 
             </div>
         </div>
-        <!-- <div class="footer-container">
-            <div id="footer">SHOPWEAR</div>
-        </div>
         <div id="end"></div> -->
     </div>
     <div id="footer">Copyright © 2022 SHOPWEAR / Dimitry Wu</div>
 
-
-
-
-    <script>
-        const showLogin = (a, b) => {
-            document.getElementById("signup-block").style.display = a;
-            document.getElementById("signin-block").style.display = b;
-        }
-    </script>
 
 </body>
 

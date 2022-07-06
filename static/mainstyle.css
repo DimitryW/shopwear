@@ -45,6 +45,82 @@ input {
 }
 
 
+/* loader spinner */
+
+.lds-fb {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.lds-fb div {
+    display: inline-block;
+    position: absolute;
+    left: 8px;
+    width: 16px;
+    background: #3130db;
+    animation: lds-fb 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+
+.lds-fb div:nth-child(1) {
+    left: 8px;
+    animation-delay: -0.24s;
+}
+
+.lds-fb div:nth-child(2) {
+    left: 32px;
+    animation-delay: -0.12s;
+}
+
+.lds-fb div:nth-child(3) {
+    left: 56px;
+    animation-delay: 0;
+}
+
+@keyframes lds-fb {
+    0% {
+        top: 8px;
+        height: 64px;
+    }
+    50%,
+    100% {
+        top: 24px;
+        height: 32px;
+    }
+}
+
+#index-lds,
+#wear-lds {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#mw-upload-lds,
+#mw-sticker-lds {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 6;
+}
+
+#mywear-lds {
+    position: absolute;
+}
+
+#product-lds {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+}
+
+
 /* 上方navbar */
 
 .topnav-container {
@@ -173,7 +249,8 @@ input {
 .mywear-option-container,
 .category-wrapper,
 .wear-single-container,
-.other-wears-wrapper {
+.other-wears-wrapper,
+.cover-wrapper {
     display: flex;
     width: 100%;
     justify-content: center;
@@ -260,7 +337,7 @@ input {
     color: #2e2e2e
 }
 
-[id^="box"]>img {
+[id^="box"] img {
     grid-area: img;
     width: 100%;
     height: 100%;
@@ -269,7 +346,20 @@ input {
     box-shadow: 0px 0px 1px 1px #dddddd;
 }
 
-[id^="box"]>img:hover {
+[id^="box"] img:hover {
+    box-shadow: 0px 5px 15px 2px #c0c0c0;
+}
+
+[id^="box"] canvas {
+    grid-area: img;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0px 0px 1px 1px #dddddd;
+}
+
+[id^="box"] canvas:hover {
     box-shadow: 0px 5px 15px 2px #c0c0c0;
 }
 
@@ -343,14 +433,35 @@ input {
     margin: 30px;
 }
 
+#wear-single-backdrop {
+    position: absolute;
+    top: 0px;
+    z-index: 6;
+    display: none;
+    background: black;
+    height: 100%;
+    width: 100%;
+    opacity: 0.5;
+}
+
 .wear-single {
     margin: 20px 0 0;
     border: 1px solid #d3d3d3;
     display: grid;
     grid-template-columns: 6fr 4fr;
     height: 600px;
+    border-radius: 10px;
     /* border-bottom: 1px solid #E8E8E8; */
     /* column-gap: 30px; */
+}
+
+#wear-single-photo img {
+    height: 600px;
+    width: 100%;
+    position: absolute;
+    inset: 0;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 #wear-caresoul {
@@ -423,7 +534,7 @@ input {
 .wear-msg {
     display: none;
     position: absolute;
-    z-index: 2;
+    z-index: 7;
     top: 30%;
     transform: translate(-50%, -50%);
     left: 50%;
@@ -474,7 +585,7 @@ input {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 3px;
+    border-radius: 8px;
 }
 
 #other-wears img:hover {
@@ -634,7 +745,7 @@ input {
 .slide>img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     /* border-radius: 5px; */
 }
 
@@ -831,14 +942,15 @@ input {
 
 /* checkout */
 
-#backdrop-wrapper {
+#ckout-backdrop-wrapper {
     position: absolute;
     width: 100%;
     height: 100%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    backdrop-filter: blur(2px);
+    backdrop-filter: brightness(60%);
+    z-index: 1;
 }
 
 #backdrop {
@@ -854,17 +966,17 @@ input {
     backdrop-filter: blur(2px);
 }
 
-#backdrop-text {
-    width: 200px;
-    height: 200px;
-    text-align: center;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+#ckout-backdrop-wrapper>div {
     position: absolute;
-    z-index: 6;
-    font-size: 20px;
-    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    z-index: 7;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 5px;
+    width: 200px;
+    height: 120px;
+    text-align: center;
 }
 
 #checkout-table {
@@ -1353,7 +1465,7 @@ input {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 3px;
+    border-radius: 8px;
 }
 
 #pic1 {
@@ -1745,7 +1857,7 @@ input {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 3px;
+    border-radius: 8px;
 }
 
 .three-pics img:hover {
@@ -1809,7 +1921,8 @@ input {
 @media screen and (min-width:1200px) {
     #index-carousel,
     .category,
-    #orders {
+    #orders,
+    #cover {
         width: 950px;
     }
     .product,

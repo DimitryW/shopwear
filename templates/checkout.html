@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
-    <script type="text/javascript" src="../static/script/script.js"></script>
+    <script type="text/javascript" src="../static/script/main.js"></script>
+    <script type="text/javascript" src="../static/script/purchase.js"></script>
     <style>
         .spinner {
             width: 100px;
@@ -64,13 +65,18 @@
 </head>
 
 <body id="body">
-    <div id="backdrop-wrapper" style="display: none;">
-        <div id="backdrop-text">訂單處理中</div>
-        <!-- <div id="backdrop"></div> -->
-        <div class="spinner" id="index-spinner" style="margin: 300px auto;position: absolute;left: 50%;transform: translate(-50%, -50%);">
-            <div></div>
-            <div></div>
+    <div id="ckout-backdrop-wrapper" style="display: none;">
+        <div>
+            <div style="width: 100%;height: 10px;background: #3130db;border-top-left-radius: 5px;border-top-right-radius: 5px;margin: 0 0 10px;"></div>
+            <div id="backdrop-text" style="font-size: 20px;font-weight: bold;">訂單處理中</div>
+            <!-- loader spinner -->
+            <div class="lds-fb" id="checkout-lds">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </div>
+
     </div>
     <div class="page_container">
         <div class="page-wrapper" style="padding-bottom: 0;">
@@ -117,7 +123,6 @@
                                 <div id="cvc" name=" cvc " class="form-control cvc"></div>
                             </div>
                             <div id="card-err-msg" style="display: none; font-size: 19px; color: red;">信用卡資料不正確，請重新輸入</div>
-                            <!-- <div id="total-price">總價：新台幣 <span></span> 元</div><br> -->
                             <div id="logistic">
                                 <div id="receiver" style="font-size: 19px; font-weight: 700; margin: 44px 0px 24px 0px;">收件人資料</div>
                                 <div><label for="receiver-name">姓名 : </label><input id="receiver-name" type="text" placeholder="姓名" style="margin: 0 60px 20px 20px;"></div>
@@ -127,9 +132,6 @@
                             <button id="confirm-button" type="submit" class="btn btn-default">確認送出</button>
                         </div>
                     </form>
-                    <!-- <div id="checkout-footer-container">
-                        <div id="checkout-footer">SHOPWEAR</div>
-                    </div> -->
                 </div>
             </div>
 
@@ -196,33 +198,8 @@
         })
         $('form').on('submit', function(event) {
             event.preventDefault()
-                // let name = document.getElementById("contact-name").value;
-                // let email = document.getElementById("contact-email").value;
-                // let number = document.getElementById("contact-number").value;
-                // let emailRegex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$/;
-                // let numberRegex = /^09[0-9]{8}$/;
-                // if (name === "" | email === "" | number === "") {
-                //     document.getElementById("contact-err-msg").style.display = "block";
-                //     document.getElementById("card-err-msg").style.display = "none";
-                //     return
-                // } else {
-                //     document.getElementById("contact-err-msg").style.display = "none";
-                // }
-                // if (!emailRegex.test(email)) {
-                //     document.getElementById("contact-err-msg").innerHTML = "請輸入正確信箱格式";
-                //     document.getElementById("contact-err-msg").style.display = "block";
-                //     document.getElementById("card-err-msg").style.display = "none";
-                //     return;
-                // }
-                // if (!numberRegex.test(number)) {
-                //     document.getElementById("contact-err-msg").innerHTML = "請輸入正確手機號碼格式";
-                //     document.getElementById("contact-err-msg").style.display = "block";
-                //     document.getElementById("card-err-msg").style.display = "none";
-                //     return;
-                // }
 
             const tappayStatus = TPDirect.card.getTappayFieldsStatus()
-                // console.log("tappayStatus")
                 // console.log(tappayStatus)
             document.getElementById("backdrop-wrapper").style.display = "block";
 
@@ -243,7 +220,7 @@
                 }
                 document.getElementById("card-err-msg").style.display = "none";
                 // confirmBooking();
-                send_order(result.card.prime);
+                sendOrder(result.card.prime);
             })
         })
     </script>

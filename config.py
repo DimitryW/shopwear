@@ -3,9 +3,9 @@ import os
 
 load_dotenv()
 
-host = os.getenv("host")
-user = os.getenv("user")
-password = os.getenv("password")
+host = os.getenv("HOST")
+user = os.getenv("USER")
+password = os.getenv("PASSWORD")
 
 dbconfig = {
   "host": host,
@@ -14,6 +14,6 @@ dbconfig = {
   "database": "wehelp3"
 }
 
-aws_access_key_id=os.getenv("aws_access_key_id")
-aws_secret_access_key=os.getenv("aws_secret_access_key")
+aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID")
+aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 
