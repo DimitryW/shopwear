@@ -18,7 +18,7 @@ Of course, you can share yours, too!
 ## Table of Contents
   
   * [Backend Technique](#backend-technique)
-    * [Language/Web Framework](https://github.com/DimitryW/shopwear/edit/main/README.md#language--web-framework)
+    * [Language/Web Framework](#language--web-framework)
     * [Containerization](#containerization)
     * [AWS Cloud Service](#aws-cloud-service)
     * [Database](#database)
