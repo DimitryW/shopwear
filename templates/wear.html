@@ -7,9 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
-    <!-- Uncaught TypeError: Failed to execute 'observe' on 'IntersectionObserver': parameter 1 is not of type 'Element' -->
-    <!-- 加上 "defer" 到<script> 避免 Uncaught TypeError -->
-    <script type="text/javascript" src="../static/script/script.js" defer></script>
 </head>
 
 <body id="body">
@@ -19,7 +16,6 @@
                 <a href="/">
                     <img id="shopwear" src="../static/photo/shopwear-2.png" style="height: 40px;position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);">
                 </a>
-                <!-- <a id="nav-title" href="/">SHOPWEAR</a> -->
                 <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">穿搭牆</a></button>
                 <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="https://dimalife.com/cart">購物車</a></button>
                 <div id="cart-item" style="display: none;"></div>
@@ -44,69 +40,12 @@
                 <div class="wear-desc-content" style="margin: 10px 0;font-weight: bold;color: #7b7b7b;">WEAR 穿搭牆</div>
             </div>
             <div class="wear-pics-container">
+                <div class="lds-fb" id="wear-lds">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
                 <div class="wear-pics" id="wear-pics">
-                    <!-- <div class="pics-set">
-                        <div id="pic1">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic2">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic3">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic4">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic5">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic6">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic7">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic8">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic9">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic10">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                        <div id="pic11">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div> 
-                        <div id="pic12">
-                            <a>
-                                <img src="../static/photo/sample2.jpg">
-                            </a>
-                        </div>
-                    </div> -->
 
                 </div>
             </div>
@@ -115,9 +54,10 @@
     </div>
 
     <div id="footer">Copyright © 2022 SHOPWEAR / Dimitry Wu</div>
-    <div id="end"></div>
+    <div id="wear-end"></div>
 
-
+    <script type="text/javascript" src="../static/script/main.js"></script>
+    <script type="text/javascript" src="../static/script/wear.js"></script>
     <script>
         window.onload = () => {
             loggedIn();

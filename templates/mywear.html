@@ -7,27 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
-    <script type="text/javascript" src="../static/script/script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
-        #wear-upload-spinner {
-            display: none;
-            position: absolute;
-            top: -15%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 6;
-        }
-        
-        #wear-upload-spinner svg {
-            color: rgb(229, 231, 235);
-            height: 70px;
-            width: 70px;
-            fill: #2d28d9;
-        }
-        
-        .animation-spin {
+        /* .animation-spin {
             -webkit-animation: spin 1s infinite linear;
             animation: spin 1s infinite linear;
         }
@@ -41,7 +23,7 @@
                 -webkit-transform: rotate(359deg);
                 transform: rotate(359deg);
             }
-        }
+        } */
         
         .media-container {
             position: relative;
@@ -110,7 +92,7 @@
         } */
         /* button */
         
-        .btn {
+        .mw-btn {
             width: 120px;
             margin: 10px 3px;
             display: inline-block;
@@ -132,63 +114,10 @@
             box-sizing: border-box;
         }
         
-        .btn>i {
+        .mw-btn>i {
             color: #555;
             font-size: 12px !important;
             /* margin-right: 10px; */
-        }
-    </style>
-    <style>
-        .spinner {
-            width: 100px;
-            height: 100px;
-            position: relative;
-        }
-        
-        .spinner div {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 10px solid transparent;
-            border-top-color: #3436cb;
-            border-radius: 50%;
-            animation: spinnerOne 1.2s linear infinite;
-        }
-        
-        .spinner div:nth-child(2) {
-            border: 10px solid transparent;
-            border-bottom-color: #3436cb;
-            animation: spinnerTwo 1.2s linear infinite;
-        }
-        
-        @keyframes spinnerOne {
-            0% {
-                transform: rotate(0deg);
-                border-width: 10px;
-            }
-            50% {
-                transform: rotate(180deg);
-                border-width: 1px;
-            }
-            100% {
-                transform: rotate(360deg);
-                border-width: 10px;
-            }
-        }
-        
-        @keyframes spinnerTwo {
-            0% {
-                transform: rotate(0deg);
-                border-width: 1px;
-            }
-            50% {
-                transform: rotate(180deg);
-                border-width: 10px;
-            }
-            100% {
-                transform: rotate(360deg);
-                border-width: 1px;
-            }
         }
     </style>
 </head>
@@ -196,6 +125,11 @@
 <body id="body">
     <div class="page-wrapper">
         <div id="mywear-backdrop" style="display: none;width: 100%;height: 100%;position: absolute;z-index: 6;background: #5f5f5f;opacity: 50%;"></div>
+        <div class="lds-fb" id="mw-sticker-lds">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
         <div class="topnav-container ">
             <div class="topnav">
                 <a href="/">
@@ -232,6 +166,7 @@
                             </span>
                             <figure class="media-object">
                                 <img class="img-object" id="photo-sticker" src="../static/photo/member-icon1.png">
+                                <canvas class="img-object" id="c-sticker" style="display: none;"></canvas>
                                 <div>
                                     <img class="indicator" id="indicator" src="../static/photo/add_pic-1.png" style="display: none; height: 130%;width: 130%;top: 50%;left: 50%;transform: translate(-50%, -50%);border-radius: 50%;object-fit: contain;opacity: 90%;background: rgb(213, 213, 213);">
                                 </div>
@@ -239,13 +174,13 @@
                         </div>
                         <div id="upload-sticker" style="display: flex; height: 50px;">
                             <div class="media-control" id="m-c-upload" style="display:none ;">
-                                <button class="btn edit-profile">
+                                <button class="mw-btn edit-profile">
                                 <i class="an an-write"></i>上傳大頭貼</button>
-                                <button class="btn save-profile">
+                                <button class="mw-btn save-profile">
                                 <i class="an an-save"></i>確認上傳</button>
                             </div>
                             <div id="m-c-cancel" style="display:none ;">
-                                <button class="btn" id="m-c-cancel-btn" onclick="switchUploadSticker('off')">
+                                <button class="mw-btn" id="m-c-cancel-btn" onclick="switchUploadSticker('off')">
                                     <i class="an an-write"></i>取消</button>
                             </div>
                         </div>
@@ -254,7 +189,6 @@
                         <div id="mywear-desc">
                             <div id="member-name" style="font-weight: bold;"></div>
                             <div id="post-count" style="margin: 10px;font-weight: bold;"></div>
-                            <!-- <button>編輯個人檔案</button> -->
                         </div>
                     </div>
 
@@ -280,18 +214,11 @@
                                 <img id="file-ip-1-preview">
                             </div>
 
-                            <!-- <div id="wear-upload-spinner">
-                            </div> -->
-                            <div class="wear-upload-container" id="wear-upload-spinner">
-                                <!-- <svg role="status" class="spinner animation-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"></path>
-                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"></path>
-                                </svg> -->
-
-                                <div class="spinner" id="index-spinner" style="margin: 300px auto;position: absolute;left: 50%;transform: translate(-50%, -50%);">
-                                    <div></div>
-                                    <div></div>
-                                </div>
+                            <!-- loader spinner -->
+                            <div class="lds-fb" id="mw-upload-lds">
+                                <div></div>
+                                <div></div>
+                                <div></div>
                             </div>
 
                             <div id="wear-upload-msg" style="position: absolute;bottom: 60px;color: red;font-weight: bold;">
@@ -341,10 +268,7 @@
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">SUITPANTS</td>
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">PANTS</td>
                                     </tr>
-                                    <!-- <tr>
-                                        <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">OTHERS</td>
-                                        <td></td>
-                                    </tr> -->
+
                                 </table>
                                 <div>外套類</div>
                                 <table>
@@ -358,7 +282,6 @@
                                     </tr>
                                     <tr>
                                         <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">DENIM</td>
-                                        <!-- <td onclick="nextStep('upload-container-2', 'upload-container-3');selectProduct(this.innerHTML);">OTHERS</td> -->
                                     </tr>
                                 </table>
                             </div>
@@ -383,7 +306,6 @@
                         <br>
                         <div style="text-align: center;position: absolute;bottom: 20px;">
                             <button style="margin: 0;" class="upload-btn prev" onclick="nextStep('upload-container-3', 'upload-container-2');closeCate();">上一步</button>
-                            <!-- <button style="margin: 0;" class="upload-btn next" onclick="nextStep('upload-container-2', 'upload-container-1');">下一步</button> -->
                         </div>
                     </div>
 
@@ -391,7 +313,9 @@
             </div>
 
             <div class="mywear-pics-container" id="mywear-pics-container">
-                <div class="spinner" id="three-pics-spinner" style="margin: 60px auto;position: absolute;left: 50%;transform: translate(-50%, -50%);">
+                <!-- loader spinner -->
+                <div class="lds-fb" id="mywear-lds">
+                    <div></div>
                     <div></div>
                     <div></div>
                 </div>
@@ -402,11 +326,12 @@
 
         </div>
     </div>
-    <div id="end" style="height: 20px;"></div>
+    <div id="mywear-end" style="height: 20px;"></div>
     <div id="footer">Copyright © 2022 SHOPWEAR / Dimitry Wu</div>
 
 
-
+    <script type="text/javascript" src="../static/script/main.js"></script>
+    <script type="text/javascript" src="../static/script/wear.js"></script>
     <script>
         window.onload = () => {
             loggedIn();
@@ -414,122 +339,52 @@
         }
     </script>
 
-    <script>
-        let stickerSrc = "../static/photo/member-icon1.png";
-
-        let p = 0;
-        // 觸發條件後的回呼函式
-        let showMyWear = (entry) => {
-            console.log("p: " + p)
-            if (entry[0].isIntersecting) {
-                console.log("SCROLL showWear OK")
-                memberId = window.location.pathname.split("/")[2];
-                if (p != null) {
-                    src = "/api/mywear?member=" + memberId + "&page=" + p;
-
-                    fetch(src)
-                        .then((response) => {
-                            return response.json();
-                        })
-                        .then((result) => {
-                            p = result["next_page"];
-                            if (result.error) {
-                                console.log("WEAR NO OK")
-                                observer.unobserve(target);
-                            } else {
-                                if (result["member_photo"] !== null) {
-                                    stickerSrc = "https://d1pxx4pixmike8.cloudfront.net/mywear/photo_sticker/" + result["member_photo"];
-                                    document.getElementById("photo-sticker").src = stickerSrc;
-                                }
-
-                                document.getElementById("member-name").innerHTML = result["nickname"] !== null ? result["nickname"] : result["member_name"];
-                                document.getElementById("post-count").innerHTML = result["total_post"] + " 則貼文";
-                                if (result["total_page"] === 0) {
-                                    document.getElementById("three-pics-spinner").style.display = "none";
-                                    observer.unobserve(myWeartarget);
-                                    console.log("unobserved");
-                                    return
-                                }
-                                let photoWrapper = document.createElement("div");
-                                photoWrapper.className = "three-pics";
-                                for (let i in result.data) {
-                                    data = result["data"][i]
-                                    let id = data["id"];
-                                    let photo = data["photo"];
-                                    let member = data["member_id"];
-                                    let caption = data["caption"];
-
-                                    let photoBox = document.createElement("div");
-                                    let aTag = document.createElement("a");
-                                    let img = document.createElement("img");
-
-                                    // photoBox.id = "pic" + photoCount;
-                                    aTag.href = "/wear/" + id;
-                                    img.src = "https://d1pxx4pixmike8.cloudfront.net/mywear/" + memberId + "/" + photo;
-                                    img.onload = () => {
-                                        document.getElementById("three-pics-spinner").style.display = "none";
-                                    }
-                                    aTag.appendChild(img);
-                                    photoBox.appendChild(aTag);
-                                    photoWrapper.appendChild(photoBox);
-                                }
-
-                                document.getElementById("mywear-pics").appendChild(photoWrapper)
-                            }
-                        })
-                } else {
-                    observer.unobserve(myWeartarget);
-                    console.log("unobserved");
-                };
-            }
-        }
-
-
-        // 觸發條件
-        let myWearOptions = {
-            rootMargin: '20px',
-            threshold: 0,
-        };
-        // 建立 IntersectionObserver物件
-        let myWearobserver = new IntersectionObserver(showMyWear, myWearOptions);
-        const myWeartarget = document.getElementById("end");
-        myWearobserver.observe(myWeartarget);
-    </script>
 
     <script>
-        var btn_save = $(".save-profile"),
-            btn_edit = $(".edit-profile"),
-            img_object = $(".img-object"),
-            overlay = $(".media-overlay"),
-            media_input = $("#media-input");
+        let btn_save = document.getElementsByClassName("save-profile")[0];
+        let btn_edit = document.getElementsByClassName("edit-profile")[0];
+        let img_object = document.getElementsByClassName("img-object")[0];
+        let overlay = document.getElementsByClassName("media-overlay")[0];
+        let indicator = document.getElementById("indicator");
+        let media_input = document.getElementById("media-input");
 
-        btn_save.hide(0);
-        overlay.hide(0);
+        btn_save.style.display = "none";
+        overlay.style.display = "none";
 
-        btn_edit.on("click", function() {
-            $(this).hide(0);
-            overlay.fadeIn(300);
-            btn_save.fadeIn(300);
-            $("#indicator").fadeIn(300);
+        btn_edit.addEventListener("click", () => {
+            btn_edit.style.display = "none";
+            overlay.style.display = "block"
+            btn_save.style.display = "block"
+            indicator.style.display = "block"
         });
-        btn_save.on("click", function() {
-            $(this).hide(0);
+
+        btn_save.addEventListener("click", () => {
+            btn_save.style.display = "none";
             submitPhotoSticker();
-            overlay.fadeOut(300);
-            btn_edit.fadeIn(300);
-            $("#indicator").fadeOut(300);
-        });
+            overlay.style.display = "none"
+            btn_edit.style.display = "block"
+            indicator.style.display = "none"
+        })
 
-        media_input.change(function() {
-            $("#indicator").hide(0);
-            if (this.files && this.files[0]) {
+        media_input.addEventListener("change", () => {
+            console.log("changed")
+            indicator.style.display = "none";
+            if (media_input.files && media_input.files[0]) {
                 var reader = new FileReader();
 
-                reader.onload = function(e) {
-                    img_object.attr("src", e.target.result);
+                reader.onload = (e) => {
+                    img_object.src = e.target.result;
+                    img_object.onload = () => {
+                        let canvas = document.getElementById('c-sticker');
+                        let context = canvas.getContext('2d');
+                        canvas.width = 400;
+                        canvas.height = 400;
+                        context.drawImage(img_object, 0, 0, 400, (400 * img_object.height / img_object.width));
+                    }
+                    document.getElementById('c-sticker').style.display = "block";
                 };
 
-                reader.readAsDataURL(this.files[0]);
+                reader.readAsDataURL(media_input.files[0]);
             }
         });
     </script>

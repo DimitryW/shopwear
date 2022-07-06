@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>SHOPWEAR</title>
     <link rel="stylesheet" type="text/css" href="../static/mainstyle.css">
-
 </head>
 
 <body id="body">
+    <div id="wear-single-backdrop"></div>
     <div class="page_container">
         <div class="page-wrapper">
             <div class="topnav-container ">
@@ -18,7 +18,6 @@
                     <a href="/">
                         <img id="shopwear" src="../static/photo/shopwear-2.png" style="height: 40px;position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);">
                     </a>
-                    <!-- <a id="nav-title" href="/">SHOPWEAR</a> -->
                     <button class="nav-item0" id="nav-item0"><a id="nav-item0-a" style="text-decoration: none;" href="https://dimalife.com/wear">穿搭牆</a></button>
                     <button class="nav-item1" id="nav-item1"><a id="nav-item1-a" style="text-decoration: none;" href="https://dimalife.com/cart">購物車</a></button>
                     <div id="cart-item" style="display: none;"></div>
@@ -62,11 +61,17 @@
                         <div class="wear-single">
                             <div id="wear-caresoul">
                                 <div class="carousel" data-carousel>
-                                    <button class="carousel-button prev" data-carousel-button="prev"><img src="../static/photo/btn_leftArrow.png"></button>
-                                    <button class="carousel-button next" data-carousel-button="next"><img src="../static/photo/btn_rightArrow.png"></button>
+                                    <button style="display: none;" class="carousel-button prev" data-carousel-button="prev"><img src="../static/photo/btn_leftArrow.png"></button>
+                                    <button style="display: none;" class="carousel-button next" data-carousel-button="next"><img src="../static/photo/btn_rightArrow.png"></button>
                                     <div class="data-switch-input">
                                     </div>
-                                    <ul class="wear-single-slide" id="slide-list" data-slides>
+                                    <ul id="wear-single-photo">
+                                        <!-- loader spinner -->
+                                        <div class="lds-fb" id="lds-fb">
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                        </div>
 
                                     </ul>
                                 </div>
@@ -81,25 +86,20 @@
                                         <a id="member_nickname" style="display: block;padding: 0 20px;text-decoration: none;color: #2e2e2e;font-weight: bold;height: 50px;line-height: 50px;"></a>
                                     </a>
 
-                                    <img id="delete-dots" src="../static/photo/dots.png" style="display: none; height: 8%;width: 8%;margin-left: auto;margin-right: 10px;cursor: pointer;">
-                                    <!-- <div style="position: absolute;width: 45px;height: 40px;line-height: 40px;background: white;border-bottom-left-radius: 3px;border-bottom-right-radius: 3px;font-weight: bold;color: red;border: 1px solid #d3d3d3;right: 2px;top: 55px;" id="delete-wear">刪除</div> -->
+
+                                    <img id="delete-dots" src="../static/photo/trash.png" style="display: none; height: 8%;width: 8%;margin-left: auto;margin-right: 10px;cursor: pointer;">
                                 </div>
                                 <div style="height: 40px;line-height: 40px;margin: 20px 0 0;font-weight: bold;padding: 0 20px;text-align: left;">搭配單品</div>
                                 <div id="wear-products" style="height: 430px;overflow-y: auto;padding: 0 20px;"></div>
                                 <div id="caption"></div>
 
-                                <!-- <div id="content"></div> -->
                                 <div class="wear-like" style="display: flex;align-items: center;padding: 0 20px;height: 50px;border-top: 1px solid #d6d6d6;">
                                     <div id="like-wrapper" style="position: relative;top: -3px;">
                                     </div>
                                     <div id="like-backdrop" onclick="backdrop();"></div>
                                     <span id="like-count" style="font-weight: bold;font-size: 14px;"></span>
                                 </div>
-
-
                             </div>
-                            <!-- <div>數量</div> -->
-                            <!-- <button id="cart-btn">加入購物車</button> -->
                         </div>
                     </div>
 
@@ -114,35 +114,17 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="footer-container">
-            <div id="footer">SHOPWEAR</div>
-        </div>
-
-        <div id="end"></div> -->
         </div>
         <div id="footer">Copyright © 2022 SHOPWEAR / Dimitry Wu</div>
-        <script type="text/javascript" src="../static/script/script.js"></script>
 
+        <script type="text/javascript" src="../static/script/main.js"></script>
+        <script type="text/javascript" src="../static/script/wear.js"></script>
         <script>
             window.onload = () => {
                 showWearDetail();
                 loggedIn();
                 showCart();
-                // showOtherWears();
             }
-            const backdrop = () => {
-                document.getElementById('ws-login').style.display = "block";
-                setTimeout(function() {
-                    document.getElementById('ws-login').style.display = "none";
-                }, 1500)
-            }
-            document.getElementById("delete-dots").addEventListener("click", () => {
-                document.getElementById("ws-delete").style.display = "block";
-            });
-            document.getElementById("ws-delete-cancl").addEventListener("click", () => {
-                document.getElementById("ws-delete").style.display = "none";
-            });
-            document.getElementById("ws-delete-confm").addEventListener("click", deleteWear);
         </script>
 </body>
 

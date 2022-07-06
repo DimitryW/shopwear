@@ -1,34 +1,27 @@
 from flask import *
-from flask_cors import CORS
 import jwt
-import time
-import requests
 from dotenv import load_dotenv
 import json
 import datetime
+import time
 import os
 import re
 import boto3
+import requests
+import sys
+sys.path.append('../shopwear')
 import config
-
-
 from model.model import Products, Products_Photos, Members, Orders, Wears, Likes
 from google.oauth2 import id_token
 import google.auth.transport.requests
-import requests
 
 load_dotenv()
-jwt_key = os.getenv("jwt_key")
-partner_key = os.getenv("partner_key")
-merchant_id = os.getenv("merchant_id")
-tappay_details = os.getenv("tappay_details")
-x_api_key = os.getenv("x_api_key")
+jwt_key = os.getenv("JWT_KEY")
+partner_key = os.getenv("PARTNER_KEY")
+merchant_id = os.getenv("MERCHANT_ID")
+tappay_details = os.getenv("TAPPAY_DETAILS")
+x_api_key = os.getenv("X_API_KEY")
 
-app = Flask(__name__)
-app.config["JSON_AS_ASCII"] = False
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-app.config['JSON_SORT_KEYS'] = False  
-CORS(app)
 
 s3 = boto3.client(
     "s3",
@@ -36,70 +29,9 @@ s3 = boto3.client(
     aws_secret_access_key=config.aws_secret_access_key
 )
 
+blueprints = Blueprint("usr_bp", __name__, static_folder="../static", template_folder="../templates")
 
-#商品展示首頁
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-#個別商品頁面
-@app.route("/product/<product_id>")
-def product(product_id):
-    return render_template("product.html")
-
-#購物車頁面
-@app.route("/cart")
-def booking():
-    return render_template("cart.html")
-
-#結帳頁面    
-@app.route("/checkout")
-def checkout():
-    return render_template("checkout.html")
-
-#結帳完成頁面
-@app.route("/thankyou")
-def thankyou():
-    order_no = request.args.get("order")
-    return render_template("thankyou.html", order_no=order_no)
-
-#結帳頁面    
-@app.route("/order")
-def orders():
-    return render_template("order.html")
-
-# 登入頁面
-@app.route("/login")
-def login():
-    return render_template("login.html")
-
-#會員頁面
-@app.route("/member")
-def member():
-    return render_template("member.html")
-
-#更改密碼
-@app.route("/password")
-def password():
-    return render_template("password.html")
-
-#個人頁面
-@app.route("/mywear/<member_id>")
-def mywear(member_id):
-    return render_template("mywear.html")
-
-#WEAR頁面
-@app.route("/wear")
-def wear():
-    return render_template("wear.html")
-
-#WEAR單頁
-@app.route("/wear/<wear_id>")
-def wear_single_page(wear_id):
-    return render_template("wear_single.html")
-
-#全部產品資料
-@app.route("/api/products", methods=["GET"])
+@blueprints.route("/products", methods=["GET"])
 def api_product_index():
     try:
         page = request.args.get("page", default=0, type=int)
@@ -124,17 +56,23 @@ def api_product_index():
             }
             res["data"].append(product)
         status=200
+        resp = make_response((res), status)
+        resp.cache_control.max_age = 3600
+        # resp.cache_control.max_age = "no-cache"
+        
     except:
         res = {
         "error":True,
         "message": "內部伺服器錯誤"
         }
         status=500
+        resp = make_response((res), status)
 
-    return jsonify(res), status
+    return resp
+
 
 # 篩選產品子類別
-@app.route("/api/selectproducts", methods=["GET"])
+@blueprints.route("/selectproducts", methods=["GET"])
 def api_select_product():
     try:
         subcategory = request.args.get("subcategory", default="", type=str)
@@ -167,7 +105,7 @@ def api_select_product():
     return jsonify(res), status
 
 # 單一產品詳細資料
-@app.route("/api/product/<product_id>", methods=["GET"])
+@blueprints.route("/product/<product_id>", methods=["GET"])
 def api_product(product_id):
     try:
         data, stock = Products.check_product_details(product_id)
@@ -182,18 +120,21 @@ def api_product(product_id):
         "stock": stock
         }
         status=200
+        resp = make_response((res), status)
+        resp.cache_control.max_age = 3600
     except:
         res = {
         "error":True,
         "message": "內部伺服器錯誤"
         }
         status=500
+        resp = make_response((res), status)
 
-    return jsonify(res), status
+    return resp
 
 
 # Google登入
-@app.route('/api/googleuser', methods=["POST"])
+@blueprints.route('/googleuser', methods=["POST"])
 def api_login():
     data = request.get_json()
     token = data["token"]
@@ -201,7 +142,7 @@ def api_login():
         # Specify the CLIENT_ID of the app that accesses the backend:
         # 如果有時間差，用clock_skew_in_seconds來調整
         id_info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(),\
-             "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=55)
+                "286685632918-hl2ehilfl64emfu0ost6r1let7kse4fd.apps.googleusercontent.com", clock_skew_in_seconds=10)
         if id_info:
             # ID token is valid. 
             # user_id = id_info['sub']
@@ -217,7 +158,7 @@ def api_login():
             "ok":True
             }
             res = make_response((api), 200)
-            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
+            res.set_cookie(key="shopwear_user", value=encoded_jwt, domain=".dimalife.com", expires=time.time()+10800)
         else:
             # Invalid token
             api = {
@@ -237,7 +178,7 @@ def api_login():
     return res
 
 # 會員註冊、登入與登出
-@app.route("/api/user", methods=["GET", "POST", "PATCH", "DELETE"])
+@blueprints.route("/user", methods=["GET", "POST", "PATCH", "DELETE"])
 def user():
     # 會員登入狀態
     if request.method == "GET":
@@ -341,7 +282,7 @@ def user():
                 "ok": True
             }
             res = make_response((signin_api),200)
-            res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
+            res.set_cookie(key="shopwear_user", value=encoded_jwt, domain=".dimalife.com", expires=time.time()+10800)
             
         elif data == 0:
             signin_api = {
@@ -365,33 +306,11 @@ def user():
             "ok": True
         }
         res = make_response((loggedout_api), 200)
-        res.set_cookie("shopwear_user", "", expires=0)
+        res.set_cookie("shopwear_user", "", domain=".dimalife.com", expires=0)
         return res
 
-# 訪客帳號
-@app.route("/api/guest", methods=["PATCH"])
-def guest_siginin():
-    try:
-        request_data = request.get_json()
-        email = request_data["email"]
-        password = request_data["password"]
-        encoded_jwt = jwt.encode({"third_party": False, "email": email}, jwt_key, algorithm="HS256")
-        signin_api = {
-            "ok": True
-        }
-        res = make_response((signin_api),200)
-        res.set_cookie(key="shopwear_user", value=encoded_jwt, expires=time.time()+10800)
-    except:
-        signin_api = {
-                "error": True,
-                "message": "伺服器內部錯誤"
-            }
-        res = make_response((signin_api), 500)
-    
-    return res
-
 #更新會員資料
-@app.route("/api/member", methods=["PATCH"])
+@blueprints.route("/member", methods=["PATCH"])
 def api_member():
     try:
         if "shopwear_user" in request.cookies:
@@ -422,7 +341,7 @@ def api_member():
     return jsonify(res), status
 
 #更新會員密碼
-@app.route("/api/password", methods=["PATCH"])
+@blueprints.route("/password", methods=["PATCH"])
 def api_password():
     try:
         if "shopwear_user" in request.cookies:
@@ -479,7 +398,7 @@ def api_password():
     return jsonify(res), status
 
 #建立訂單與確認付款
-@app.route("/api/orders", methods=["POST"])
+@blueprints.route("/orders", methods=["POST"])
 def receive_order():
     user_token = request.cookies.get("shopwear_user")
     try:
@@ -558,7 +477,7 @@ def receive_order():
             return jsonify(order_response), 500
 
 # 查歷史訂單
-@app.route("/api/orders", methods=["GET"])
+@blueprints.route("/orders", methods=["GET"])
 def check_orders():
     if "shopwear_user" in request.cookies:
         user_token = request.cookies.get("shopwear_user")
@@ -590,7 +509,7 @@ def check_orders():
     return jsonify(res), status
 
 #查詳細訂單資料
-@app.route("/api/order_details/<order_no>", methods=["GET"])
+@blueprints.route("/order_details/<order_no>", methods=["GET"])
 def check_order_details(order_no): 
     try:
         data = Orders.check_order_details(order_no)
@@ -617,7 +536,7 @@ def check_order_details(order_no):
     return jsonify(res), status
 
 # Wear穿搭牆資料
-@app.route("/api/wears", methods=['GET'])
+@blueprints.route("/wears", methods=['GET'])
 def api_wears():
     try:
         page = request.args.get("page", default=0, type=int)
@@ -652,7 +571,7 @@ def api_wears():
     return jsonify(res), status
 
 # MyWear資料
-@app.route("/api/mywear", methods=['GET'])
+@blueprints.route("/mywear", methods=['GET'])
 def api_mywear():
     try:
         page = request.args.get("page", default=0, type=int)
@@ -699,7 +618,7 @@ def api_mywear():
     return jsonify(res), status
 
 # WEAR貼文資料
-@app.route("/api/wear/<wear_id>", methods=['GET'])
+@blueprints.route("/wear/<wear_id>", methods=['GET'])
 def api_wear_detail(wear_id):
     try:
         (data, member_data, product_photos, likes) = Wears.show_wear_detail(wear_id)
@@ -738,7 +657,7 @@ def api_wear_detail(wear_id):
     return jsonify(res), status
 
 # 刪除Wear貼文
-@app.route("/api/wear/<wear_id>", methods=['DELETE'])
+@blueprints.route("/wear/<wear_id>", methods=['DELETE'])
 def delete_wear(wear_id):
     try:
         if "shopwear_user" in request.cookies:
@@ -768,7 +687,7 @@ def delete_wear(wear_id):
 
 
 # mywear上傳貼文
-@app.route("/api/mywear/upload", methods=['POST'])
+@blueprints.route("/mywear/upload", methods=['POST'])
 def upload_mywear():
     try:
         if "shopwear_user" in request.cookies:
@@ -818,7 +737,7 @@ def upload_mywear():
     return jsonify(res), status
 
 # mywear會員上傳大頭貼
-@app.route("/api/mywear/photo_sticker", methods=["POST"])
+@blueprints.route("/mywear/photo_sticker", methods=["POST"])
 def photo_sticker():
     try:
         if "shopwear_user" in request.cookies:
@@ -858,7 +777,7 @@ def photo_sticker():
     return jsonify(res)
 
 # 按讚資料
-@app.route("/api/like", methods=["POST"])
+@blueprints.route("/like", methods=["POST"])
 def update_like():
     try:
         if "shopwear_user" in request.cookies:
@@ -887,11 +806,3 @@ def update_like():
             }
         status=500
     return jsonify(res), status
-
-
-
-
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
-    # app.run(debug=True, port=5000)
